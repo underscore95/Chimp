@@ -1,0 +1,6 @@
+_type: SoundEffectSettings
+Files:
+ - sounds/place.wav
+MaxSimultaneousSounds: 10
+MinPitch: 0.6
+MaxPitch: 1.2

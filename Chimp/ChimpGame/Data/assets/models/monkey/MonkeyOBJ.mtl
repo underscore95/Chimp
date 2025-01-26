@@ -1,0 +1,45 @@
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
+
+newmtl ee
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.900000 0.900000 0.900000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd eyes_u2_v1.png
+
+newmtl matd
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd body_u1_v1.png
+map_Bump NormalMap2.png
+
+newmtl monkey_head
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd head_u1_v1.png
+map_Bump NormalMap.png
+
+newmtl tail2
+Ns 96.078415
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd body_u2_v1.png
+map_Bump NormalMap3.png
