@@ -1,7 +1,0 @@
-_type: SoundEffectSettings
-Files:
- - sounds/bloon1.wav
- - sounds/bloon2.wav
-MaxSimultaneousSounds: 3
-MinPitch: 0.9
-MaxPitch: 1.65

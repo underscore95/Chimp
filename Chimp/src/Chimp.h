@@ -13,8 +13,6 @@
 #include "api/audio/IPlayingAudio.h"
 
 // Utils
-#include "api/files/yaml/YAMLBlockParser.h"
-#include "api/files/yaml/YAMLWriter.h"
 #include "api/utils/FileReader.h"
 #include "api/utils/HashCombine.h"
 #include "api/utils/Maths.h"
