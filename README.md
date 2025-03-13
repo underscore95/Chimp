@@ -1,10 +1,7 @@
 # Chimp
 
-Chimp is a game engine I made for university, comes with an example project which is a clone of Bloons TD Battles (multiplayer 2.5d tower defense)
+Chimp is a game framework originally started as a university project and later continued as a passion project.
 
-Libraries:
+Chimp is a 3D framework (OpenGL) with networking (ENet) capabilities.
 
-GLM (Maths), STB (Image Loading), FLECS (ECS), ENet (Networking), GLFW (Window Management), OpenGL (Graphics), Assimp (Model Loading), ImGUI (UI), libsndfile (Audio Loading), and OpenAL (Audio)
-
-Video:
-https://www.youtube.com/watch?v=NDiz5kLaRjI
+Blabon is a Bloons TD Battles clone developed by me using Chimp v1: https://github.com/underscore95/Blaboon
