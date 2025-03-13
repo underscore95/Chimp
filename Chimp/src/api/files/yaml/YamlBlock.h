@@ -1,5 +1,9 @@
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+#include <string>
+
 namespace Chimp {
 	struct YAMLBlock {
 		std::unordered_map<std::string, bool> Bools;

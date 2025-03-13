@@ -20,8 +20,6 @@ endif()
 # Chimp
 project ("Chimp")
 
-include(FetchContent)
-
 add_subdirectory("ChimpGame")
 
 # Sources
@@ -34,150 +32,65 @@ target_include_directories(Chimp PRIVATE "src/impl/")
 
 target_link_libraries(Chimp PRIVATE ChimpGame)
 
-# libsndfile
-add_compile_definitions(CHIMP_LIBSNDFILE=1)
-set(LIBSNDFILE_BUILD_TYPE "Debug")
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(LIBSNDFILE_BUILD_TYPE "Release")
-endif()
-execute_process(
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/clone_lib.bat libsndfile/libsndfile-src https://github.com/libsndfile/libsndfile.git 1.2.2
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-execute_process(
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libsndfile_build.bat ${LIBSNDFILE_BUILD_TYPE}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libsndfile
-)
-set(LIBSNDFILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/libsndfile")
-set(LIBSNDFILE_LIB "${LIBSNDFILE_DIR}/libsndfile-build/${LIBSNDFILE_BUILD_TYPE}/sndfile.lib")
-target_link_libraries(Chimp PRIVATE ${LIBSNDFILE_LIB})
-target_include_directories(Chimp PRIVATE ${LIBSNDFILE_DIR}/libsndfile-src/include)
-
 # GLM
 add_compile_definitions(CHIMP_GLM=1)
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/clone_lib.bat glm https://github.com/g-truc/glm.git 1.0.1
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(Chimp PRIVATE glm::glm)
+
+# libsndfile
+add_compile_definitions(CHIMP_LIBSNDFILE=1)
+find_package(SndFile CONFIG REQUIRED)
+target_link_libraries(Chimp PRIVATE SndFile::sndfile)
 
 # STB
 add_compile_definitions(CHIMP_STB=1)
-execute_process(
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/clone_lib.bat stb https://github.com/nothings/stb.git 5c205738c191bcb0abc65c4febfa9bd25ff35234
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+find_package(Stb REQUIRED)
+target_include_directories(Chimp PRIVATE ${Stb_INCLUDE_DIR})
 
 # FLECS
 add_compile_definitions(CHIMP_FLECS=1)
-FetchContent_Declare(
-    flecs
-    GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
-    GIT_TAG b3ad03c391a268234c54270ccf3793c5b6ad6312
-)
-FetchContent_MakeAvailable(flecs)
-target_link_libraries(Chimp PRIVATE flecs::flecs_static)
+find_package(flecs CONFIG REQUIRED)
+target_link_libraries(Chimp PRIVATE $<IF:$<TARGET_EXISTS:flecs::flecs>,flecs::flecs,flecs::flecs_static>)
 
 # ENET
-# Ended up having a lot of issues with linking ENET
-# This code basically clones the repo, builds it with cmake from a batch script, then links it
-# there is definitely a better way to do this, but it works
-# you do need cmake and git in your env path though
-# also it uses batch so thats windows only
 add_compile_definitions(CHIMP_ENET=1)
-set(ENET_BUILD_TYPE "Debug")
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(ENET_BUILD_TYPE "Release")
-endif()
-execute_process(
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/clone_lib.bat enet/enet-src https://github.com/lsalzman/enet.git master
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-execute_process(
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/enet_build.bat ${ENET_BUILD_TYPE}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/vendor/enet
-)
-set(ENET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/enet")
-include_directories(${ENET_DIR}/enet-src/include)
-set(ENET_LIB "${ENET_DIR}/enet-build/${ENET_BUILD_TYPE}/enet.lib")
-target_link_libraries(Chimp PRIVATE ${ENET_LIB} winmm)
+find_package(unofficial-enet CONFIG REQUIRED)
+target_link_libraries(Chimp PRIVATE unofficial::enet::enet winmm)
 
 # GLFW
 add_compile_definitions(CHIMP_GLFW=1)
-FetchContent_Declare(
-  glfw
-  GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.4
-)
-FetchContent_MakeAvailable(glfw)
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(Chimp PRIVATE glfw)
 
 # OpenAL
 add_compile_definitions(CHIMP_OPENAL=1)
-FetchContent_Declare(
-  openal
-  GIT_REPOSITORY https://github.com/kcat/openal-soft.git
-  GIT_TAG 1.24.1
-)
-FetchContent_MakeAvailable(openal)
+
+find_package(OpenAL CONFIG REQUIRED)
 target_link_libraries(Chimp PRIVATE OpenAL::OpenAL)
-# Copy OpenAL dll into build directory, since apparantly that is necessary
-set(COPY_DLL_SCRIPT ${CMAKE_BINARY_DIR}/copy_openal_dlls.cmake)
-file(WRITE ${COPY_DLL_SCRIPT} "
-if(EXISTS \"${CMAKE_BINARY_DIR}/_deps/openal-build/OpenAL32.dll\")
-    file(COPY \"${CMAKE_BINARY_DIR}/_deps/openal-build/OpenAL32.dll\" DESTINATION \"${CMAKE_BINARY_DIR}\")
-endif()
-if(EXISTS \"${CMAKE_BINARY_DIR}/_deps/openal-build/OpenAL32d.dll\")
-    file(COPY \"${CMAKE_BINARY_DIR}/_deps/openal-build/OpenAL32d.dll\" DESTINATION \"${CMAKE_BINARY_DIR}\")
-endif()
-")
-add_custom_command(TARGET Chimp POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -P ${COPY_DLL_SCRIPT}
-)
 
 # OpenGL
 add_compile_definitions(CHIMP_OPENGL=1)
 find_package(OpenGL REQUIRED)
 target_link_libraries(Chimp PRIVATE OpenGL::GL)
 # GLEW (OpenGL Extension Wrangler Library)
-FetchContent_Declare(
-  glew
-  GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-  GIT_TAG glew-cmake-2.2.0
-)
-FetchContent_MakeAvailable(glew)
-target_link_libraries(Chimp PRIVATE libglew_static)
+find_package(GLEW REQUIRED)
+target_link_libraries(Chimp PRIVATE GLEW::GLEW)
+
+## Assimp
+add_compile_definitions(CHIMP_ASSIMP=1)
+
+find_package(assimp CONFIG REQUIRED)
+target_link_libraries(Chimp PRIVATE assimp::assimp)
+
+# ImGui
+add_compile_definitions(CHIMP_IMGUI=1)
+
+find_package(imgui CONFIG REQUIRED)
+
+target_link_libraries(Chimp PRIVATE imgui::imgui)
+
+# C++ Version
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Chimp PROPERTY CXX_STANDARD 20)
 endif()
-
-## Assimp
-add_compile_definitions(CHIMP_ASSIMP=1)
-FetchContent_Declare(
-    Assimp
-    GIT_REPOSITORY https://github.com/assimp/assimp.git
-    GIT_TAG v5.4.3 
-)
-FetchContent_MakeAvailable(Assimp)
-target_link_libraries(Chimp PRIVATE assimp)
-
-# ImGui
-add_compile_definitions(CHIMP_IMGUI=1)
-execute_process(
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/clone_lib.bat imgui https://github.com/ocornut/imgui.git master
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-set(IMGUI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui)
-file(GLOB IMGUI_SRC
-    ${IMGUI_SOURCE_DIR}/*.cpp
-    ${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-    ${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
-)
-add_library(imgui STATIC ${IMGUI_SRC})
-target_include_directories(imgui PUBLIC
-    ${IMGUI_SOURCE_DIR}
-    ${IMGUI_SOURCE_DIR}/backends
-)
-find_package(OpenGL REQUIRED)
-target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
-target_link_libraries(Chimp PRIVATE imgui)

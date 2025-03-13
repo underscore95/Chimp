@@ -61,7 +61,7 @@
 
 // STB
 #ifdef CHIMP_STB
-#include <../vendor/stb/stb_image.h>
+#include <stb_image.h>
 #endif
 
 // ASSIMP
