@@ -28,25 +28,6 @@ namespace Chimp {
 			}
 		}
 
-		static Path<Chimp::Vector2f> Deserialise(const YAMLBlock& block, Chimp::Vector2f offsetPoints = {}) {
-			size_t numPoints = block.Blocks.size();
-			std::vector<Chimp::Vector2f> points;
-			for (size_t i = 0; i < numPoints; ++i) {
-				auto iter = block.Blocks.find(std::to_string(i));
-				if (iter == block.Blocks.end()) {
-					assert(false);
-					return Path<Chimp::Vector2f>({});
-				}
-
-				auto& block = iter->second;
-				points.push_back(Chimp::Vector2f{
-					block.Floats.at("x"),
-					block.Floats.at("y")
-					});
-			}
-			return Path<Chimp::Vector2f>(points, offsetPoints);
-		}
-
 		// Get point by index
 		// Make sure index is valid
 		T GetPointByIndex(size_t index) const {

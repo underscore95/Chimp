@@ -35,9 +35,6 @@ namespace Chimp {
 
 		PacketTypeRegistry::RegisterChimpPacketTypes();
 
-		RegisterYAMLSerialisableMathsTypes(m_YAMLSerialiser);
-		m_YAMLSerialiser.RegisterSerialisable<SoundEffectSettings>("SoundEffectSettings", SoundEffectSettings::Deserialise);
-
 		Loggers::Main().Info("Initialized Chimp Engine!");
 	}
 
@@ -79,11 +76,6 @@ namespace Chimp {
 	ImGuiHelper& Engine::GetImGuiHelper()
 	{
 		return m_ImGuiHelper;
-	}
-
-	YAMLSerialiser& Engine::GetYAMLSerialiser()
-	{
-		return m_YAMLSerialiser;
 	}
 
 	Random& Engine::GetRandom()

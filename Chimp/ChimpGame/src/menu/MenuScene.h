@@ -1,12 +1,10 @@
 #pragma once
 
 #include "stdafx.h"
-#include "Settings.h"
-#include "networking/Networking.h"
 
 class MenuScene : public Chimp::Scene {
 public:
-	MenuScene(Chimp::Engine& engine, std::shared_ptr<Chimp::GameShader> shader = nullptr);
+	MenuScene(Chimp::Engine& engine);
 	~MenuScene();
 
 public:
@@ -26,7 +24,4 @@ protected:
 private:
 	Chimp::Engine& m_Engine;
 	std::shared_ptr<Chimp::GameShader> m_GameShader;
-	Chimp::ConnectionInfo m_ConnectionInfo;
-	Chimp::YAMLBlock m_MapList;
-	Settings m_Settings;
 };

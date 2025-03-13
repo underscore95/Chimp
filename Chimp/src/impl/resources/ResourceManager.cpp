@@ -15,8 +15,7 @@ namespace Chimp {
 		m_Models(engine),
 		m_Sprites(engine, m_Textures),
 		m_Images(engine),
-		m_Sounds(engine),
-		m_SoundEffects(engine, m_Sounds)
+		m_Sounds(engine)
 	{
 		InitModelImporter();
 	}
@@ -52,11 +51,6 @@ namespace Chimp {
 		return m_Sounds;
 	}
 
-	SoundEffectResourceContainer& ResourceManager::GetSoundEffects()
-	{
-		return m_SoundEffects;
-	}
-
 	MeshStorage& ResourceManager::GetMeshStorage()
 	{
 		return m_MeshStorage;
@@ -74,7 +68,6 @@ namespace Chimp {
 
 	void ResourceManager::Update() {
 		m_Sounds.Update();
-		m_SoundEffects.Update();
 	}
 
 	void ResourceManager::UnloadUnusedResources()
@@ -85,7 +78,6 @@ namespace Chimp {
 		m_Models.UnloadUnused();
 		m_Images.UnloadUnused();
 		m_Sounds.UnloadUnused();
-		m_SoundEffects.UnloadUnused();
 	}
 
 	void ResourceManager::LoadRequiredResources()
@@ -96,6 +88,5 @@ namespace Chimp {
 		m_Models.LoadDependencies();
 		m_Images.LoadDependencies();
 		m_Sounds.LoadDependencies();
-		m_SoundEffects.LoadDependencies();
 	}
 }

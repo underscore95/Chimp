@@ -14,7 +14,6 @@
 #include "api/threading/ThreadPool.h"
 #include "api/utils/TaskScheduler.h"
 #include "api/utils/ImGuiHelper.h"
-#include "api/files/yaml/YAMLSerialiser.h"
 #include "api/utils/Random.h"
 #include "api/audio/AudioManager.h"
 #include "api/audio/music/MusicPlayer.h"
@@ -37,7 +36,6 @@ namespace Chimp {
 		[[nodiscard]] SceneManager& GetSceneManager();
 		[[nodiscard]] ThreadPool& GetThreadPool();
 		[[nodiscard]] ImGuiHelper& GetImGuiHelper();
-		[[nodiscard]] YAMLSerialiser& GetYAMLSerialiser();
 		[[nodiscard]] Random& GetRandom();
 		[[nodiscard]] AudioManager& GetAudioManager();
 		[[nodiscard]] MusicPlayer& GetMusicPlayer();
@@ -79,7 +77,6 @@ namespace Chimp {
 		std::unique_ptr<SceneManager> m_SceneManager; // initialized in MainLoop
 		ThreadPool m_ThreadPool;
 		ImGuiHelper m_ImGuiHelper;
-		YAMLSerialiser m_YAMLSerialiser;
 		Random m_Random;
 	};
 }
