@@ -16,6 +16,9 @@ target_include_directories(ChimpGame PUBLIC "src/")
 add_compile_definitions(CHIMP_FLECS=1)
 add_compile_definitions(CHIMP_LIBSNDFILE=1)
 target_include_directories(ChimpGame PUBLIC "../src/")
+
+  find_package(flecs CONFIG REQUIRED)
+  find_package(imgui CONFIG REQUIRED)
 target_link_libraries(ChimpGame PRIVATE imgui flecs::flecs_static)
 
 # In debug mode, we'll just use the data folder in the source directory
