@@ -94,3 +94,21 @@ target_link_libraries(Chimp PRIVATE imgui::imgui)
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Chimp PROPERTY CXX_STANDARD 20)
 endif()
+
+# In debug mode, we'll just use the data folder in the source directory
+# in release mode, we'll copy it to the build directory and use that one
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+add_compile_definitions(CHIMP_DATA_FOLDER="ChimpData")
+else()
+add_compile_definitions(CHIMP_DATA_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/ChimpData")
+endif()
+
+# Copy data folder into build directory
+# only copy in release
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/ChimpData)
+add_custom_command(TARGET Chimp POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_CURRENT_SOURCE_DIR}/ChimpData ${CMAKE_BINARY_DIR}/ChimpData
+)
+endif()

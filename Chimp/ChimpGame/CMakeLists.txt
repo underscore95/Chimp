@@ -21,16 +21,16 @@ target_include_directories(ChimpGame PUBLIC "../src/")
   find_package(imgui CONFIG REQUIRED)
 target_link_libraries(ChimpGame PRIVATE imgui flecs::flecs_static)
 
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  set_property(TARGET ChimpGame PROPERTY CXX_STANDARD 20)
+endif()
+
 # In debug mode, we'll just use the data folder in the source directory
 # in release mode, we'll copy it to the build directory and use that one
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
 add_compile_definitions(GAME_DATA_FOLDER="Data")
 else()
 add_compile_definitions(GAME_DATA_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/Data")
-endif()
-
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET ChimpGame PROPERTY CXX_STANDARD 20)
 endif()
 
 # Copy data folder into build directory
