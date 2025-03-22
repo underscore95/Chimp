@@ -3,7 +3,9 @@
 #include "api/time/TimeManager.h"
 #include "api/window/IWindow.h"
 #include "api/graphics/IRenderingManager.h"
+#include "api/graphics/shaders/shaders/LitShader.h"
 #include "api/graphics/images/IImageLoader.h"
+#include "api/graphics/camera/CameraPerspective.h"
 #include "api/resources/ResourceManager.h"
 #include "api/networking/EventHandler.h"
 #include "api/networking/IServer.h"
@@ -26,8 +28,11 @@ namespace Chimp {
 		friend class MainLoop;
 	private:
 		Engine();
+		void PostInit();
 
 	public:
+		~Engine();
+
 		[[nodiscard]] TimeManager& GetTimeManager();
 		[[nodiscard]] IWindow& GetWindow();
 		[[nodiscard]] IRenderingManager& GetRenderingManager();

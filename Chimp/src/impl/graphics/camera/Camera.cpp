@@ -3,7 +3,7 @@
 namespace Chimp {
 	Camera::Camera() :
 		m_Position(0.0f, 0.0f, -1000.0f),
-		m_UpVector(0.0f, -1.0f, 0.0f),
+		m_UpVector(0.0f, 1.0f, 0.0f),
 		m_ForwardVector(0.0f, 0.0f, 1.0f),
 		m_RightVector(1.0f, 0.0f, 0.0f),
 		m_ViewTopLeft(0.0f, 0.0f),
@@ -49,6 +49,14 @@ namespace Chimp {
 	void Camera::SetNormalizedVectors(const std::array<Vector3f, 3> forwardUpRight)
 	{
 		SetNormalizedVectors(forwardUpRight[0], forwardUpRight[1], forwardUpRight[2]);
+	}
+
+	void Camera::Rotate(const Quaternion& quat)
+	{
+		m_UpVector *= quat;
+		m_RightVector *= quat;
+		m_ForwardVector *= quat;
+		UpdateViewMatrix();
 	}
 
 	void Camera::SetViewTopLeft(const Vector2f& topLeft)

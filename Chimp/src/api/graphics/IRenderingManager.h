@@ -11,14 +11,23 @@
 #include "IRenderer.h"
 #include "api/graphics/images/IImageLoader.h"
 #include "api/graphics/textures/ITexture.h"
+#include "api/graphics/shaders/shaders/ChimpShaders.h"
 
 namespace Chimp {
+	class Engine;
 	class IRenderingManager {
+		friend class Engine;
 	protected:
 		IRenderingManager(IImageLoader& imageLoader);
 
 	public:
 		~IRenderingManager() = default;
+
+	private:
+		void InitChimpShaders(Engine& engine);
+		void DestroyChimpShaders() {
+			m_ChimpShaders = nullptr;
+		}
 
 	public:
 		static constexpr TextureSlot CHIMP_TEXTURE_SLOT = 0;
@@ -106,7 +115,11 @@ namespace Chimp {
 			const TextureProperties& properties = {}
 		) const;
 
+		// Get shaders built into Chimp
+		ChimpShaders& GetChimpShaders() const;
+
 	protected:
 		IImageLoader& m_ImageLoader;
+		std::unique_ptr<ChimpShaders> m_ChimpShaders;
 	};
 }

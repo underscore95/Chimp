@@ -23,5 +23,10 @@ protected:
 
 private:
 	Chimp::Engine& m_Engine;
-	std::shared_ptr<Chimp::GameShader> m_GameShader;
+	Chimp::ECS m_ECS;
+	Chimp::Reference<Chimp::Mesh> m_TestMesh;
+	Chimp::FreeCameraController m_Controller;
+	Chimp::CameraPerspective m_Camera;
+
+	Chimp::ModelResourcePath m_ModelPath;
 };

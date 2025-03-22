@@ -34,8 +34,18 @@ namespace Chimp {
 		m_ResourceManager.InitModelImporter();
 
 		PacketTypeRegistry::RegisterChimpPacketTypes();
+	}
+
+	void Engine::PostInit()
+	{
+		m_RenderingManager->InitChimpShaders(*this);
 
 		Loggers::Main().Info("Initialized Chimp Engine!");
+	}
+
+	Engine::~Engine()
+	{
+		m_RenderingManager->DestroyChimpShaders();
 	}
 
 	TimeManager& Engine::GetTimeManager()
@@ -87,12 +97,12 @@ namespace Chimp {
 	{
 		return *m_AudioManager;
 	}
-	
+
 	MusicPlayer& Engine::GetMusicPlayer()
 	{
 		return m_MusicPlayer;
 	}
-	
+
 	std::unique_ptr<TaskScheduler> Engine::CreateTaskScheduler()
 	{
 		return std::make_unique<TaskScheduler>(*this);

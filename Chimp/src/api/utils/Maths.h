@@ -20,6 +20,8 @@ namespace Chimp {
 	struct Vector3i;
 	struct Vector4i;
 
+	typedef glm::quat Quaternion;
+
 	// Compare two floats for equality, supports floating point error
 	[[nodiscard]] bool FloatEqual(float a, float b);
 
@@ -154,6 +156,17 @@ namespace Chimp {
 		}
 		bool operator>=(const Vector3f& other) const {
 			return x >= other.x && y >= other.y && z >= other.z;
+		}
+
+		Vector3f operator*(const glm::quat& q) const {
+			glm::vec3 rotated = q * glm::vec3(x, y, z);
+			return Vector3f(rotated.x, rotated.y, rotated.z);
+		}
+		void operator*=(const glm::quat& q) {
+			glm::vec3 rotated = q * glm::vec3(x, y, z);
+			x = rotated.x;
+			y = rotated.y;
+			z = rotated.z;
 		}
 
 		float x;
@@ -503,8 +516,9 @@ namespace Chimp {
 		}
 	};
 
-	// Register serialisable types to a YAMLSerialiser, does not need to be called for the one stored in engine
-	void RegisterYAMLSerialisableMathsTypes(YAMLSerialiser& serialiser);
+	// Unit conversation
+	[[nodiscard]] float ToRadians(float degrees);
+	[[nodiscard]] float ToDegrees(float radians);
 
 	// Cross product of two vectors
 	[[nodiscard]] Vector3f VectorCrossProduct(const Vector3f& a, const Vector3f& b);
@@ -538,13 +552,20 @@ namespace Chimp {
 	[[nodiscard]] Matrix CreateViewMatrix(Vector3f position, Vector3f target, Vector3f up = Vector3f(0.0f, 1.0f, 0.0f));
 
 	// Create an orthographic projection matrix
-	// left - The coordinate of the left vertical clipping plane. This defines the minimum x-coordinate visible in the orthographic projection.
-	// right - The coordinate of the right vertical clipping plane. This defines the maximum x-coordinate visible in the orthographic projection.
-	// bottom - The coordinate of the bottom horizontal clipping plane. This defines the minimum y-coordinate visible in the orthographic projection.
-	// top - The coordinate of the top horizontal clipping plane. This defines the maximum y-coordinate visible in the orthographic projection.
-	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the orthographic projection.
-	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the orthographic projection.
+	// left - The coordinate of the left vertical clipping plane. This defines the minimum x-coordinate visible in the projection.
+	// right - The coordinate of the right vertical clipping plane. This defines the maximum x-coordinate visible in the projection.
+	// bottom - The coordinate of the bottom horizontal clipping plane. This defines the minimum y-coordinate visible in the projection.
+	// top - The coordinate of the top horizontal clipping plane. This defines the maximum y-coordinate visible in the projection.
+	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the projection.
+	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the projection.
 	[[nodiscard]] Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar);
+
+	// Create an perspective projection matrix
+	// fov - The FOV in degrees
+	// aspectRatio - The aspect ratio (e.g 16/9)
+	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the projection.
+	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the projection.
+	[[nodiscard]] Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar);
 
 	// Represents a transformation
 	struct Transform {
@@ -828,4 +849,7 @@ namespace Chimp {
 	[[nodiscard]] inline float Dot(Vector4f a, Vector4f b) {
 		return glm::dot((glm::vec4)a, (glm::vec4)b);
 	}
+
+	// Quaternions
+	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);
 }

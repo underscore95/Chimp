@@ -46,6 +46,14 @@ namespace Chimp::GL {
 		if (!m_IsValid)
 		{
 			std::cerr << "Failed to link shader program " << m_ProgramID << std::endl;
+			GLint logLength = 0;
+			glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &logLength);
+			if (logLength > 0)
+			{
+				std::vector<char> log(logLength);
+				glGetProgramInfoLog(m_ProgramID, logLength, nullptr, log.data());
+				std::cerr << "Shader Program Link Error: " << log.data() << std::endl;
+			}
 			assert(false);
 			HelperDeleteShaders(shaderIds);
 			m_ProgramID = 0;

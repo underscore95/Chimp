@@ -5,7 +5,7 @@
 #include "api/window/IWindow.h"
 #include "api/graphics/IRenderingManager.h"
 #include "api/graphics/meshes/TexturedQuad.h"
-#include "api/graphics/camera/controllers/DebugCameraController.h"
+#include "api/graphics/camera/controllers/FreeCameraController.h"
 #include "api/ecs/ECS.h"
 #include "api/ecs/Components.h"
 #include "api/networking/PacketTypeRegistry.h"

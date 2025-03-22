@@ -1,17 +1,18 @@
+
 #pragma once
 
 #include "CameraMatrices.h"
 #include "ICamera.h"
 
 namespace Chimp {
-	// Represents an orthographic camera in 3D space
+	// Represents an perspective camera in 3D space
 	// Updating any property of the camera will automatically update the view / projection matrix
-	class Camera : public ICamera {
+	class CameraPerspective : public ICamera {
 	public:
-		// Create a camera positioned at (0, 0, -1000) where +z is forward and -y is up and +x is right
-		// The view will be a 1280x720 viewport positioned at (0, 0) with a clipping plane of 0.0 to 1000.0
-		Camera();
-		~Camera() = default;
+		// Create a camera positioned at (0, 0, 1) where -z is forward and +y is up and +x is right
+		// The FOV will be 50 degrees, aspect ratio 16:9 and clipping plane 0.1 to 1000
+		CameraPerspective();
+		~CameraPerspective() = default;
 
 		void SetPosition(const Vector3f& position) override;
 
@@ -26,16 +27,12 @@ namespace Chimp {
 
 		void Rotate(const Quaternion& quat) override;
 
-		// Set the top left of the view in screen space
-		// This generally will be (0, 0). (unless split screen!!)
-		void SetViewTopLeft(const Vector2f& topLeft);
-
-		// Set the size of the viewport in screen space
-		void SetViewSize(const Vector2f& size);
+		// Set the aspect ratio
+		void SetAspectRatio(float aspectRatio);
 
 		// Set the clipping plane of the view.
 		// This is the minimum and maximum z coordinates where objects will be visible. (zNear, zFar)
-		void SetViewClippingPlane(const Vector2f& clippingPlane) override;
+		void SetViewClippingPlane(const Vector2f& clippingPlane);
 
 		[[nodiscard]] const Vector3f& GetPosition() const override;
 
@@ -46,15 +43,6 @@ namespace Chimp {
 		[[nodiscard]] const Vector3f& GetForwardVector() const override;
 
 		[[nodiscard]] const Vector3f& GetRightVector() const override;
-
-		// Get the top left of the view in screen space
-		[[nodiscard]] const Vector2f& GetViewTopLeft() const;
-
-		// Get the bottom right of the view in screen space
-		[[nodiscard]] const Vector2f& GetViewBottomRight() const;
-
-		// Get the size of the viewport in screen space
-		[[nodiscard]] const Vector2f GetViewSize() const;
 
 		[[nodiscard]] const Vector2f& GetViewClippingPlane() const override;
 
@@ -75,8 +63,8 @@ namespace Chimp {
 		Vector3f m_ForwardVector;
 		Vector3f m_RightVector;
 
-		Vector2f m_ViewTopLeft;
-		Vector2f m_ViewBottomRight;
+	float m_AspectRatio;
+		float m_FOV;
 		Vector2f m_ViewClippingPlane;
 	};
 }

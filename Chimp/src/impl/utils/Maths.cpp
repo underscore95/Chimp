@@ -1,4 +1,5 @@
 #include "api/utils/Maths.h"
+#include "Loggers.h"
 
 namespace Chimp {
 
@@ -108,6 +109,16 @@ namespace Chimp {
 		return abs(a - b) < std::numeric_limits<float>::epsilon();
 	}
 
+	float ToRadians(float degrees)
+	{
+		return glm::radians(degrees);
+	}
+
+	float ToDegrees(float radians)
+	{
+		return glm::degrees(radians);
+	}
+
 	Vector3f VectorCrossProduct(const Vector3f& a, const Vector3f& b)
 	{
 		return glm::cross((glm::vec3)a, (glm::vec3)b);
@@ -185,11 +196,24 @@ namespace Chimp {
 
 	Matrix CreateViewMatrix(Vector3f position, Vector3f target, Vector3f up)
 	{
-		return glm::lookAt((glm::vec3)position, (glm::vec3)target, (glm::vec3)up);
+		return glm::lookAtRH((glm::vec3)position, (glm::vec3)target, (glm::vec3)up);
 	}
 
 	Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
-		return glm::ortho(left, right, bottom, top, zNear, zFar);
+		return glm::orthoRH(left, right, bottom, top, zNear, zFar);
+	}
+
+	Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar)
+	{
+		return glm::perspectiveRH(fov, aspectRatio, zNear, zFar);
+	}
+
+	Quaternion QuatRotation(Vector3f degrees)
+	{
+		return
+			glm::angleAxis(ToRadians(degrees.x), glm::vec3{ 1,0,0 }) *
+			glm::angleAxis(ToRadians(degrees.y), glm::vec3{ 0,1,0 }) *
+			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 0,0,1 });
 	}
 }

@@ -6,6 +6,11 @@ namespace Chimp {
 	{
 	}
 
+	void IRenderingManager::InitChimpShaders(Engine& engine)
+	{
+		m_ChimpShaders = std::unique_ptr<ChimpShaders>(new ChimpShaders(engine));
+	}
+
 	std::unique_ptr<IBuffer> IRenderingManager::CreateBuffer(const size_t size, const size_t numElements, const Usage& usage, const BindTarget target) const
 	{
 		auto buffer = CreateBuffer(usage, target);
@@ -50,6 +55,11 @@ namespace Chimp {
 
 		// Create texture
 		return CreateCustomisedTextureFromImage(CHIMP_TEXTURE_SLOT, thisTextureProperties, std::move(image));
+	}
+
+	ChimpShaders& IRenderingManager::GetChimpShaders() const
+	{
+		return *m_ChimpShaders;
 	}
 
 }

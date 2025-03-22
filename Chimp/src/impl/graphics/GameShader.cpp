@@ -1,5 +1,6 @@
 #include "api/graphics/GameShader.h"
 #include "api/ecs/Components.h"
+#include "api/Engine.h"
 
 namespace Chimp {
 	GameShader::GameShader(Engine& engine,
@@ -13,6 +14,7 @@ namespace Chimp {
 		auto& renderingManager = m_Engine.GetRenderingManager();
 
 		// COMPILE SHADER
+
 		m_Shader = m_Engine.GetResourceManager().GetShaders().ImmediateDepend(m_ShaderFilePaths);
 
 		// CAMERA BUFFER
@@ -48,7 +50,7 @@ namespace Chimp {
 		m_Camera = &m_Engine.GetRenderingManager().GetRenderer().GetDefaultCamera();
 	}
 
-	void GameShader::SetCamera(Camera& camera) {
+	void GameShader::SetCamera(ICamera& camera) {
 		m_Camera = &camera;
 	}
 
@@ -77,46 +79,6 @@ namespace Chimp {
 
 			// Draw the section
 			m_Engine.GetRenderingManager().GetRenderer().Draw(section, *m_Shader);
-		}
-	}
-
-	void GameShader::RenderWorld(ECS& ecs) {
-		struct Renderable
-		{
-			float Z;
-			Chimp::Matrix TransformMatrix;
-			Chimp::Mesh* Mesh;
-		};
-		auto zSorter = [](
-			const Renderable& a,
-			const Renderable& b) {
-				return a.Z > b.Z;
-			};
-		std::vector<Renderable> renderQueue;
-
-		auto view = ecs.GetEntitiesWithComponents<TransformComponent, EntityIdComponent, MeshComponent>();
-		for (auto& [transform, id, mesh] : view)
-		{
-			// if has health, dont render if dead
-			auto health = ecs.GetComponent<HealthComponent>(id.Id);
-			if (health.HasValue() && health->Health <= 0)
-			{
-				continue;
-			}
-
-			Renderable renderable;
-			renderable.TransformMatrix = transform.GetTransformMatrix();
-			assert(mesh.Mesh != nullptr);
-			renderable.Mesh = mesh.Mesh;
-			renderable.Z = transform.GetTranslation().z;
-			renderQueue.push_back(renderable);
-		}
-
-		std::sort(renderQueue.begin(), renderQueue.end(), zSorter);
-
-		for (const auto& renderable : renderQueue)
-		{
-			Render(*renderable.Mesh, renderable.TransformMatrix);
 		}
 	}
 }
