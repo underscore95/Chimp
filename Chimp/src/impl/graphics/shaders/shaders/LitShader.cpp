@@ -34,12 +34,21 @@ namespace Chimp {
 
 		SceneLighting lights;
 		lights.Ambient = { 0.25, 0.25, 0.25 };
-		lights.NumPointLights = 1;
+		lights.NumPointLights = 0;
+
 		lights.PointLights[0] = {
-			{ 0, 0, 0 },
+			{ 0, 0, 0 }, // Position
 			0,
-			{ 1, 1, 1 },
+			{ 1,1,1 }, // Colour
 			0
+		};
+
+		lights.NumDirectionLights = 1;
+		lights.DirectionLights[0] = {
+		{ 0, -1, 0 }, // Direction
+		0,
+		{ 1, 1, 1 }, // Colour
+		0
 		};
 
 		for (auto& light : lights.PointLights) light.Position *= m_Camera->GetCameraMatrices().GetViewMatrix();
