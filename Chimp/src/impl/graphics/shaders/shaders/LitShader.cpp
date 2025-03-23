@@ -45,7 +45,7 @@ namespace Chimp {
 		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &lights, sizeof(SceneLighting));
 	}
 
-	void LitShader::Render(const Mesh& mesh, const Matrix& transform)
+	void LitShader::Render(const Mesh& mesh, const TransformMatrices& transform)
 	{
 		for (auto& section : mesh) {
 			assert(section.ElementArray->GetElementLayout().GetStride() == VertexSize()); // Does mesh vertices match what the shader expects?

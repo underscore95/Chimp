@@ -5,6 +5,7 @@
 #include "api/graphics/shaders/IShaderBuffers.h"
 #include "api/utils/OptionalReference.h"
 #include "api/ecs/ECS.h"
+#include "api/ecs/components/TransformComponent.h"
 
 namespace Chimp {
 	class Engine;
@@ -28,7 +29,7 @@ namespace Chimp {
 		virtual void BeginFrame();
 
 		// Render a mesh
-		virtual void Render(const Mesh& mesh, const Matrix& transform);
+		virtual void Render(const Mesh& mesh, const TransformMatrices& transform);
 
 	protected:
 		OptionalReference<Chimp::IShader> m_Shader;

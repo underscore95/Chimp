@@ -7,6 +7,7 @@ layout (location = 2) in vec2 texCoords;
 layout(std140) uniform Camera {
 	mat4 view;
     mat4 projection;
+	mat4 normalMatrix;
 };
 
 layout (std140) uniform Model {
@@ -25,6 +26,6 @@ void main()
 	gl_Position = projection * view * worldPosition;
 
 	outVert.Position = worldPosition.xyz / worldPosition.w;
-	outVert.Normal = transpose(inverse(mat3(model))) * normal;
+	outVert.Normal = mat3(normalMatrix) * normal;
 	outVert.TexCoords = texCoords;
 }
