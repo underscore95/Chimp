@@ -11,7 +11,7 @@ namespace Chimp {
 		})
 	{
 		std::shared_ptr<Chimp::IBuffer> sceneLightingBuffer = engine.GetRenderingManager().CreateBuffer(
-			sizeof(Chimp::Matrix),
+			sizeof(Chimp::SceneLighting),
 			1,
 			{
 				Chimp::Usage::UpdateFrequency::OCCASIONAL,
@@ -32,8 +32,6 @@ namespace Chimp {
 	{
 		GameShader::BeginFrame();
 
-		//Chimp::Matrix cameraMatrix = m_Camera->GetCameraMatrices().GetProjectionMatrix() * m_Camera->GetCameraMatrices().GetViewMatrix();
-	//	m_Shader->SetShaderBufferSubData(m_CameraBufferId, &cameraMatrix, sizeof(Chimp::Matrix), 0);
 		SceneLighting lights;
 		lights.NumPointLights = 1;
 		lights.PointLights[0] = {

@@ -2,10 +2,10 @@
 
 #include "stdafx.h"
 
-class MenuScene : public Chimp::Scene {
+class EntryScene : public Chimp::Scene {
 public:
-	MenuScene(Chimp::Engine& engine);
-	~MenuScene();
+	EntryScene(Chimp::Engine& engine);
+	~EntryScene();
 
 public:
 

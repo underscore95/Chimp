@@ -7,7 +7,7 @@ endif()
 
 project ("ChimpGame")
 
-add_library (ChimpGame STATIC "src/GameMain.cpp" "src/menu/MenuScene.h" "src/menu/MenuScene.cpp" "src/stdafx.h" "src/Logger.h")
+add_library (ChimpGame STATIC "src/GameMain.cpp" "src/EntryScene.h" "src/EntryScene.cpp" "src/stdafx.h" "src/Logger.h")
 
 # Add src as include dir
 target_include_directories(ChimpGame PUBLIC "src/")

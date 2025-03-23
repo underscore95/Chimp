@@ -19,7 +19,7 @@ namespace Chimp {
 
 		// CAMERA BUFFER
 		std::shared_ptr<Chimp::IBuffer> cameraBuffer = renderingManager.CreateBuffer(
-			sizeof(Chimp::Matrix),
+			sizeof(CameraMatrices),
 			1,
 			{
 				Chimp::Usage::UpdateFrequency::OCCASIONAL,
@@ -58,8 +58,7 @@ namespace Chimp {
 		m_IsFrameBegun = true;
 
 		// Update camera
-		Chimp::Matrix cameraMatrix = m_Camera->GetCameraMatrices().GetProjectionMatrix() * m_Camera->GetCameraMatrices().GetViewMatrix();
-		m_Shader->SetShaderBufferSubData(m_CameraBufferId, &cameraMatrix, sizeof(Chimp::Matrix), 0);
+		m_Shader->SetShaderBufferSubData(m_CameraBufferId, &m_Camera->GetCameraMatrices(), sizeof(CameraMatrices), 0);
 	}
 
 	void GameShader::Render(const Mesh& mesh, const Matrix& transform) {

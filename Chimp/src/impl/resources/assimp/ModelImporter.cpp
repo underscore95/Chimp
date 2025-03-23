@@ -35,13 +35,13 @@ namespace Chimp {
 			if (settings.IncludeTextureCoordinates) {
 				if (!modelMesh->HasTextureCoords(0)) {
 					Loggers::Resources().Error("Mesh section " + std::to_string(meshIndex) + " does not have texture coordinates: " + path);
-					return nullptr;
+					continue;
 				}
 			}
 			if (settings.IncludeNormals) {
 				if (!modelMesh->HasNormals()) {
 					Loggers::Resources().Error("Mesh section " + std::to_string(meshIndex) + " does not have normals: " + path);
-					return nullptr;
+					continue;
 				}
 			}
 
