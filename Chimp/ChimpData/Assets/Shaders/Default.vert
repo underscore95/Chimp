@@ -7,25 +7,25 @@ layout (location = 2) in vec2 texCoords;
 layout(std140) uniform Camera {
 	mat4 view;
     mat4 projection;
-	mat4 normalMatrix;
 };
 
 layout (std140) uniform Model {
 	mat4 model;
+	mat4 normalMatrix;
 };
 
 out OutputVertex {
-	vec3 Position;
+	vec3 ViewPosition;
 	vec3 Normal;
 	vec2 TexCoords;
 } outVert;
 
 void main()
 {
-	vec4 worldPosition = (model * vec4(position.x, position.y, position.z, 1.0f));
-	gl_Position = projection * view * worldPosition;
+	vec4 viewPosition = (view * model * vec4(position.x, position.y, position.z, 1.0f));
+	gl_Position = projection * viewPosition;
 
-	outVert.Position = worldPosition.xyz / worldPosition.w;
+	outVert.ViewPosition = viewPosition.xyz / viewPosition.w;
 	outVert.Normal = mat3(normalMatrix) * normal;
 	outVert.TexCoords = texCoords;
 }

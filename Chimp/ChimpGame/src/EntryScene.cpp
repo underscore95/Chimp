@@ -26,17 +26,14 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	m_Engine.GetWindow().SetSize({ 1280, 720 });
 	m_Engine.GetWindow().SetResizable(true);
 
+	m_Camera.SetPosition(m_Camera.GetPosition() + Vector3f{0, -3, 0});
+
 	auto& renderingManager = m_Engine.GetRenderingManager();
 	renderingManager.GetRenderer().SetClearColor(0.1, 0.1, 0.5);
 	renderingManager.GetChimpShaders().GetLitShader().SetCamera(m_Camera);
 
 	auto ent = m_ECS.CreateEntity();
 	m_ECS.SetComponent(ent, TransformComponent{ {0,-3,-10},{},{1,1,1} });
-	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
-	m_ECS.SetComponent(ent, MeshComponent{ &m_Engine.GetResourceManager().GetModels().Get(m_ModelPath) });
-
-	ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,0,0},{},{.01,.01,.01} });
 	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
 	m_ECS.SetComponent(ent, MeshComponent{ &m_Engine.GetResourceManager().GetModels().Get(m_ModelPath) });
 }
@@ -66,7 +63,7 @@ void EntryScene::OnRender()
 			continue;
 		}
 
-		shader.Render(*mesh.Mesh, transform.GetTransformMatrix());
+		shader.Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera.GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
 	}
 }
 

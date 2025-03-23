@@ -42,6 +42,8 @@ namespace Chimp {
 			0
 		};
 
+		for (auto& light : lights.PointLights) light.Position *= m_Camera->GetCameraMatrices().GetViewMatrix();
+
 		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &lights, sizeof(SceneLighting));
 	}
 

@@ -8,6 +8,13 @@
 #include "api/ecs/components/TransformComponent.h"
 
 namespace Chimp {
+
+	struct TransformMatrices {
+		Matrix TransformMatrix;
+		Matrix NormalMatrix;
+	};
+	static_assert(sizeof(TransformMatrices) % 16 == 0);
+
 	class Engine;
 	class ICamera;
 	class Mesh;
@@ -33,11 +40,11 @@ namespace Chimp {
 
 	protected:
 		OptionalReference<Chimp::IShader> m_Shader;
+		Reference<ICamera> m_Camera;
 
 	private:
 		Engine& m_Engine;
 		ShaderFilePaths m_ShaderFilePaths;
-		Reference<ICamera> m_Camera;
 		ShaderBufferId m_CameraBufferId;
 		ShaderBufferId m_ModelBufferId;
 		bool m_IsFrameBegun = false;

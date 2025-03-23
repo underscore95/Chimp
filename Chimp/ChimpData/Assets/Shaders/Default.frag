@@ -1,7 +1,7 @@
 #version 410 core
 
 in OutputVertex {
-	vec3 Position;
+	vec3 ViewPosition;
 	vec3 Normal;
 	vec2 TexCoords;
 } inVert;
@@ -26,7 +26,7 @@ layout (std140) uniform SceneLighting {
 };
 
 vec3 FragToLight(vec3 lightPos) {
-	return normalize(lightPos - inVert.Position);
+	return normalize(lightPos - inVert.ViewPosition);
 }
 
 vec3 CalculatePointLight(PointLight light) {

@@ -4,11 +4,6 @@
 #include "api/utils/Maths.h"
 
 namespace Chimp {
-	struct TransformMatrices {
-		Matrix TransformMatrix;
-		Matrix NormalMatrix;
-	};
-	static_assert(sizeof(TransformMatrices) % 16 == 0);
 
 	struct TransformComponent {
 		TransformComponent() = default;
@@ -60,17 +55,16 @@ namespace Chimp {
 			UpdateTransform();
 		}
 
-		const TransformMatrices& GetTransformMatrix() const { return m_TransformMatrix; }
+		const Matrix& GetTransformMatrix() const { return m_TransformMatrix; }
 		const Transform& GetTransform() const { return m_Transform; } // Can't be changed since it wouldn't update our matrix
 
 	private:
 		void UpdateTransform() {
-			m_TransformMatrix.TransformMatrix = m_Transform.CreateTransformMatrix();
-			m_TransformMatrix.NormalMatrix = ToNormalMatrix(m_TransformMatrix.TransformMatrix);
+			m_TransformMatrix = m_Transform.CreateTransformMatrix();
 		}
 
 	private:
 		Transform m_Transform;
-		TransformMatrices m_TransformMatrix;
+		Matrix m_TransformMatrix;
 	};
 }
