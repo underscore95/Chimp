@@ -14,6 +14,8 @@ namespace Chimp {
 
 	static const int MAX_POINT_LIGHTS = 1;
 	struct alignas(16) SceneLighting {
+		Vector3f Ambient = { 0,0,0 };
+		float Padding = 0;
 		int NumPointLights = 0;
 		std::array<PointLight, MAX_POINT_LIGHTS> PointLights;
 	};

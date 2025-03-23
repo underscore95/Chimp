@@ -18,8 +18,11 @@ struct PointLight {
 };
 
 layout (std140) uniform SceneLighting {
+	vec3 AmbientLight;
+	float Padding;
 	int NumPointLights;
 	PointLight PointLights[1];
+
 };
 
 vec3 FragToLight(vec3 lightPos) {
@@ -28,7 +31,7 @@ vec3 FragToLight(vec3 lightPos) {
 
 vec3 CalculatePointLight(PointLight light) {
 	vec3 lightDir = FragToLight(light.Position);
-	vec3 diffuse = max(dot(inVert.Normal, -lightDir), 0.0) * light.Color;
+	vec3 diffuse = max(dot(inVert.Normal, lightDir), 0.0) * light.Color;
 
 	return diffuse;
 }
@@ -37,7 +40,7 @@ void main()
 {
     FragColor = texture(u_ActiveTexture, inVert.TexCoords);
     
-	vec3 light = vec3(0.2,0.2,0.2);
+	vec3 light = AmbientLight;
 	for (int i = 0; i < NumPointLights; ++i) {
 		light += CalculatePointLight(PointLights[i]);
 	}

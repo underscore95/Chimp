@@ -33,6 +33,7 @@ namespace Chimp {
 		GameShader::BeginFrame();
 
 		SceneLighting lights;
+		lights.Ambient = { 0.25, 0.25, 0.25 };
 		lights.NumPointLights = 1;
 		lights.PointLights[0] = {
 			{ 0, 0, 0 },
