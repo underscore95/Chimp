@@ -133,6 +133,7 @@ namespace Chimp::GL {
 
 #ifndef NDEBUG
 		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(glDebugOutput, nullptr);
 #endif
 

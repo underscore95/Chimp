@@ -4,6 +4,7 @@
 #include "api/utils/Maths.h"
 
 namespace Chimp {
+
 	struct TransformComponent {
 		TransformComponent() = default;
 		TransformComponent(const Vector3f& translation, const Vector3f& rotation, const Vector3f& scale)
@@ -59,18 +60,11 @@ namespace Chimp {
 
 	private:
 		void UpdateTransform() {
-			// offset for bottom left origin
-			m_TransformMatrix = m_Transform.CreateTransformMatrix(
-				{
-					m_Transform.Scale.x * 0.5f,
-					m_Transform.Scale.y * -0.5f,
-					0.0f
-				}
-			);
+			m_TransformMatrix = m_Transform.CreateTransformMatrix();
 		}
 
 	private:
 		Transform m_Transform;
-		Matrix m_TransformMatrix = CreateIdentityMatrix();
+		Matrix m_TransformMatrix;
 	};
 }

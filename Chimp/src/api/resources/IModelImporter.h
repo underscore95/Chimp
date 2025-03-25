@@ -10,8 +10,8 @@ namespace Chimp {
 	public:
 
 		struct Settings {
-			bool FlipUVs = false;
-			bool IncludeNormals = false;
+			bool FlipUVs = true;
+			bool IncludeNormals = true;
 			bool IncludeTextureCoordinates = true;
 		};
 	protected:

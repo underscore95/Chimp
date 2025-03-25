@@ -11,7 +11,7 @@ namespace Chimp {
 		})
 	{
 		std::shared_ptr<Chimp::IBuffer> sceneLightingBuffer = engine.GetRenderingManager().CreateBuffer(
-			sizeof(Chimp::Matrix),
+			sizeof(Chimp::SceneLighting),
 			1,
 			{
 				Chimp::Usage::UpdateFrequency::OCCASIONAL,
@@ -32,21 +32,31 @@ namespace Chimp {
 	{
 		GameShader::BeginFrame();
 
-		//Chimp::Matrix cameraMatrix = m_Camera->GetCameraMatrices().GetProjectionMatrix() * m_Camera->GetCameraMatrices().GetViewMatrix();
-	//	m_Shader->SetShaderBufferSubData(m_CameraBufferId, &cameraMatrix, sizeof(Chimp::Matrix), 0);
 		SceneLighting lights;
-		lights.NumPointLights = 1;
+		lights.Ambient = { 0.25, 0.25, 0.25 };
+		lights.NumPointLights = 0;
+
 		lights.PointLights[0] = {
-			{ 0, 0, 0 },
+			{ 0, 0, 0 }, // Position
 			0,
-			{ 1, 1, 1 },
+			{ 1,1,1 }, // Colour
 			0
 		};
+
+		lights.NumDirectionLights = 1;
+		lights.DirectionLights[0] = {
+		{ 0, -1, 0 }, // Direction
+		0,
+		{ 1, 1, 1 }, // Colour
+		0
+		};
+
+		for (auto& light : lights.PointLights) light.Position *= m_Camera->GetCameraMatrices().GetViewMatrix();
 
 		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &lights, sizeof(SceneLighting));
 	}
 
-	void LitShader::Render(const Mesh& mesh, const Matrix& transform)
+	void LitShader::Render(const Mesh& mesh, const TransformMatrices& transform)
 	{
 		for (auto& section : mesh) {
 			assert(section.ElementArray->GetElementLayout().GetStride() == VertexSize()); // Does mesh vertices match what the shader expects?

@@ -14,7 +14,7 @@ namespace Chimp {
 		virtual ~LitShader();
 
 		void BeginFrame() override;
-		void Render(const Mesh& mesh, const Matrix& transform) override;
+		void Render(const Mesh& mesh, const TransformMatrices& transform) override;
 
 		static inline int VertexSize() {
 			return 3 * sizeof(float) // position

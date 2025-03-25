@@ -5,8 +5,16 @@
 #include "api/graphics/shaders/IShaderBuffers.h"
 #include "api/utils/OptionalReference.h"
 #include "api/ecs/ECS.h"
+#include "api/ecs/components/TransformComponent.h"
 
 namespace Chimp {
+
+	struct TransformMatrices {
+		Matrix TransformMatrix;
+		Matrix NormalMatrix;
+	};
+	static_assert(sizeof(TransformMatrices) % 16 == 0);
+
 	class Engine;
 	class ICamera;
 	class Mesh;
@@ -28,15 +36,15 @@ namespace Chimp {
 		virtual void BeginFrame();
 
 		// Render a mesh
-		virtual void Render(const Mesh& mesh, const Matrix& transform);
+		virtual void Render(const Mesh& mesh, const TransformMatrices& transform);
 
 	protected:
 		OptionalReference<Chimp::IShader> m_Shader;
+		Reference<ICamera> m_Camera;
 
 	private:
 		Engine& m_Engine;
 		ShaderFilePaths m_ShaderFilePaths;
-		Reference<ICamera> m_Camera;
 		ShaderBufferId m_CameraBufferId;
 		ShaderBufferId m_ModelBufferId;
 		bool m_IsFrameBegun = false;

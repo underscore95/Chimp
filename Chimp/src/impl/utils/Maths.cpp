@@ -216,4 +216,24 @@ namespace Chimp {
 			glm::angleAxis(ToRadians(degrees.y), glm::vec3{ 0,1,0 }) *
 			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 0,0,1 });
 	}
+
+	Matrix3x3 To3x3(const Matrix& m)
+	{
+		return m;
+	}
+
+	Matrix3x3 Inverse(const Matrix3x3& m)
+	{
+		return glm::inverse(m);
+	}
+
+	Matrix3x3 Transpose(const Matrix3x3& m)
+	{
+		return glm::transpose(m);
+	}
+
+	Matrix3x3 ToNormalMatrix(const Matrix m)
+	{
+		return Transpose(Inverse(To3x3(m)));
+	}
 }

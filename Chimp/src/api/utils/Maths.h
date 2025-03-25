@@ -463,6 +463,7 @@ namespace Chimp {
 #pragma endregion
 
 	typedef glm::mat4x4 Matrix;
+	typedef glm::mat3x3 Matrix3x3;
 #pragma endregion
 
 	constexpr float PI = glm::pi<float>();
@@ -852,4 +853,15 @@ namespace Chimp {
 
 	// Quaternions
 	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);
+
+	// Matrices
+	Matrix3x3 To3x3(const Matrix& m);
+
+	Matrix3x3 Inverse(const Matrix3x3& m);
+
+	Matrix3x3 Transpose(const Matrix3x3& m);
+
+	// Convert matrix to a normal matrix (for normal vectors)
+	// Chimp uses world space (so only passing in model matrix) in shaders
+	Matrix3x3 ToNormalMatrix(const Matrix m);
 }

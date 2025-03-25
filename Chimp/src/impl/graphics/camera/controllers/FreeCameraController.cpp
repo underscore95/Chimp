@@ -27,11 +27,11 @@ namespace Chimp {
 			{
 				translation += m_Camera.GetRightVector();
 			}
-			if (m_InputManager.IsKeyDown(Keyboard::Q))
+			if (m_InputManager.IsKeyDown(Keyboard::E))
 			{
 				translation -= m_Camera.GetUpVector();
 			}
-			if (m_InputManager.IsKeyDown(Keyboard::E))
+			if (m_InputManager.IsKeyDown(Keyboard::Q))
 			{
 				translation += m_Camera.GetUpVector();
 			}
