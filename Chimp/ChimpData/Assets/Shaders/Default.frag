@@ -15,6 +15,8 @@ struct PointLight {
 	float Padding;
 	vec3 Color;
 	float Padding2;
+	vec3 Attenuation;
+	float Padding3;
 };
 
 struct DirectionalLight {
@@ -56,18 +58,32 @@ vec3 CalculateDirectionalLight(DirectionalLight light) {
 	return diffuse;
 }
 
+float CalculateAttenuation(vec3 attenuation, float dist) {
+	return 1.0f / (attenuation.x + attenuation.y * dist + attenuation.z * (dist * dist));
+}
+
 void main()
 {
     FragColor = texture(u_ActiveTexture, inVert.TexCoords);
     
 	vec3 light = AmbientLight;
 
+	// Point lights
 	for (int i = 0; i < NumPointLights; ++i) {
-		light += CalculatePointLight(PointLights[i]);
+		// Attenuation
+		float dist = distance(PointLights[i].Position, inVert.ViewPosition);
+		float attenuation = CalculateAttenuation(PointLights[i].Attenuation, dist);
+
+		// Diffuse
+		vec3 diffuse = CalculatePointLight(PointLights[i]) * attenuation;
+		light += diffuse;
 	}
 
+	// Directional lights
 	for (int i = 0; i < NumDirectionalLights; ++i) {
-		light += CalculateDirectionalLight(DirectionalLights[i]);
+		// Diffuse
+		vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
+		light += diffuse;
 	}
 
 	FragColor.rgb *= light;

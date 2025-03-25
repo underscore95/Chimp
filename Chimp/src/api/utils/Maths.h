@@ -107,6 +107,12 @@ namespace Chimp {
 
 		operator glm::vec3() const { return glm::vec3(x, y, z); }
 
+		void operator=(const Vector3f& other) {
+			x = other.x;
+			y = other.y;
+			z = other.z;
+		}
+
 		Vector3f operator*(float scale) const {
 			return Vector3f(x * scale, y * scale, z * scale);
 		}
@@ -169,6 +175,13 @@ namespace Chimp {
 			z = rotated.z;
 		}
 
+		Vector3f operator*(const glm::mat3x3& m) const {
+			return m * glm::vec3(x, y, z);
+		}
+		void operator*=(const glm::mat3x3& m) {
+			(*this) = (*this) * m;
+		}
+
 		float x;
 		float y;
 		float z;
@@ -188,6 +201,13 @@ namespace Chimp {
 		}
 
 		operator glm::vec4() const { return glm::vec4(x, y, z, w); }
+
+		void operator=(const Vector4f& other) {
+			x = other.x;
+			y = other.y;
+			z = other.z;
+			w = other.w;
+		}
 
 		Vector4f operator*(float scale) const {
 			return Vector4f(x * scale, y * scale, z * scale, w * scale);
@@ -242,6 +262,13 @@ namespace Chimp {
 		}
 		bool operator>=(const Vector4f& other) const {
 			return x >= other.x && y >= other.y && z >= other.z && w >= other.w;
+		}
+
+		Vector4f operator*(const glm::mat4x4& m) const {
+			return m * glm::vec4(x, y, z, w);
+		}
+		void operator*=(const glm::mat4x4& m) {
+			(*this) = (*this) * m;
 		}
 
 		float x;
@@ -652,6 +679,20 @@ namespace Chimp {
 		return glm::dot((glm::vec4)a, (glm::vec4)a);
 	}
 
+	// Is normalised
+	inline bool IsNormalised(float a) {
+		return SquaredLength(a) == 1;
+	}
+	inline float IsNormalised(Vector2f a) {
+		return SquaredLength(a) == 1;
+	}
+	inline float IsNormalised(Vector3f a) {
+		return SquaredLength(a) == 1;
+	}
+	inline float IsNormalised(Vector4f a) {
+		return SquaredLength(a) == 1;
+	}
+
 	// Returns minimum components of two values (e.g (2,3) and (1,4) would return (1,3))
 	inline float Min(float a, float b) {
 		return std::min(a, b);
@@ -863,5 +904,7 @@ namespace Chimp {
 
 	// Convert matrix to a normal matrix (for normal vectors)
 	// Chimp uses world space (so only passing in model matrix) in shaders
-	Matrix3x3 ToNormalMatrix(const Matrix m);
+	Matrix3x3 ToNormalMatrix(const Matrix& m);
+
+	Vector3f MatrixTransform(Vector3f v, const Matrix& m);
 }

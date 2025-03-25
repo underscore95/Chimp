@@ -232,8 +232,15 @@ namespace Chimp {
 		return glm::transpose(m);
 	}
 
-	Matrix3x3 ToNormalMatrix(const Matrix m)
+	Matrix3x3 ToNormalMatrix(const Matrix& m)
 	{
 		return Transpose(Inverse(To3x3(m)));
+	}
+
+	Vector3f MatrixTransform(Vector3f v, const Matrix& m)
+	{
+		Vector4f transformed = Vector4f(v, 1) * m;
+		assert(transformed.w != 0.0f);
+		return Vector3f(transformed) / transformed.w;
 	}
 }

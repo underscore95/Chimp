@@ -11,6 +11,8 @@ namespace Chimp {
 		float Padding;
 		Vector3f Color;
 		float Padding2;
+		Vector3f Attenuation;
+		float Padding3;
 	};
 	static_assert(sizeof(PointLight) % 16 == 0);
 
