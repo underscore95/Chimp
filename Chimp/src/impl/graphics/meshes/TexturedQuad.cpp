@@ -7,13 +7,13 @@ namespace Chimp {
 	) {
 		// Vertex buffer
 		RawArray vertexData;
-		vertexData.NumberElements = (3 + 2) * 4;
+		vertexData.NumberElements = (3 + 3 + 2) * 4;
 		vertexData.Size = sizeof(float) * vertexData.NumberElements;
 		vertexData.Data = new float[vertexData.NumberElements] {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-				0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-				0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-				-0.5f, 0.5f, 0.0f, 1.0f, 1.0f
+			-0.5f, -0.5f, 0.0f,        0.0f, 0.0f, 1.0f,     1.0f, 0.0f,
+				0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,     0.0f, 0.0f,
+				0.5f, 0.5f, 0.0f,      0.0f, 0.0f, 1.0f,     0.0f, 1.0f,
+				-0.5f, 0.5f, 0.0f,     0.0f, 0.0f, 1.0f,     1.0f, 1.0f
 			};
 
 		std::shared_ptr<IBuffer> vertexBuffer = renderingManager.CreateBuffer(
@@ -48,6 +48,7 @@ namespace Chimp {
 		std::unique_ptr<IElementArrayLayout> elementLayout = renderingManager.CreateElementArrayLayout(
 			PrimitiveType::TRIANGLES,
 			{
+				{ GraphicsType::FLOAT, 3, false },
 				{ GraphicsType::FLOAT, 3, false },
 				{ GraphicsType::FLOAT, 2, false }
 			}

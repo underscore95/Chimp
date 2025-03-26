@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <array>
+#define GLM_FORCE_RADIANS
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -907,4 +909,9 @@ namespace Chimp {
 	Matrix3x3 ToNormalMatrix(const Matrix& m);
 
 	Vector3f MatrixTransform(Vector3f v, const Matrix& m);
+
+	// Trig
+	inline float Cos(float degrees) {
+		return glm::cos(ToRadians(degrees));
+	}
 }

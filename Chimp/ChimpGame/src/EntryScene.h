@@ -25,8 +25,10 @@ private:
 	Chimp::Engine& m_Engine;
 	Chimp::ECS m_ECS;
 	Chimp::Reference<Chimp::Mesh> m_TestMesh;
+	Chimp::Reference<Chimp::Mesh> m_TestSprite;
 	Chimp::FreeCameraController m_Controller;
 	Chimp::CameraPerspective m_Camera;
 
 	Chimp::ModelResourcePath m_ModelPath;
+	Chimp::TextureResourcePath m_TexPath;
 };

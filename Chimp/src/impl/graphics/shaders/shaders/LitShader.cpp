@@ -34,7 +34,7 @@ namespace Chimp {
 
 		SceneLighting lights;
 		lights.Ambient = { 0.25, 0.25, 0.25 };
-		lights.NumPointLights = 1;
+		lights.NumPointLights = 0;
 
 		lights.PointLights[0] = {
 			{ 0, 0, 0 }, // Position
@@ -53,13 +53,36 @@ namespace Chimp {
 		0
 		};
 
+		lights.NumSpotlightsLights = 1;
+		lights.Spotlights[0] =
+		{
+			{ 0, -1, 0 }, // Direction
+			0,
+			{ 0, 10, 0 }, // Position
+			0,
+			{1,1,1}, // Color
+			0,
+			{1.0f,0.0f,0.0f}, // Attenuation
+			Cos(35), // Cutoff angle
+		};
+
+
+		lights.NumSpotlightsLights = 1;
+
+
 		for (auto& light : lights.PointLights) {
 			light.Position = MatrixTransform(light.Position, m_Camera->GetCameraMatrices().GetViewMatrix());
 		}
 
 		for (auto& light : lights.DirectionLights) {
 			light.Direction *= ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix());
-			assert(IsNormalised(light.Direction));
+			light.Direction = VectorNormalized(light.Direction);
+		}
+
+		for (auto& light : lights.Spotlights) {
+			light.Position = MatrixTransform(light.Position, m_Camera->GetCameraMatrices().GetViewMatrix());
+			light.Direction *= ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix());
+			light.Direction = VectorNormalized(light.Direction);
 		}
 
 		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &lights, sizeof(SceneLighting));
