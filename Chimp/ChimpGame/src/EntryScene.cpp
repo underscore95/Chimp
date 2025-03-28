@@ -84,7 +84,7 @@ void EntryScene::LoadResources()
 {
 	m_Engine.GetResourceManager().GetModels().ImportSettings.IncludeNormals = true;
 	m_ModelPath = m_Engine.GetResourceManager().GetModels().Depend(GAME_DATA_FOLDER + std::string("/Assets/Models/cube.obj"));
-	m_TexPath = m_Engine.GetResourceManager().GetSprites().Depend(GAME_DATA_FOLDER + std::string("/Assets/Models/test.png"));
+	m_TexPath = m_Engine.GetResourceManager().GetSprites().Depend(GAME_DATA_FOLDER + std::string("/Assets/Models/gray.png"));
 }
 
 void EntryScene::UnloadResources()
