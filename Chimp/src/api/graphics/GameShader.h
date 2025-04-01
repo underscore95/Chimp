@@ -6,6 +6,7 @@
 #include "api/utils/OptionalReference.h"
 #include "api/ecs/ECS.h"
 #include "api/ecs/components/TransformComponent.h"
+#include "api/graphics/camera/CameraMatrices.h"
 
 namespace Chimp {
 
@@ -31,6 +32,7 @@ namespace Chimp {
 		// Change the camera
 		void SetDefaultCamera();
 		void SetCamera(ICamera& camera);
+		void SetCameraMatrices(CameraMatrices matrices);
 
 		// Should be called at the beginning of each frame
 		virtual void BeginFrame();
@@ -38,9 +40,18 @@ namespace Chimp {
 		// Render a mesh
 		virtual void Render(const Mesh& mesh, const TransformMatrices& transform);
 
+		IShader& GetRawShader();
+
 	protected:
 		OptionalReference<Chimp::IShader> m_Shader;
+
+		const CameraMatrices& GetCameraMatrices();
+		const CameraMatrices* GetCameraMatricesPtr();
+
+	private:
 		Reference<ICamera> m_Camera;
+		bool m_UsingCameraMatrices;
+		CameraMatrices m_CameraMatrices;
 
 	private:
 		Engine& m_Engine;

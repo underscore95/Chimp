@@ -47,18 +47,25 @@ namespace Chimp {
 	}
 
 	void GameShader::SetDefaultCamera() {
-		m_Camera = &m_Engine.GetRenderingManager().GetRenderer().GetDefaultCamera();
+		SetCamera(m_Engine.GetRenderingManager().GetRenderer().GetDefaultCamera());
 	}
 
 	void GameShader::SetCamera(ICamera& camera) {
 		m_Camera = &camera;
+		m_UsingCameraMatrices = false;
+	}
+
+	void GameShader::SetCameraMatrices(CameraMatrices matrices)
+	{
+		m_CameraMatrices = matrices;
+		m_UsingCameraMatrices = true;
 	}
 
 	void GameShader::BeginFrame() {
 		m_IsFrameBegun = true;
 
 		// Update camera
-		m_Shader->SetShaderBufferSubData(m_CameraBufferId, &m_Camera->GetCameraMatrices(), sizeof(CameraMatrices), 0);
+		m_Shader->SetShaderBufferSubData(m_CameraBufferId, GetCameraMatricesPtr(), sizeof(CameraMatrices), 0);
 	}
 
 	void GameShader::Render(const Mesh& mesh, const TransformMatrices& transform) {
@@ -79,5 +86,19 @@ namespace Chimp {
 			// Draw the section
 			m_Engine.GetRenderingManager().GetRenderer().Draw(section, *m_Shader);
 		}
+	}
+
+	IShader& GameShader::GetRawShader()
+	{
+		return *m_Shader;
+	}
+
+	const CameraMatrices& GameShader::GetCameraMatrices() 
+	{
+		return m_UsingCameraMatrices ? m_CameraMatrices : m_Camera->GetCameraMatrices();
+	}
+	const CameraMatrices* GameShader::GetCameraMatricesPtr()
+	{
+		return &(GetCameraMatrices());
 	}
 }

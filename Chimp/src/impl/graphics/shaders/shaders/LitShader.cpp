@@ -1,25 +1,31 @@
 #include "api/graphics/shaders/shaders/LitShader.h"
 #include "Loggers.h"
 #include "Engine.h"
-#include "api/graphics/shaders/shaders/lighting/Lights.h"
 
 namespace Chimp {
-	LitShader::LitShader(Engine& engine) : GameShader(
-		engine, Chimp::ShaderFilePaths{
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.vert"),
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.frag")
-		})
-	{
-		std::shared_ptr<Chimp::IBuffer> sceneLightingBuffer = engine.GetRenderingManager().CreateBuffer(
-			sizeof(Chimp::SceneLighting),
+	IShaderBuffers::Index CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name) {
+		std::shared_ptr<IBuffer> buffer = engine.GetRenderingManager().CreateBuffer(
+			sizeof(SceneLighting),
 			1,
 			{
-				Chimp::Usage::UpdateFrequency::OCCASIONAL,
-				Chimp::Usage::Access::CPU_WRITE
+				Usage::UpdateFrequency::OCCASIONAL,
+				Usage::Access::CPU_WRITE
 			},
-			Chimp::BindTarget::SHADER_BUFFER
+			BindTarget::SHADER_BUFFER
 		);
-		m_SceneLightingBufferIndex = m_Shader->GetShaderBuffers().AddBuffer({ sceneLightingBuffer, "SceneLighting" });
+		return shader.GetShaderBuffers().AddBuffer({ buffer, name.data()});
+	}
+
+	LitShader::LitShader(Engine& engine) : GameShader(
+		engine, ShaderFilePaths{
+	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.vert"),
+	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.frag")
+		}),
+		m_lighting(),
+		m_lightMatrices()
+	{
+		m_SceneLightingBufferIndex = CreateBuffer(engine,*m_Shader, sizeof(SceneLighting), "SceneLighting");
+		m_LightMatricesBufferIndex = CreateBuffer(engine,*m_Shader, sizeof(LightMatrices), "LightMatrices");
 
 		Loggers::Rendering().Info("Initialised LitShader");
 	}
@@ -32,60 +38,10 @@ namespace Chimp {
 	{
 		GameShader::BeginFrame();
 
-		SceneLighting lights;
-		lights.Ambient = { 0.25, 0.25, 0.25 };
-		lights.NumPointLights = 0;
+		m_lightMatrices.NumSpotlights = m_lighting.NumSpotlights;
 
-		lights.PointLights[0] = {
-			{ 0, 0, 0 }, // Position
-			0,
-			{ 1,1,1 }, // Colour
-			0,
-			{ 1.0f, 0.02f, 0.0f }, // Attenuation
-			0
-		};
-
-		lights.NumDirectionLights = 0;
-		lights.DirectionLights[0] = {
-		{ 0, -1, 0 }, // Direction
-		0,
-		{ 1, 1, 1 }, // Colour
-		0
-		};
-
-		lights.NumSpotlightsLights = 1;
-		lights.Spotlights[0] =
-		{
-			{ 0, -1, 0 }, // Direction
-			0,
-			{ 0, 10, 0 }, // Position
-			0,
-			{1,1,1}, // Color
-			0,
-			{1.0f,0.0f,0.0f}, // Attenuation
-			Cos(35), // Cutoff angle
-		};
-
-
-		lights.NumSpotlightsLights = 1;
-
-
-		for (auto& light : lights.PointLights) {
-			light.Position = MatrixTransform(light.Position, m_Camera->GetCameraMatrices().GetViewMatrix());
-		}
-
-		for (auto& light : lights.DirectionLights) {
-			light.Direction *= ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix());
-			light.Direction = VectorNormalized(light.Direction);
-		}
-
-		for (auto& light : lights.Spotlights) {
-			light.Position = MatrixTransform(light.Position, m_Camera->GetCameraMatrices().GetViewMatrix());
-			light.Direction *= ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix());
-			light.Direction = VectorNormalized(light.Direction);
-		}
-
-		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &lights, sizeof(SceneLighting));
+		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &m_lighting, sizeof(SceneLighting));
+		m_Shader->SetShaderBufferSubData(m_LightMatricesBufferIndex, &m_lightMatrices, sizeof(LightMatrices));
 	}
 
 	void LitShader::Render(const Mesh& mesh, const TransformMatrices& transform)
@@ -95,5 +51,10 @@ namespace Chimp {
 		}
 
 		GameShader::Render(mesh, transform);
+	}
+
+	void LitShader::SetSpotlightMatrix(int index, Matrix mat)
+	{
+		m_lightMatrices.Spotlights[index] = mat;
 	}
 }

@@ -4,11 +4,13 @@ in OutputVertex {
 	vec3 ViewPosition;
 	vec3 Normal;
 	vec2 TexCoords;
+	vec4 SpotlightPosition[1];
 } inVert;
 
 out vec4 FragColor;
 
 uniform sampler2D u_ActiveTexture;
+uniform sampler2D u_ShadowMap;
 
 struct PointLight {
 	vec3 Position;
@@ -30,19 +32,19 @@ struct DirectionalLight {
 };
 
 struct Spotlight {
-		vec3 Direction;
-		float Padding;
+	vec3 Direction;
+	float Padding;
 
-		vec3 Position;
-		float Padding2;
+	vec3 Position;
+	float Padding2;
 
-		vec3 Color;
-		float Padding4;
+	vec3 Color;
+	float Padding4;
 
-		vec3 Attenuation;
+	vec3 Attenuation;
 		
-		float CutoffAngle; // Is Cos(Angle)
-	};
+	float CutoffAngle; // Is Cos(Angle)
+};
 
 layout (std140) uniform SceneLighting {
 	vec3 AmbientLight;
@@ -53,7 +55,7 @@ layout (std140) uniform SceneLighting {
 	int NumPointLights;
 	int NumDirectionalLights;
 	int NumSpotlights;
-	float Padding2;
+	float IsDepthPass;
 };
 
 vec3 FragToLight(vec3 lightPos) {
@@ -92,8 +94,26 @@ float CalculateAttenuation(vec3 attenuation, float dist) {
 	return 1.0f / (attenuation.x + attenuation.y * dist + attenuation.z * (dist * dist));
 }
 
+bool IsInShadow(vec4 lightSpacePos) {
+	// Get UV coordinates in the shadow map
+	vec3 uvz = lightSpacePos.xyz / lightSpacePos.w;
+	uvz *= 0.5f;
+	uvz += vec3(0.5f, 0.5f, 0.5f);
+
+	// Is in map?
+	if (uvz.x < 0 || uvz.y < 0 || uvz.x > 1 || uvz.y > 1) return false;
+
+	// Is in shadow?
+	float depth = texture(u_ShadowMap, uvz.xy).x;
+	return depth + 0.0025 >= uvz.z;
+}
+
 void main()
 {
+	if (IsDepthPass == 1) {
+		return;
+	}
+
     FragColor = texture(u_ActiveTexture, inVert.TexCoords);
     
 	vec3 light = AmbientLight;
@@ -111,13 +131,15 @@ void main()
 
 		// Spotlights
 	for (int i = 0; i < NumSpotlights; ++i) {
-		// Attenuation
-		float dist = distance(Spotlights[i].Position, inVert.ViewPosition);
-		float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
+		if (!IsInShadow(inVert.SpotlightPosition[i])) {
+			// Attenuation
+			float dist = distance(Spotlights[i].Position, inVert.ViewPosition);
+			float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
 
-		// Diffuse
-		vec3 diffuse = CalculateSpotlight(Spotlights[i]) * attenuation;
-		light += diffuse;
+			// Diffuse
+			vec3 diffuse = CalculateSpotlight(Spotlights[i]) * attenuation;
+			light += diffuse;
+		}
 	}
 
 	// Directional lights

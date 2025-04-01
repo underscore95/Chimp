@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/Maths.h"
+#include "api/utils/Maths.h"
 
 namespace Chimp {
 
@@ -26,14 +26,14 @@ namespace Chimp {
 
 		Vector3f Color;
 		float Padding2;
-	};	
+	};
 	static_assert(sizeof(DirectionalLight) % 16 == 0);
 
 	// SPOTLIGHT
 	static const int MAX_SPOTLIGHTS = 1;
 	struct alignas(16) Spotlight {
 		Vector3f Direction;
-		float Padding;
+		float ShadowRangeCPU = 50;
 
 		Vector3f Position;
 		float Padding2;
@@ -43,8 +43,33 @@ namespace Chimp {
 
 		Vector3f Attenuation;
 		float CutoffAngle; // Should be Cos(angle)
-	};	
+
+		CameraMatrices CalculateMatrices(float fovDegrees = 90, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
+			CameraMatrices matrices;
+			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(fovDegrees, aspectRatio, 0.1f, ShadowRangeCPU));
+			assert(IsNormalised(Direction));
+
+			// Fix forward and up vectors being collinear which means we can't make a right vector
+			if (IsCollinear(up, Direction)) {
+				// TODO handle this better?
+				if (up.x == 0) up.x += 0.001f;
+				else up.y += 0.001f;
+				up = VectorNormalized(up);
+			}
+
+			matrices.SetViewMatrix(CreateViewMatrix(Position, Position + Direction, up));
+			return matrices;
+		}
+	};
 	static_assert(sizeof(Spotlight) % 16 == 0);
+
+	// LIGHT MATRICES
+	struct alignas(16) LightMatrices {
+		int NumSpotlights;
+		Vector3f Padding;
+		std::array<Matrix, MAX_SPOTLIGHTS> Spotlights;
+	};
+	static_assert(sizeof(LightMatrices) % 16 == 0);
 
 	// LIGHTING
 	struct alignas(16) SceneLighting {
@@ -55,8 +80,8 @@ namespace Chimp {
 		std::array<Spotlight, MAX_SPOTLIGHTS> Spotlights;
 		int NumPointLights = 0;
 		int NumDirectionLights = 0;
-		int NumSpotlightsLights = 0;
-		float Padding2 = 0;
+		int NumSpotlights = 0;
+		int IsDepthPass = 0;
 	};
 	static_assert(sizeof(SceneLighting) % 16 == 0);
 

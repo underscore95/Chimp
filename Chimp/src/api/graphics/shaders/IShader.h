@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "IShaderBuffers.h"
 #include "api/utils/RawArray.h"
+#include "api/graphics/textures/TextureSlot.h"
 
 namespace Chimp {
 	class ITexture;
@@ -54,6 +55,7 @@ namespace Chimp {
 		// This function will bind both the shader and the texture.
 		// name - the name of the sampler uniform in the shader
 		// texture - the texture to send
-		virtual void SetTextureSampler(const std::string& name, const ITexture& texture) const = 0;
+		virtual void SetTextureSampler(const std::string& name, TextureSlot slot) const = 0;
+		void SetTextureSampler(const std::string& name, const ITexture& texture) const;
 	};
 }

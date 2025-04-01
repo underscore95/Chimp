@@ -14,10 +14,17 @@ layout (std140) uniform Model {
 	mat4 normalMatrix;
 };
 
+layout (std140) uniform LightMatrices {
+	int numSpotlights;
+	vec3 padding;
+	mat4 spotlightMatrices[1];
+};
+
 out OutputVertex {
 	vec3 ViewPosition;
 	vec3 Normal;
 	vec2 TexCoords;
+	vec4 SpotlightPosition[1];
 } outVert;
 
 void main()
@@ -28,4 +35,8 @@ void main()
 	outVert.ViewPosition = viewPosition.xyz / viewPosition.w;
 	outVert.Normal = mat3(normalMatrix) * normal;
 	outVert.TexCoords = texCoords;
+
+	for (int i = 0; i < numSpotlights; ++i) {
+		outVert.SpotlightPosition[i] = spotlightMatrices[i] * vec4(outVert.ViewPosition.x, outVert.ViewPosition.y, outVert.ViewPosition.z, 1.0f);
+	}
 }

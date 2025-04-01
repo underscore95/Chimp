@@ -5,6 +5,7 @@
 #include "shaders/Shader.h"
 #include "textures/Texture.h"
 #include "Loggers.h"
+#include "shadows/ShadowMap.h"
 
 // https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/1.debugging/debugging.cpp
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -82,6 +83,11 @@ namespace Chimp::GL {
 		return std::make_unique<GL::Buffer>(usage, target);
 	}
 
+	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height) const
+	{
+		return std::unique_ptr<IShadowMap>(((IShadowMap*) new ShadowMap(width, height)));
+	}
+
 	std::unique_ptr<IElementArrayLayout> RenderingManager::CreateElementArrayLayout(
 		const PrimitiveType primitivesType,
 		const std::vector<ElementComponentLayout>& layouts) const
@@ -114,6 +120,26 @@ namespace Chimp::GL {
 	std::unique_ptr<ITexture> RenderingManager::CreateTexture(const TextureSlot slot, const TextureProperties& properties, const void* initialData) const
 	{
 		return std::make_unique<GL::Texture>(slot, properties, initialData);
+	}
+
+	void RenderingManager::ClearDepthBuffer() const
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	void RenderingManager::ClearColorBuffer() const
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	void RenderingManager::SetFrameBuffer(int id) const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
+	}
+
+	void RenderingManager::SetViewport(Vector2i position, Vector2f size) const
+	{
+		glViewport(position.x, position.y, size.x, size.y);
 	}
 
 	void RenderingManager::InitOpenGL()

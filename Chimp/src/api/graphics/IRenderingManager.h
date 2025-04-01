@@ -12,6 +12,7 @@
 #include "api/graphics/images/IImageLoader.h"
 #include "api/graphics/textures/ITexture.h"
 #include "api/graphics/shaders/shaders/ChimpShaders.h"
+#include "api/graphics/shadows/IShadowMap.h"
 
 namespace Chimp {
 	class Engine;
@@ -52,6 +53,14 @@ namespace Chimp {
 		[[nodiscard]] virtual std::unique_ptr<IBuffer> CreateBuffer(
 			const Usage& usage,
 			const BindTarget target
+		) const = 0;
+
+		// Create a shadow map
+		// width - The width in pixels
+		// height - The height in pixels
+		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateShadowMap(
+			unsigned int width,
+			unsigned int height
 		) const = 0;
 
 		// Create an element array layout which defines how the data in an ElementArray is structured
@@ -114,6 +123,18 @@ namespace Chimp {
 			const std::string& filePath,
 			const TextureProperties& properties = {}
 		) const;
+
+		// Clear the depth buffer
+		virtual void ClearDepthBuffer() const = 0;
+
+		// Clear the depth buffer
+		virtual void ClearColorBuffer() const = 0;
+
+		// Set frame buffer
+		virtual void SetFrameBuffer(int id = 0) const = 0;
+
+		// Set view port
+		virtual void SetViewport(Vector2i position, Vector2f size) const = 0;
 
 		// Get shaders built into Chimp
 		ChimpShaders& GetChimpShaders() const;

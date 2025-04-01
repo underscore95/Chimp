@@ -894,6 +894,13 @@ namespace Chimp {
 		return glm::dot((glm::vec4)a, (glm::vec4)b);
 	}
 
+	// Are two vectors collinear?
+	// Returns true if a and b are parallel directions
+	[[nodiscard]] inline bool IsCollinear(Vector3f a, Vector3f b) {
+		float dot = Dot(a, b);
+		return FloatEqual(dot * dot, SquaredLength(a) * SquaredLength(b));
+	}
+
 	// Quaternions
 	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);
 

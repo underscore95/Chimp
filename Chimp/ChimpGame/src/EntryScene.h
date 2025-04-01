@@ -22,6 +22,9 @@ protected:
 	void UnloadResources() override;
 
 private:
+	void ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights);
+
+private:
 	Chimp::Engine& m_Engine;
 	Chimp::ECS m_ECS;
 	Chimp::Reference<Chimp::Mesh> m_TestMesh;
@@ -31,4 +34,5 @@ private:
 
 	Chimp::ModelResourcePath m_ModelPath;
 	Chimp::TextureResourcePath m_TexPath;
+	std::unique_ptr<Chimp::IShadowMap> m_ShadowMap;
 };
