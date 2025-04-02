@@ -73,21 +73,19 @@ void EntryScene::OnRender()
 		assert(lights.Spotlights.size() == 1);
 
 		// Reset depth buffer
-		m_Engine.GetRenderingManager().ClearDepthBuffer();
-
-		// Set texture
 		m_ShadowMap->BindForWriting();
+		m_Engine.GetRenderingManager().ClearDepthBuffer();
 
 		// Update shader
 		auto matrices = spotlight.CalculateMatrices(45, m_ShadowMap->GetAspectRatio());
-		shader.SetSpotlightMatrix(i, matrices.GetProjectionMatrix() * matrices.GetViewMatrix());
+		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
+		shader.SetSpotlightMatrix(i, lightMatrix);
 		shader.SetCameraMatrices(matrices);
 		shader.BeginFrame();
 
 		// Draw
 		for (auto& [transform, id, mesh] : view)
 		{
-			//transform.SetRotation(transform.GetRotation() +(Vector3f{0.0f, 1.0f, 0.0f} * 0.01f));
 			// if has health, dont render if dead
 			auto health = m_ECS.GetComponent<HealthComponent>(id.Id);
 			if (health.HasValue() && health->Health <= 0)
@@ -104,11 +102,11 @@ void EntryScene::OnRender()
 
 	m_Engine.GetRenderingManager().SetFrameBuffer();
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
+	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 	m_Engine.GetRenderingManager().ClearColorBuffer();
 
 	lights.IsDepthPass = false;
-	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 	shader.SetCamera(m_Camera);
 
 	shader.BeginFrame();

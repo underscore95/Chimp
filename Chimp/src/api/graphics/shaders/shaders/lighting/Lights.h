@@ -46,7 +46,7 @@ namespace Chimp {
 
 		CameraMatrices CalculateMatrices(float fovDegrees = 90, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
-			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(fovDegrees, aspectRatio, 0.1f, ShadowRangeCPU));
+			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(fovDegrees, aspectRatio, 0,1000));
 			assert(IsNormalised(Direction));
 
 			// Fix forward and up vectors being collinear which means we can't make a right vector
@@ -65,9 +65,11 @@ namespace Chimp {
 
 	// LIGHT MATRICES
 	struct alignas(16) LightMatrices {
-		int NumSpotlights;
-		Vector3f Padding;
 		std::array<Matrix, MAX_SPOTLIGHTS> Spotlights;
+		int NumSpotlights;
+		float Padding1;
+		float Padding2;
+		float Padding3;
 	};
 	static_assert(sizeof(LightMatrices) % 16 == 0);
 

@@ -15,9 +15,11 @@ layout (std140) uniform Model {
 };
 
 layout (std140) uniform LightMatrices {
-	int numSpotlights;
-	vec3 padding;
 	mat4 spotlightMatrices[1];
+	int numSpotlights;
+	float padding1;
+	float padding2;
+	float padding3;
 };
 
 out OutputVertex {

@@ -15,7 +15,7 @@ namespace Chimp {
 
 		// Setup depth buffer
 		glBindTexture(GL_TEXTURE_2D, m_texId);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 		GLint filterType = GL_NEAREST; // hard shadows
 
@@ -49,6 +49,7 @@ namespace Chimp {
 
 	void ShadowMap::BindForReading(TextureSlot slot, const IShader& shader) const
 	{
+		assert(slot != 0);
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, m_texId);
 
