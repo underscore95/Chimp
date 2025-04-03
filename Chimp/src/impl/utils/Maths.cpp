@@ -201,20 +201,29 @@ namespace Chimp {
 
 	Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
+		assert(false);// this won't work probably because we added reversed z
 		return glm::orthoRH(left, right, bottom, top, zNear, zFar);
 	}
 
-	Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar)
+	Matrix CreateReversedPerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear)
 	{
-		return glm::perspectiveRH(fov, aspectRatio, zNear, zFar);
+		assert(zNear != 0);
+		// https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
+		//return glm::perspectiveRH(fov, aspectRatio, zNear, zFar);
+		float f = 1.0f / tan(ToRadians(fov) / 2.0f);
+		return glm::mat4(
+			f / aspectRatio, 0.0f, 0.0f, 0.0f,
+			0.0f, f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, -1.0f,
+			0.0f, 0.0f, zNear, 0.0f);
 	}
 
 	Quaternion QuatRotation(Vector3f degrees)
 	{
 		return
-			glm::angleAxis(ToRadians(degrees.x), glm::vec3{ 1,0,0 }) *
+			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 1,0,0 }) *
 			glm::angleAxis(ToRadians(degrees.y), glm::vec3{ 0,1,0 }) *
-			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 0,0,1 });
+			glm::angleAxis(ToRadians(degrees.x), glm::vec3{ 0,0,1 });
 	}
 
 	Matrix3x3 To3x3(const Matrix& m)

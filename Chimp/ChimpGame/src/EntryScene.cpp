@@ -73,6 +73,7 @@ void EntryScene::OnRender()
 		assert(lights.Spotlights.size() == 1);
 
 		// Reset depth buffer
+	//	m_Engine.GetRenderingManager().ClearDepthBuffer();
 		m_ShadowMap->BindForWriting();
 		m_Engine.GetRenderingManager().ClearDepthBuffer();
 

@@ -3,7 +3,7 @@
 namespace Chimp {
 	CameraPerspective::CameraPerspective() :
 		m_Position(0.0f, 0.0f, 1.0f),
-		m_UpVector(0.0f, -1.0f, 0.0f),
+		m_UpVector(0.0f, 1.0f, 0.0f),
 		m_ForwardVector(0.0f, 0.0f, -1.0f),
 		m_RightVector(1.0f, 0.0f, 0.0f),
 		m_AspectRatio(16.0f / 9.0f),
@@ -56,6 +56,7 @@ namespace Chimp {
 		m_UpVector *= quat;
 		m_RightVector *= quat;
 		m_ForwardVector *= quat;
+		
 		UpdateViewMatrix();
 	}
 
@@ -114,11 +115,10 @@ namespace Chimp {
 
 	void CameraPerspective::UpdateProjectionMatrix()
 	{
-		m_CameraMatrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(
+		m_CameraMatrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(
 			m_FOV,
 			m_AspectRatio,
-			m_ViewClippingPlane.x,
-			m_ViewClippingPlane.y
+			m_ViewClippingPlane.x
 		));
 	}
 }

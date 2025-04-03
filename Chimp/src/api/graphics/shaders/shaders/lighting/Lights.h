@@ -33,7 +33,7 @@ namespace Chimp {
 	static const int MAX_SPOTLIGHTS = 1;
 	struct alignas(16) Spotlight {
 		Vector3f Direction;
-		float ShadowRangeCPU = 50;
+		float Padding1;
 
 		Vector3f Position;
 		float Padding2;
@@ -46,7 +46,7 @@ namespace Chimp {
 
 		CameraMatrices CalculateMatrices(float fovDegrees = 90, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
-			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(fovDegrees, aspectRatio, 0,1000));
+			matrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(fovDegrees, aspectRatio, 5.0f));
 			assert(IsNormalised(Direction));
 
 			// Fix forward and up vectors being collinear which means we can't make a right vector

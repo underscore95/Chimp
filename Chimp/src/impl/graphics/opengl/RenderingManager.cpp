@@ -166,8 +166,12 @@ namespace Chimp::GL {
 
 		// Depth testing
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
+		glDepthFunc(GL_GREATER);
 		glDepthMask(GL_TRUE);
+		glClearDepth(0.0f);
+
+		// Clipping
+		glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 
 		// Blending
 		glEnable(GL_BLEND);

@@ -46,10 +46,10 @@ namespace Chimp {
 	Vector3f rotation;
 	{
 		if (m_InputManager.IsKeyDown(Keyboard::I)) {
-			rotation.x++;
+			rotation.x--;
 		}
 		if (m_InputManager.IsKeyDown(Keyboard::K)) {
-			rotation.x--;
+			rotation.x++;
 		}
 		if (m_InputManager.IsKeyDown(Keyboard::L)) {
 			rotation.y--;
