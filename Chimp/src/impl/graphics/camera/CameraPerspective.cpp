@@ -115,10 +115,11 @@ namespace Chimp {
 
 	void CameraPerspective::UpdateProjectionMatrix()
 	{
-		m_CameraMatrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(
+		m_CameraMatrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(
 			m_FOV,
 			m_AspectRatio,
-			m_ViewClippingPlane.x
+			m_ViewClippingPlane.x,
+			m_ViewClippingPlane.y
 		));
 	}
 }

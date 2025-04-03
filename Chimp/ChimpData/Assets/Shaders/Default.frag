@@ -104,7 +104,7 @@ bool IsInShadow(vec4 lightSpacePos) {
 	if (uvz.x < 0 || uvz.y < 0 || uvz.x > 1 || uvz.y > 1) return true;
 
 	// Is in shadow?
-	float depth = 1 - texture(u_ShadowMap, uvz.xy).x; // 1 - due to reversed z
+	float depth =  texture(u_ShadowMap, uvz.xy).x;
 	return depth + 0.0025 < uvz.z;
 }
 

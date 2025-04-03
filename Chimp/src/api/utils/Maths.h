@@ -590,12 +590,13 @@ namespace Chimp {
 	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the projection.
 	[[nodiscard]] Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar);
 
-	// Create a reversed perspective projection matrix with an infinite far plane
+	// Create a perspective projection matrix
 	// Reversed projection matrix required for https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
 	// fov - The FOV in degrees
 	// aspectRatio - The aspect ratio (e.g 16/9)
-	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the projection.
-	[[nodiscard]] Matrix CreateReversedPerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear);
+	// zNear - The Z value of the near clipping plane. This defines the minimum distance visible in the projection.
+	// zNear - The Z value of the far clipping plane. This defines the maximum distance visible in the projection.
+	[[nodiscard]] Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar);
 
 	// Represents a transformation
 	struct Transform {

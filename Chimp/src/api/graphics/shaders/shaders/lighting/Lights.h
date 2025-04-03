@@ -33,21 +33,21 @@ namespace Chimp {
 	static const int MAX_SPOTLIGHTS = 1;
 	struct alignas(16) Spotlight {
 		Vector3f Direction;
-		float Padding1;
+		float Padding;
 
 		Vector3f Position;
 		float Padding2;
 
 		Vector3f Color;
-		float Padding4;
+		float Padding43;
 
 		Vector3f Attenuation;
 		float CutoffAngle; // Should be Cos(angle)
 
-		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
+		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
 			assert(FloatEqual(Cos(cutoffAngleDegrees), CutoffAngle));
-			matrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(cutoffAngleDegrees * 2, aspectRatio, 5.0f));
+			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(cutoffAngleDegrees * 2 + 1, aspectRatio, zNear, zFar));
 			assert(IsNormalised(Direction));
 
 			// Fix forward and up vectors being collinear which means we can't make a right vector
