@@ -28,7 +28,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	m_Engine.GetWindow().SetSize({ 1280, 720 });
 	m_Engine.GetWindow().SetResizable(true);
 
-	m_Camera.SetPosition(Vector3f{ 20, 20, 20 });
+	m_Camera.SetPosition(Vector3f{ 10, 6, 10 });
 	m_Camera.SetForwardVector(m_Camera.GetPosition() * -1.0f); // Look at 0 0 0
 
 	auto& renderingManager = m_Engine.GetRenderingManager();
@@ -73,12 +73,11 @@ void EntryScene::OnRender()
 		assert(lights.Spotlights.size() == 1);
 
 		// Reset depth buffer
-	//	m_Engine.GetRenderingManager().ClearDepthBuffer();
 		m_ShadowMap->BindForWriting();
 		m_Engine.GetRenderingManager().ClearDepthBuffer();
 
 		// Update shader
-		auto matrices = spotlight.CalculateMatrices(45, m_ShadowMap->GetAspectRatio());
+		auto matrices = spotlight.CalculateMatrices(35, m_ShadowMap->GetAspectRatio());
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetSpotlightMatrix(i, lightMatrix);
 		shader.SetCameraMatrices(matrices);
@@ -103,9 +102,9 @@ void EntryScene::OnRender()
 
 	m_Engine.GetRenderingManager().SetFrameBuffer();
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
-	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 	m_Engine.GetRenderingManager().ClearColorBuffer();
+	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 
 	lights.IsDepthPass = false;
 	shader.SetCamera(m_Camera);

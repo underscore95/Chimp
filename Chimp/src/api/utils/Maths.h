@@ -919,6 +919,7 @@ namespace Chimp {
 
 	// Trig
 	inline float Cos(float degrees) {
+		assert(FloatEqual(glm::cos(ToRadians(90)), 0)); 
 		return glm::cos(ToRadians(degrees));
 	}
 }

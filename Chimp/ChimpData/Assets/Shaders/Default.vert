@@ -31,7 +31,8 @@ out OutputVertex {
 
 void main()
 {
-	vec4 viewPosition = (view * model * vec4(position.x, position.y, position.z, 1.0f));
+	vec4 modelPosition = model * vec4(position.x, position.y, position.z, 1.0f);
+	vec4 viewPosition = (view * modelPosition);
 	gl_Position = projection * viewPosition;
 
 	outVert.ViewPosition = viewPosition.xyz / viewPosition.w;
@@ -39,6 +40,6 @@ void main()
 	outVert.TexCoords = texCoords;
 
 	for (int i = 0; i < numSpotlights; ++i) {
-		outVert.SpotlightPosition[i] = spotlightMatrices[i] * vec4(outVert.ViewPosition.x, outVert.ViewPosition.y, outVert.ViewPosition.z, 1.0f);
+		outVert.SpotlightPosition[i] = spotlightMatrices[i] * vec4(modelPosition.x, modelPosition.y, modelPosition.z, 1.0f);
 	}
 }

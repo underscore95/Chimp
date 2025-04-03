@@ -44,9 +44,10 @@ namespace Chimp {
 		Vector3f Attenuation;
 		float CutoffAngle; // Should be Cos(angle)
 
-		CameraMatrices CalculateMatrices(float fovDegrees = 90, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
+		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
-			matrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(fovDegrees, aspectRatio, 5.0f));
+			assert(FloatEqual(Cos(cutoffAngleDegrees), CutoffAngle));
+			matrices.SetProjectionMatrix(CreateReversedPerspectiveProjectionMatrix(cutoffAngleDegrees * 2, aspectRatio, 5.0f));
 			assert(IsNormalised(Direction));
 
 			// Fix forward and up vectors being collinear which means we can't make a right vector
