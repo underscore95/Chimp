@@ -39,6 +39,7 @@ namespace Chimp {
 		GameShader::BeginFrame();
 
 		m_lightMatrices.NumSpotlights = m_lighting.NumSpotlights;
+		m_lightMatrices.NumDirectionalLights = m_lighting.NumDirectionLights;
 
 		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &m_lighting, sizeof(SceneLighting));
 		m_Shader->SetShaderBufferSubData(m_LightMatricesBufferIndex, &m_lightMatrices, sizeof(LightMatrices));
@@ -56,5 +57,10 @@ namespace Chimp {
 	void LitShader::SetSpotlightMatrix(int index, Matrix mat)
 	{
 		m_lightMatrices.Spotlights[index] = mat;
+	}
+
+	void LitShader::SetDirectionalMatrix(int index, Matrix mat)
+	{
+		m_lightMatrices.DirectionalLights[index] = mat;
 	}
 }

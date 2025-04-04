@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api/utils/Maths.h"
+#include "Loggers.h"
 
 namespace Chimp {
 
@@ -85,10 +86,11 @@ namespace Chimp {
 	// LIGHT MATRICES
 	struct alignas(16) LightMatrices {
 		std::array<Matrix, MAX_SPOTLIGHTS> Spotlights;
+		std::array<Matrix, MAX_DIRECTIONAL_LIGHTS> DirectionalLights;
 		int NumSpotlights;
-		float Padding1;
-		float Padding2;
-		float Padding3;
+		int NumDirectionalLights;
+		int Padding2;
+		int Padding3;
 	};
 	static_assert(sizeof(LightMatrices) % 16 == 0);
 

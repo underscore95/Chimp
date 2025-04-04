@@ -16,8 +16,9 @@ layout (std140) uniform Model {
 
 layout (std140) uniform LightMatrices {
 	mat4 spotlightMatrices[1];
+	mat4 directionalMatrices[1];
 	int numSpotlights;
-	float padding1;
+	int numDirectional;
 	float padding2;
 	float padding3;
 };
@@ -27,6 +28,7 @@ out OutputVertex {
 	vec3 Normal;
 	vec2 TexCoords;
 	vec4 SpotlightPosition[1];
+	vec4 DirectionalPosition[1];
 } outVert;
 
 void main()
@@ -41,5 +43,9 @@ void main()
 
 	for (int i = 0; i < numSpotlights; ++i) {
 		outVert.SpotlightPosition[i] = spotlightMatrices[i] * vec4(modelPosition.x, modelPosition.y, modelPosition.z, 1.0f);
+	}
+
+	for (int i = 0; i < numDirectional; ++i) {
+		outVert.DirectionalPosition[i] = directionalMatrices[i] * vec4(modelPosition.x, modelPosition.y, modelPosition.z, 1.0f);
 	}
 }

@@ -19,6 +19,7 @@ namespace Chimp {
 		void Render(const Mesh& mesh, const TransformMatrices& transform) override;
 
 		void SetSpotlightMatrix(int index, Matrix mat);
+		void SetDirectionalMatrix(int index, Matrix mat);
 
 		static inline int VertexSize() {
 			return 3 * sizeof(float) // position

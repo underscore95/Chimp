@@ -5,6 +5,7 @@ in OutputVertex {
 	vec3 Normal;
 	vec2 TexCoords;
 	vec4 SpotlightPosition[1];
+	vec4 DirectionalPosition[1];
 } inVert;
 
 out vec4 FragColor;
@@ -101,7 +102,7 @@ bool IsInShadow(vec4 lightSpacePos) {
 	uvz += vec3(0.5f, 0.5f, 0.5f);
 
 	// Is in map?
-	if (uvz.x < 0 || uvz.y < 0 || uvz.x > 1 || uvz.y > 1) return true;
+	if (uvz.x < 0 || uvz.y < 0 || uvz.x > 1 || uvz.y > 1) return false;
 
 	// Is in shadow?
 	float depth =  texture(u_ShadowMap, uvz.xy).x;
@@ -110,7 +111,7 @@ bool IsInShadow(vec4 lightSpacePos) {
 
 void main()
 {
-	if (IsDepthPass == 1) {
+	if (IsDepthPass != 0) {
 		return;
 	}
 
@@ -129,7 +130,7 @@ void main()
 		light += diffuse;
 	}
 
-		// Spotlights
+	// Spotlights
 	for (int i = 0; i < NumSpotlights; ++i) {
 		if (!IsInShadow(inVert.SpotlightPosition[i])) {
 			// Attenuation
@@ -137,16 +138,19 @@ void main()
 			float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
 
 			// Diffuse
-			vec3 diffuse = CalculateSpotlight(Spotlights[i]) * attenuation;
-			light += diffuse;
+			vec3 diffuse = CalculateSpotlight(Spotlights[i]);
+
+			light += diffuse * attenuation;
 		}
 	}
 
 	// Directional lights
 	for (int i = 0; i < NumDirectionalLights; ++i) {
-		// Diffuse
-		vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
-		light += diffuse;
+		if (!IsInShadow(inVert.DirectionalPosition[i])) {
+			// Diffuse
+			vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
+			light += diffuse;
+		}
 	}
 
 	FragColor.rgb *= light;

@@ -23,6 +23,7 @@ protected:
 
 private:
 	void ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights);
+	void ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
 
 private:
 	Chimp::Engine& m_Engine;

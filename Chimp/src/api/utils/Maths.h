@@ -25,7 +25,7 @@ namespace Chimp {
 	typedef glm::quat Quaternion;
 
 	// Compare two floats for equality, supports floating point error
-	[[nodiscard]] bool FloatEqual(float a, float b);
+	[[nodiscard]] bool FloatEqual(float a, float b, float epsilon = 1e-6);
 
 #pragma region Types
 #pragma region Vectors
@@ -506,6 +506,10 @@ namespace Chimp {
 			assert(size.x >= 0 && size.y >= 0);
 		}
 
+		Rect(float x, float y, float width, float height) : Rect({ x, y }, { width,height }) {
+
+		}
+
 		Rect(std::unique_ptr<Vector2f> position, std::unique_ptr<Vector2f> size) : Rect(*position, *size) {}
 
 		// Check if a point is inside the rectangle
@@ -696,16 +700,16 @@ namespace Chimp {
 
 	// Is normalised
 	inline bool IsNormalised(float a) {
-		return SquaredLength(a) == 1;
+		return FloatEqual(SquaredLength(a), 1);
 	}
 	inline float IsNormalised(Vector2f a) {
-		return SquaredLength(a) == 1;
+		return FloatEqual(SquaredLength(a), 1);
 	}
 	inline float IsNormalised(Vector3f a) {
-		return SquaredLength(a) == 1;
+		return FloatEqual(SquaredLength(a), 1);
 	}
 	inline float IsNormalised(Vector4f a) {
-		return SquaredLength(a) == 1;
+		return FloatEqual(SquaredLength(a), 1);
 	}
 
 	// Returns minimum components of two values (e.g (2,3) and (1,4) would return (1,3))
@@ -932,7 +936,7 @@ namespace Chimp {
 
 	// Trig
 	inline float Cos(float degrees) {
-		assert(FloatEqual(glm::cos(ToRadians(90)), 0)); 
+		assert(FloatEqual(glm::cos(ToRadians(90)), 0));
 		return glm::cos(ToRadians(degrees));
 	}
 }

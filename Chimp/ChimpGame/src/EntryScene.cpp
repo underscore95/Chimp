@@ -68,33 +68,30 @@ void EntryScene::OnRender()
 	ResetLighting(CreateIdentityMatrix(), lights);
 
 	// Shadow pass
-	for (int i = 0; i < lights.Spotlights.size(); ++i) {
+	assert(lights.NumSpotlights + lights.NumDirectionLights == 1);
+
+	for (int i = 0; i < lights.NumSpotlights; ++i) {
 		auto& spotlight = lights.Spotlights[i];
 		assert(lights.Spotlights.size() == 1);
 
-		// Reset depth buffer
-		m_ShadowMap->BindForWriting();
-		m_Engine.GetRenderingManager().ClearDepthBuffer();
-
-		// Update shader
 		auto matrices = spotlight.CalculateMatrices(35, m_ShadowMap->GetAspectRatio());
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetSpotlightMatrix(i, lightMatrix);
 		shader.SetCameraMatrices(matrices);
-		shader.BeginFrame();
 
-		// Draw
-		for (auto& [transform, id, mesh] : view)
-		{
-			// if has health, dont render if dead
-			auto health = m_ECS.GetComponent<HealthComponent>(id.Id);
-			if (health.HasValue() && health->Health <= 0)
-			{
-				continue;
-			}
+		ShadowPass(shader, view);
+	}
 
-			shader.Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera.GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
-		}
+	for (int i = 0; i < lights.NumDirectionLights; ++i) {
+		auto& light = lights.DirectionLights[i];
+		assert(lights.DirectionLights.size() == 1);
+
+		auto matrices = light.CalculateMatrices(Rect{-10,-10,20,20});
+		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
+		shader.SetDirectionalMatrix(i, lightMatrix);
+		shader.SetCameraMatrices(matrices);
+
+		ShadowPass(shader, view);
 	}
 
 	// Render pass
@@ -104,7 +101,7 @@ void EntryScene::OnRender()
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 	m_Engine.GetRenderingManager().ClearColorBuffer();
-	//m_ShadowMap->BindForReading(1, shader.GetRawShader());
+	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 
 	lights.IsDepthPass = false;
 	shader.SetCamera(m_Camera);
@@ -156,11 +153,12 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights)
 
 	lights.NumDirectionLights = 1;
 	lights.DirectionLights[0] = {
-	{ 0, -1, 0 }, // Direction
+	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
 	{ 1, 1, 1 }, // Colour
 	0
 	};
+	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
 	lights.NumSpotlights = 0;
 	lights.Spotlights[0] =
@@ -175,8 +173,6 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights)
 		Cos(35), // Cutoff angle
 	};
 
-	lights.NumSpotlights = 1;
-
 	for (auto& light : lights.PointLights) {
 		light.Position = MatrixTransform(light.Position, view);
 	}
@@ -190,5 +186,29 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights)
 		light.Position = MatrixTransform(light.Position, view);
 		light.Direction *= ToNormalMatrix(view);
 		light.Direction = VectorNormalized(light.Direction);
+	}
+}
+
+void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view)
+{
+	// Reset depth buffer
+	m_ShadowMap->BindForWriting();
+	m_Engine.GetRenderingManager().ClearDepthBuffer();
+
+	// Update shader
+	
+	shader.BeginFrame();
+
+	// Draw
+	for (auto& [transform, id, mesh] : view)
+	{
+		// if has health, dont render if dead
+		auto health = m_ECS.GetComponent<HealthComponent>(id.Id);
+		if (health.HasValue() && health->Health <= 0)
+		{
+			continue;
+		}
+
+		shader.Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera.GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
 	}
 }

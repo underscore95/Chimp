@@ -104,9 +104,9 @@ namespace Chimp {
 #pragma endregion
 #pragma endregion
 
-	bool FloatEqual(float a, float b)
+	bool FloatEqual(float a, float b, float epsilon)
 	{
-		return abs(a - b) < std::numeric_limits<float>::epsilon();
+		return abs(a - b) < epsilon;
 	}
 
 	float ToRadians(float degrees)
