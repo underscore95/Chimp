@@ -201,7 +201,6 @@ namespace Chimp {
 
 	Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
-		assert(false);// this won't work probably because we added reversed z
 		return glm::orthoRH(left, right, bottom, top, zNear, zFar);
 	}
 

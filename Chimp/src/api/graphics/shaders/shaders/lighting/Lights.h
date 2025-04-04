@@ -26,6 +26,24 @@ namespace Chimp {
 
 		Vector3f Color;
 		float Padding2;
+
+		CameraMatrices CalculateMatrices(Rect bounds, float zNear = 1.0f, float zFar = 20.0f, Vector3f up = { 0,1,0 }) const {
+			CameraMatrices matrices;
+			matrices.SetProjectionMatrix(CreateOrthographicProjectionMatrix(bounds.GetLeft(), bounds.GetRight(), bounds.GetBottom(), bounds.GetTop(), zNear, zFar));
+			assert(IsNormalised(Direction));
+
+			// Fix forward and up vectors being collinear which means we can't make a right vector
+			if (IsCollinear(up, Direction)) {
+				// TODO handle this better?
+				if (up.x == 0) up.x += 0.001f;
+				else up.y += 0.001f;
+				up = VectorNormalized(up);
+			}
+
+			Vector3f cameraPos = Direction * -10.0f;
+			matrices.SetViewMatrix(CreateViewMatrix(cameraPos, { 0,0,0 }, up));
+			return matrices;
+		}
 	};
 	static_assert(sizeof(DirectionalLight) % 16 == 0);
 
@@ -47,7 +65,7 @@ namespace Chimp {
 		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
 			assert(FloatEqual(Cos(cutoffAngleDegrees), CutoffAngle));
-			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(cutoffAngleDegrees * 2 + 1, aspectRatio, zNear, zFar));
+			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(cutoffAngleDegrees * 2, aspectRatio, zNear, zFar));
 			assert(IsNormalised(Direction));
 
 			// Fix forward and up vectors being collinear which means we can't make a right vector

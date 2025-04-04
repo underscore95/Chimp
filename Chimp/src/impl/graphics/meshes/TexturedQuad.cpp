@@ -10,10 +10,10 @@ namespace Chimp {
 		vertexData.NumberElements = (3 + 3 + 2) * 4;
 		vertexData.Size = sizeof(float) * vertexData.NumberElements;
 		vertexData.Data = new float[vertexData.NumberElements] {
-			-0.5f, -0.5f, 0.0f,        0.0f, 0.0f, 1.0f,     1.0f, 0.0f,
-				0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,     0.0f, 0.0f,
-				0.5f, 0.5f, 0.0f,      0.0f, 0.0f, 1.0f,     0.0f, 1.0f,
-				-0.5f, 0.5f, 0.0f,     0.0f, 0.0f, 1.0f,     1.0f, 1.0f
+			-0.5f, -0.5f, 0.0f,        0.0f, 0.0f, -1.0f,     1.0f, 0.0f,
+				0.5f, -0.5f, 0.0f,     0.0f, 0.0f, -1.0f,     0.0f, 0.0f,
+				0.5f, 0.5f, 0.0f,      0.0f, 0.0f, -1.0f,     0.0f, 1.0f,
+				-0.5f, 0.5f, 0.0f,     0.0f, 0.0f, -1.0f,     1.0f, 1.0f
 			};
 
 		std::shared_ptr<IBuffer> vertexBuffer = renderingManager.CreateBuffer(

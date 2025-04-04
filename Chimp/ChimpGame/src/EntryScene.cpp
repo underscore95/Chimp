@@ -104,7 +104,7 @@ void EntryScene::OnRender()
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 	m_Engine.GetRenderingManager().ClearColorBuffer();
-	m_ShadowMap->BindForReading(1, shader.GetRawShader());
+	//m_ShadowMap->BindForReading(1, shader.GetRawShader());
 
 	lights.IsDepthPass = false;
 	shader.SetCamera(m_Camera);
@@ -154,7 +154,7 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights)
 		0
 	};
 
-	lights.NumDirectionLights = 0;
+	lights.NumDirectionLights = 1;
 	lights.DirectionLights[0] = {
 	{ 0, -1, 0 }, // Direction
 	0,
@@ -162,7 +162,7 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights)
 	0
 	};
 
-	lights.NumSpotlights = 1;
+	lights.NumSpotlights = 0;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction

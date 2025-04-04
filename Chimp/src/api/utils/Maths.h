@@ -534,6 +534,18 @@ namespace Chimp {
 		[[nodiscard]] Vector2f GetBottomRight() const {
 			return Position + Size;
 		}
+		[[nodiscard]] float GetLeft() const {
+			return GetTopLeft().x;
+		}
+		[[nodiscard]] float GetRight() const {
+			return GetTopRight().x;
+		}
+		[[nodiscard]] float GetTop() const {
+			return GetTopLeft().y;
+		}
+		[[nodiscard]] float GetBottom() const {
+			return GetBottomLeft().y;
+		}
 
 		// Scale the rectangle around its center
 		void Scale(float scale) {

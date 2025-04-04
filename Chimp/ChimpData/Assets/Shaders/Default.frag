@@ -78,13 +78,13 @@ vec3 CalculateSpotlight(Spotlight light) {
 	float theta = dot(lightDir, -light.Direction);
 
 	if (theta > light.CutoffAngle) {
-		return vec3(1,1,1);//GetDiffuse(-light.Direction, light.Color);
+		return GetDiffuse(-light.Direction, light.Color);
 	}
 	return vec3(0,0,0);
 }
 
 vec3 CalculateDirectionalLight(DirectionalLight light) {
-	vec3 lightDir = light.Direction; // idk why we can do this (this should be negative)? but it works like this
+	vec3 lightDir = -light.Direction;
 	vec3 diffuse = GetDiffuse(lightDir, light.Color);
 
 	return diffuse;
