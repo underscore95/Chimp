@@ -63,6 +63,14 @@ namespace Chimp {
 			unsigned int height
 		) const = 0;
 
+		// Create a cube map
+		// width - The width in pixels
+		// height - The height in pixels
+		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateCubeShadowMap(
+			unsigned int width,
+			unsigned int height
+		) const = 0;
+
 		// Create an element array layout which defines how the data in an ElementArray is structured
 		// primitivesType - the type of primitives in the ElementArray
 		// layouts - a vector of ElementComponentLayouts which define the layout of each component of data in the ElementArray

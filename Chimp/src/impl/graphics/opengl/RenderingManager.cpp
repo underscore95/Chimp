@@ -6,6 +6,7 @@
 #include "textures/Texture.h"
 #include "Loggers.h"
 #include "shadows/ShadowMap.h"
+#include "shadows/CubeShadowMap.h"
 
 // https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/1.debugging/debugging.cpp
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -86,6 +87,11 @@ namespace Chimp::GL {
 	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height) const
 	{
 		return std::unique_ptr<IShadowMap>(((IShadowMap*) new ShadowMap(width, height)));
+	}
+
+	std::unique_ptr<IShadowMap> RenderingManager::CreateCubeShadowMap(unsigned int width, unsigned int height) const
+	{
+		return std::unique_ptr<IShadowMap>(((IShadowMap*) new CubeShadowMap(width, height)));
 	}
 
 	std::unique_ptr<IElementArrayLayout> RenderingManager::CreateElementArrayLayout(
@@ -179,10 +185,16 @@ namespace Chimp::GL {
 
 		glCullFace(GL_BACK);
 
+		// Other details
+		GLint maxUniformBlocks = 0;
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBlocks);
+
 		Loggers::Rendering().Info("Initialized OpenGL Renderer.");
 		Loggers::Rendering().Info(" OpenGL Version: " + std::string((const char*)glGetString(GL_VERSION)));
 		Loggers::Rendering().Info(" GLSL Version: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 		Loggers::Rendering().Info(" Vendor: " + std::string((const char*)glGetString(GL_VENDOR)));
 		Loggers::Rendering().Info(" Renderer: " + std::string((const char*)glGetString(GL_RENDERER)));
+		Loggers::Rendering().Info(" Max Uniform Blocks: " + std::to_string(maxUniformBlocks));
+
 	}
 }

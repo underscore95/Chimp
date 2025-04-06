@@ -35,7 +35,8 @@ namespace Chimp::GL {
 
 	void Buffer::SetSubDataBindless(const void* data, const size_t size, const size_t offset)
 	{
-		assert(offset + size <= GetSize());
+		const auto bufferSize = GetSize();
+		assert(offset + size <= bufferSize);
 		assert(data != nullptr);
 		glBufferSubData(m_BindTarget, offset, size, data);
 	}

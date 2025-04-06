@@ -26,7 +26,9 @@ namespace Chimp {
 		GameShader(Engine& engine,
 			const ShaderFilePaths& shaderFilePaths,
 			const std::string& cameraBufferName = "Camera",
-			const std::string& modelBufferName = "Model");
+			const std::string& modelBufferName = "Model",
+			bool noCamera = false,
+			bool noActiveTexture = false);
 		virtual ~GameShader();
 
 		// Change the camera
@@ -48,6 +50,8 @@ namespace Chimp {
 		const CameraMatrices& GetCameraMatrices();
 		const CameraMatrices* GetCameraMatricesPtr();
 
+		static IShaderBuffers::Index CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name);
+
 	private:
 		Reference<ICamera> m_Camera;
 		bool m_UsingCameraMatrices;
@@ -59,5 +63,7 @@ namespace Chimp {
 		ShaderBufferId m_CameraBufferId;
 		ShaderBufferId m_ModelBufferId;
 		bool m_IsFrameBegun = false;
+		bool m_IsNoCamera;
+		bool m_IsNoActiveTexture;
 	};
 }

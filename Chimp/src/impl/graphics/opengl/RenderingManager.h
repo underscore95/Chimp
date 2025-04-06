@@ -23,6 +23,11 @@ namespace Chimp::GL {
 			unsigned int height
 		) const override;
 
+		[[nodiscard]] std::unique_ptr<IShadowMap> CreateCubeShadowMap(
+			unsigned int width,
+			unsigned int height
+		) const override;
+
 		std::unique_ptr<IElementArrayLayout> CreateElementArrayLayout(
 			const PrimitiveType primitivesType,
 			const std::vector<ElementComponentLayout>& layouts

@@ -4,6 +4,7 @@
 #include "api/window/IWindow.h"
 #include "api/graphics/IRenderingManager.h"
 #include "api/graphics/shaders/shaders/LitShader.h"
+#include "api/graphics/shaders/shaders/lit/LitPointShadowShader.h"
 #include "api/graphics/images/IImageLoader.h"
 #include "api/graphics/camera/CameraPerspective.h"
 #include "api/resources/ResourceManager.h"

@@ -1,28 +1,18 @@
 #include "api/graphics/shaders/shaders/LitShader.h"
+#include "api/graphics/shaders/shaders//lit/LitPointShadowShader.h"
 #include "Loggers.h"
 #include "Engine.h"
 
 namespace Chimp {
-	IShaderBuffers::Index CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name) {
-		std::shared_ptr<IBuffer> buffer = engine.GetRenderingManager().CreateBuffer(
-			sizeof(SceneLighting),
-			1,
-			{
-				Usage::UpdateFrequency::OCCASIONAL,
-				Usage::Access::CPU_WRITE
-			},
-			BindTarget::SHADER_BUFFER
-		);
-		return shader.GetShaderBuffers().AddBuffer({ buffer, name.data()});
-	}
-
 	LitShader::LitShader(Engine& engine) : GameShader(
 		engine, ShaderFilePaths{
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.vert"),
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.frag")
+			CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.vert"),
+			"",
+			CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.frag")
 		}),
 		m_lighting(),
-		m_lightMatrices()
+		m_lightMatrices(),
+		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(engine)))
 	{
 		m_SceneLightingBufferIndex = CreateBuffer(engine,*m_Shader, sizeof(SceneLighting), "SceneLighting");
 		m_LightMatricesBufferIndex = CreateBuffer(engine,*m_Shader, sizeof(LightMatrices), "LightMatrices");

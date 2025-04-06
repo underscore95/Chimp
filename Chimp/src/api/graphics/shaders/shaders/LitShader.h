@@ -5,6 +5,7 @@
 
 namespace Chimp {
 	class ChimpShaders;
+	class LitPointShadowShader;
 
 	class LitShader : public GameShader {
 		friend class ChimpShaders;
@@ -27,9 +28,12 @@ namespace Chimp {
 				+ 2 * sizeof(float); // tex coords
 		}
 
+		LitPointShadowShader& GetPointShadowShader() { return *m_PointShadowShader; }
+
 	private:
 		SceneLighting m_lighting;
 		LightMatrices m_lightMatrices;
+		std::unique_ptr<LitPointShadowShader> m_PointShadowShader;
 		IShaderBuffers::Index m_SceneLightingBufferIndex;
 		IShaderBuffers::Index m_LightMatricesBufferIndex;
 	};

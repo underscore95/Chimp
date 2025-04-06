@@ -18,6 +18,7 @@ namespace Chimp::GL {
 
 		for (const auto& [type, path] : pathsMap)
 		{
+			if (path.empty()) continue;
 			const auto result = compiler.Compile(type, FileReader::Read(path));
 			if (!result.Success)
 			{
@@ -93,6 +94,7 @@ namespace Chimp::GL {
 	{
 		const auto& buffer = m_ShaderBuffers.GetBuffer(id);
 		GLuint blockIndex = glGetUniformBlockIndex(m_ProgramID, buffer.Name.c_str()); // TODO: could we put this in the shader buffer struct?
+		assert(blockIndex < std::numeric_limits<unsigned int>().max()); // Your CPU buffer name doesn't match the name in the shader
 		glUniformBlockBinding(m_ProgramID, blockIndex, static_cast<GLuint>(buffer.Index));
 		buffer.Buffer->BindBufferBase(buffer.Index);
 	}

@@ -22,8 +22,9 @@ protected:
 	void UnloadResources() override;
 
 private:
-	void ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights);
+	void ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights, bool makeViewSpace = true);
 	void ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
+	void CubeShadowPass(Chimp::LitPointShadowShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
 
 private:
 	Chimp::Engine& m_Engine;
@@ -36,4 +37,5 @@ private:
 	Chimp::ModelResourcePath m_ModelPath;
 	Chimp::TextureResourcePath m_TexPath;
 	std::unique_ptr<Chimp::IShadowMap> m_ShadowMap;
+	std::unique_ptr<Chimp::IShadowMap> m_CubeMap;
 };

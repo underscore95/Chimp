@@ -14,7 +14,7 @@ namespace Chimp {
 		assert(m_texId != 0);
 
 		// Setup depth cubemap
-		glBindTexture(GL_TEXTURE_2D, m_texId);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_texId);
 		for (unsigned int i = 0; i < NUM_FACES; ++i) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32,
 				width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -32,6 +32,10 @@ namespace Chimp {
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_texId, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		assert(status == GL_FRAMEBUFFER_COMPLETE);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 

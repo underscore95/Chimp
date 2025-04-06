@@ -4,10 +4,11 @@
 #include "Loggers.h"
 
 namespace Chimp {
-	struct PointLightMatrices {
+	struct alignas(16) PointLightMatrices {
 		Matrix Projection;
 		std::array<Matrix, 6> Views;
 	};
+	static_assert(sizeof(PointLightMatrices) % 16 == 0);
 
 	// POINT LIGHT
 	static const int MAX_POINT_LIGHTS = 1;
@@ -21,7 +22,7 @@ namespace Chimp {
 		Vector3f Attenuation;
 		float Padding3;
 
-		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f) {
+		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f) const {
 			PointLightMatrices matrices = {};
 			matrices.Projection = CreatePerspectiveProjectionMatrix(90, aspectRatio, zNear, zFar);
 

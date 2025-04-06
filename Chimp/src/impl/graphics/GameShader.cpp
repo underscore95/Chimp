@@ -6,10 +6,15 @@ namespace Chimp {
 	GameShader::GameShader(Engine& engine,
 		const ShaderFilePaths& shaderFilePaths,
 		const std::string& cameraBufferName,
-		const std::string& modelBufferName) :
+		const std::string& modelBufferName,
+		bool noCamera,
+		bool noActiveTexture) :
 		m_Engine(engine),
 		m_ShaderFilePaths(shaderFilePaths),
-		m_Camera(&engine.GetRenderingManager().GetRenderer().GetDefaultCamera()) {
+		m_Camera(&engine.GetRenderingManager().GetRenderer().GetDefaultCamera()),
+		m_IsNoCamera(noCamera) ,
+		m_IsNoActiveTexture(noActiveTexture) 
+	{
 
 		auto& renderingManager = m_Engine.GetRenderingManager();
 
@@ -18,16 +23,18 @@ namespace Chimp {
 		m_Shader = m_Engine.GetResourceManager().GetShaders().ImmediateDepend(m_ShaderFilePaths);
 
 		// CAMERA BUFFER
-		std::shared_ptr<Chimp::IBuffer> cameraBuffer = renderingManager.CreateBuffer(
-			sizeof(CameraMatrices),
-			1,
-			{
-				Chimp::Usage::UpdateFrequency::OCCASIONAL,
-				Chimp::Usage::Access::CPU_WRITE
-			},
-			Chimp::BindTarget::SHADER_BUFFER
-		);
-		m_CameraBufferId = m_Shader->GetShaderBuffers().AddBuffer({ cameraBuffer, cameraBufferName });
+		if (!m_IsNoCamera) {
+			std::shared_ptr<Chimp::IBuffer> cameraBuffer = renderingManager.CreateBuffer(
+				sizeof(CameraMatrices),
+				1,
+				{
+					Chimp::Usage::UpdateFrequency::OCCASIONAL,
+					Chimp::Usage::Access::CPU_WRITE
+				},
+				Chimp::BindTarget::SHADER_BUFFER
+			);
+			m_CameraBufferId = m_Shader->GetShaderBuffers().AddBuffer({ cameraBuffer, cameraBufferName });
+		}
 
 		// MODEL BUFFER
 		std::shared_ptr<Chimp::IBuffer> modelBuffer = renderingManager.CreateBuffer(
@@ -65,7 +72,9 @@ namespace Chimp {
 		m_IsFrameBegun = true;
 
 		// Update camera
-		m_Shader->SetShaderBufferSubData(m_CameraBufferId, GetCameraMatricesPtr(), sizeof(CameraMatrices), 0);
+		if (!m_IsNoCamera) {
+			m_Shader->SetShaderBufferSubData(m_CameraBufferId, GetCameraMatricesPtr(), sizeof(CameraMatrices), 0);
+		}
 	}
 
 	void GameShader::Render(const Mesh& mesh, const TransformMatrices& transform) {
@@ -78,10 +87,13 @@ namespace Chimp {
 		{
 			// Send the texture
 			assert(section.Texture); // This shader doesn't support no texture
-			m_Shader->SetTextureSampler(
-				"u_ActiveTexture",
-				section.Texture->GetResource()
-			);
+			if (!m_IsNoActiveTexture) {
+				// Just a hacky fix so a shader without colour attachment to the fbo would work (cube shadow map)
+				m_Shader->SetTextureSampler(
+					"u_ActiveTexture",
+					section.Texture->GetResource()
+				);
+			}
 
 			// Draw the section
 			m_Engine.GetRenderingManager().GetRenderer().Draw(section, *m_Shader);
@@ -100,5 +112,18 @@ namespace Chimp {
 	const CameraMatrices* GameShader::GetCameraMatricesPtr()
 	{
 		return &(GetCameraMatrices());
+	}
+
+	IShaderBuffers::Index GameShader::CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name) {
+		std::shared_ptr<IBuffer> buffer = engine.GetRenderingManager().CreateBuffer(
+			size,
+			1,
+			{
+				Usage::UpdateFrequency::OCCASIONAL,
+				Usage::Access::CPU_WRITE
+			},
+			BindTarget::SHADER_BUFFER
+		);
+		return shader.GetShaderBuffers().AddBuffer({ buffer, name.data() });
 	}
 }

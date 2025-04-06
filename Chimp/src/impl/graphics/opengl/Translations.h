@@ -63,6 +63,8 @@ namespace Chimp::GL {
 			return GL_VERTEX_SHADER;
 		case ShaderType::FRAGMENT:
 			return GL_FRAGMENT_SHADER;
+		case ShaderType::GEOMETRY:
+			return GL_GEOMETRY_SHADER;
 		default:
 			assert(false);
 			__assume(false);
