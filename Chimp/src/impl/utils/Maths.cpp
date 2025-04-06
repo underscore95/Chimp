@@ -220,6 +220,19 @@ namespace Chimp {
 		//	0.0f, 0.0f, zNear, 0.0f);
 	}
 
+	void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward)
+	{
+		assert(IsNormalised(up));
+
+		// Fix forward and up vectors being collinear which means we can't make a right vector
+		if (IsCollinear(*up, forward)) {
+			// TODO handle this better?
+			if (up->x == 0) up->x += 0.001f;
+			else up->y += 0.001f;
+			*up = VectorNormalized(*up);
+		}
+	}
+
 	Quaternion QuatRotation(Vector3f degrees)
 	{
 		return

@@ -11,6 +11,7 @@
 #include <imgui.h>
 #include "api/utils/preprocessor/Casting.h"
 #include <memory>
+#include "OptionalReference.h"
 
 namespace Chimp {
 	class YAMLSerialiser;
@@ -917,6 +918,8 @@ namespace Chimp {
 		float dot = Dot(a, b);
 		return FloatEqual(dot * dot, SquaredLength(a) * SquaredLength(b));
 	}
+
+	[[nodiscard]] void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward);
 
 	// Quaternions
 	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);

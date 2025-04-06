@@ -18,8 +18,8 @@ namespace Chimp {
 
 	LitShader::LitShader(Engine& engine) : GameShader(
 		engine, ShaderFilePaths{
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.vert"),
-	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Default.frag")
+	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.vert"),
+	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.frag")
 		}),
 		m_lighting(),
 		m_lightMatrices()
