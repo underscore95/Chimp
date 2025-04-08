@@ -22,9 +22,14 @@ namespace Chimp {
 		Vector3f Attenuation;
 		float Padding3;
 
-		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f) const {
+		float FarPlane = 20.0f;
+		float Padding4;
+		float Padding5;
+		float Padding6;
+
+		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f) const {
 			PointLightMatrices matrices = {};
-			matrices.Projection = CreatePerspectiveProjectionMatrix(90, aspectRatio, zNear, zFar);
+			matrices.Projection = CreatePerspectiveProjectionMatrix(90, aspectRatio, zNear, FarPlane);
 
 			matrices.Views = {
 				CreateViewMatrix(Position, Position + Vector3f(1.0f,  0.0f,  0.0f), Vector3f(0.0f, -1.0f,  0.0f)),

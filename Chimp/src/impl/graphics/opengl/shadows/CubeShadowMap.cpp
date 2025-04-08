@@ -7,6 +7,8 @@ namespace Chimp {
 	CubeShadowMap::CubeShadowMap(unsigned int width, unsigned int height)
 		: IShadowMap(width, height) {
 
+		assert(width == height);
+
 		glGenFramebuffers(1, &m_fbo);
 		assert(m_fbo != 0);
 
@@ -49,7 +51,7 @@ namespace Chimp {
 	{
 		assert(slot != 0);
 		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, m_texId);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_texId);
 
 		shader.SetTextureSampler("u_CubeShadowMap", slot);
 	}

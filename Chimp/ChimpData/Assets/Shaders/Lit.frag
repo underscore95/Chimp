@@ -12,6 +12,7 @@ out vec4 FragColor;
 
 uniform sampler2D u_ActiveTexture;
 uniform sampler2D u_ShadowMap;
+uniform samplerCube u_CubeShadowMap;
 
 struct PointLight {
 	vec3 Position;
@@ -22,6 +23,11 @@ struct PointLight {
 
 	vec3 Attenuation;
 	float Padding3;
+
+	float FarPlane;
+	float Padding4;
+	float Padding5;
+	float Padding6;
 };
 
 struct DirectionalLight {
@@ -109,6 +115,14 @@ bool IsInShadow(vec4 lightSpacePos) {
 	return depth + 0.0025 < uvz.z;
 }
 
+bool IsInPointShadow(PointLight light, vec3 viewFragPos) {
+	vec3 fragToLight = viewFragPos - light.Position; 
+    float closestDepth = texture(u_CubeShadowMap, fragToLight).r;
+	closestDepth *= light.FarPlane;
+	float currentDepth = length(fragToLight);
+	return currentDepth - 0.05f > closestDepth ? true : false; 
+}
+
 void main()
 {
 	if (IsDepthPass != 0) {
@@ -118,16 +132,19 @@ void main()
     FragColor = texture(u_ActiveTexture, inVert.TexCoords);
     
 	vec3 light = AmbientLight;
+	bool TRUE = light.x != 0.33;
 
 	// Point lights
 	for (int i = 0; i < NumPointLights; ++i) {
-		// Attenuation
-		float dist = distance(PointLights[i].Position, inVert.ViewPosition);
-		float attenuation = CalculateAttenuation(PointLights[i].Attenuation, dist);
+		if (!IsInPointShadow(PointLights[i], gl_FragCoord.xyz)) {
+			// Attenuation
+			float dist = distance(PointLights[i].Position, inVert.ViewPosition);
+			float attenuation = CalculateAttenuation(PointLights[i].Attenuation, dist);
 
-		// Diffuse
-		vec3 diffuse = CalculatePointLight(PointLights[i]) * attenuation;
-		light += diffuse;
+			// Diffuse
+			vec3 diffuse = CalculatePointLight(PointLights[i]) * attenuation;
+			light += diffuse;
+		}
 	}
 
 	// Spotlights

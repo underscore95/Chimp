@@ -13,15 +13,15 @@ layout(std140) uniform PointLightMatrices {
 // Basically making a new vertex for each of the "cameras"
 void main()
 {
-     for (int face = 0; face < 6; ++face)
+    for (int face = 0; face < 6; ++face)
+    {
+        gl_Layer = face; 
+        for (int i = 0; i < 3; ++i) 
         {
-            gl_Layer = face; 
-            for (int i = 0; i < 3; ++i) 
-            {
-                FragPos = gl_in[i].gl_Position;
-                gl_Position = (proj * views[face]) * FragPos;
-                EmitVertex();
-            }    
-            EndPrimitive();
-        }
-    } 
+            FragPos = gl_in[i].gl_Position;
+            gl_Position = (proj * views[face]) * FragPos;
+            EmitVertex();
+        }    
+        EndPrimitive();
+    }
+}

@@ -67,10 +67,10 @@ void EntryScene::OnRender()
 	lights.IsDepthPass = true;
 
 	ResetLighting(CreateIdentityMatrix(), lights);
+	m_ShadowMap->BindForReading(1, shader.GetRawShader());
+	m_CubeMap->BindForReading(2, shader.GetRawShader());
 
 	// Shadow pass
-	assert(lights.NumSpotlights + lights.NumDirectionLights == 1);
-
 	for (int i = 0; i < lights.NumSpotlights; ++i) {
 		auto& spotlight = lights.Spotlights[i];
 		assert(lights.Spotlights.size() == 1);
@@ -111,7 +111,6 @@ void EntryScene::OnRender()
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 	m_Engine.GetRenderingManager().ClearColorBuffer();
-	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 
 	lights.IsDepthPass = false;
 	shader.SetCamera(m_Camera);
@@ -161,7 +160,7 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights,
 		0
 	};
 
-	lights.NumDirectionLights = 1;
+	lights.NumDirectionLights = 0;
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,

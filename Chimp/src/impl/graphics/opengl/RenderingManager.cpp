@@ -51,7 +51,6 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 	case GL_DEBUG_SEVERITY_LOW:          logger.Warning(ss);; break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION: logger.Info(ss); break;
 	}
-
 }
 
 namespace Chimp::GL {
