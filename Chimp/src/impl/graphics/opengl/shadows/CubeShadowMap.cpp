@@ -18,7 +18,7 @@ namespace Chimp {
 		// Setup depth cubemap
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_texId);
 		for (unsigned int i = 0; i < NUM_FACES; ++i) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32,
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
 				width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		}
 

@@ -1,6 +1,6 @@
 #version 410 core
 
-in vec4 FragPos;
+in vec3 FragPos;
 
 layout(std140) uniform PointLightFS {
     vec3 position;
@@ -10,5 +10,5 @@ layout(std140) uniform PointLightFS {
 void main()
 {
     // get distance between fragment and light source
-    gl_FragDepth = length(FragPos.xyz - position) / farPlane;
+    gl_FragDepth = length(FragPos.xyz - position.xyz) / farPlane;
 }  

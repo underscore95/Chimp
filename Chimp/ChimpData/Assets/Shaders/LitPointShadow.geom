@@ -3,7 +3,7 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices=18) out; // 3 * NUM_FACES
 
-out vec4 FragPos;
+out vec3 FragPos;
 
 layout(std140) uniform PointLightMatrices {
 	mat4 proj;
@@ -18,8 +18,9 @@ void main()
         gl_Layer = face; 
         for (int i = 0; i < 3; ++i) 
         {
-            FragPos = gl_in[i].gl_Position;
-            gl_Position = (proj * views[face]) * FragPos;
+            vec4 pos = views[face] * vec4(gl_in[i].gl_Position.x, gl_in[i].gl_Position.y, gl_in[i].gl_Position.z, 1.0f);
+            gl_Position = proj * pos;
+            FragPos = pos.xyz / pos.w;
             EmitVertex();
         }    
         EndPrimitive();

@@ -136,7 +136,7 @@ void main()
 
 	// Point lights
 	for (int i = 0; i < NumPointLights; ++i) {
-		if (!IsInPointShadow(PointLights[i], gl_FragCoord.xyz)) {
+		if (!IsInPointShadow(PointLights[i], inVert.ViewPosition.xyz)) {
 			// Attenuation
 			float dist = distance(PointLights[i].Position, inVert.ViewPosition);
 			float attenuation = CalculateAttenuation(PointLights[i].Attenuation, dist);
