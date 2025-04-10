@@ -22,7 +22,7 @@ protected:
 	void UnloadResources() override;
 
 private:
-	void ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights, bool makeViewSpace = true);
+	void ResetLighting(Chimp::SceneLighting& lights);
 	void ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
 	void CubeShadowPass(Chimp::LitPointShadowShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
 

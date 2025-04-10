@@ -83,7 +83,7 @@ namespace Chimp {
 		Vector3f Attenuation;
 		float CutoffAngle; // Should be Cos(angle)
 
-		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 1.0f, float zFar = 20.0f, Vector3f up = { 0,1,0 }) const {
+		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 5.0f, float zFar = 50.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
 			assert(FloatEqual(Cos(cutoffAngleDegrees), CutoffAngle));
 			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(cutoffAngleDegrees * 2, aspectRatio, zNear, zFar));

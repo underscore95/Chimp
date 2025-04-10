@@ -937,6 +937,8 @@ namespace Chimp {
 
 	Vector3f MatrixTransform(Vector3f v, const Matrix& m);
 
+	bool IsIdentityMatrix(const Matrix& m);
+
 	// Trig
 	inline float Cos(float degrees) {
 		assert(FloatEqual(glm::cos(ToRadians(90)), 0));

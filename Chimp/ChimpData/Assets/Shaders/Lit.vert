@@ -24,7 +24,7 @@ layout (std140) uniform LightMatrices {
 };
 
 out OutputVertex {
-	vec3 ViewPosition;
+	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoords;
 	vec4 SpotlightPosition[1];
@@ -37,7 +37,7 @@ void main()
 	vec4 viewPosition = (view * modelPosition);
 	gl_Position = projection * viewPosition;
 
-	outVert.ViewPosition = viewPosition.xyz / viewPosition.w;
+	outVert.WorldPosition = modelPosition.xyz / modelPosition.w;
 	outVert.Normal = mat3(normalMatrix) * normal;
 	outVert.TexCoords = texCoords;
 

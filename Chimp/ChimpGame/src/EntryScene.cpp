@@ -66,7 +66,7 @@ void EntryScene::OnRender()
 	SceneLighting& lights = shader.GetLighting();
 	lights.IsDepthPass = true;
 
-	ResetLighting(CreateIdentityMatrix(), lights);
+	ResetLighting(lights);
 	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 	m_CubeMap->BindForReading(2, shader.GetRawShader());
 
@@ -87,7 +87,7 @@ void EntryScene::OnRender()
 		auto& light = lights.DirectionLights[i];
 		assert(lights.DirectionLights.size() == 1);
 
-		auto matrices = light.CalculateMatrices(Rect{-10,-10,20,20});
+		auto matrices = light.CalculateMatrices(Rect{ -10,-10,20,20 });
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetDirectionalMatrix(i, lightMatrix);
 		shader.SetCameraMatrices(matrices);
@@ -96,16 +96,16 @@ void EntryScene::OnRender()
 	}
 
 	// Cube shadow pass
-	ResetLighting(CreateIdentityMatrix(), lights, false);
 	for (int i = 0; i < lights.NumPointLights; ++i) {
 		auto& pointlight = lights.PointLights[i];
 
+		ResetLighting(lights);
 		shader.GetPointShadowShader().SetPointLight(pointlight);
 		CubeShadowPass(shader.GetPointShadowShader(), view);
 	}
 
 	// Render pass
-	ResetLighting(m_Camera.GetCameraMatrices().GetViewMatrix(), lights);
+	ResetLighting(lights);
 
 	m_Engine.GetRenderingManager().SetFrameBuffer();
 	m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
@@ -146,7 +146,7 @@ void EntryScene::UnloadResources()
 {
 }
 
-void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights, bool makeViewSpace)
+void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 {
 	lights.Ambient = { 0.25, 0.25, 0.25 };
 	lights.NumPointLights = 1;
@@ -181,23 +181,6 @@ void EntryScene::ResetLighting(Chimp::Matrix view, Chimp::SceneLighting& lights,
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle
 	};
-
-	if (makeViewSpace) {
-		for (auto& light : lights.PointLights) {
-			light.Position = MatrixTransform(light.Position, view);
-		}
-
-		for (auto& light : lights.DirectionLights) {
-			light.Direction *= ToNormalMatrix(view);
-			light.Direction = VectorNormalized(light.Direction);
-		}
-
-		for (auto& light : lights.Spotlights) {
-			light.Position = MatrixTransform(light.Position, view);
-			light.Direction *= ToNormalMatrix(view);
-			light.Direction = VectorNormalized(light.Direction);
-		}
-	}
 }
 
 void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view)
@@ -207,7 +190,7 @@ void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::Tr
 	m_Engine.GetRenderingManager().ClearDepthBuffer();
 
 	// Update shader
-	
+
 	shader.BeginFrame();
 
 	// Draw
@@ -225,7 +208,7 @@ void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::Tr
 }
 
 void EntryScene::CubeShadowPass(Chimp::LitPointShadowShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view)
-{	
+{
 	// Reset depth buffer
 	m_CubeMap->BindForWriting();
 	m_Engine.GetRenderingManager().ClearDepthBuffer();

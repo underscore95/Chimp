@@ -1,7 +1,7 @@
 #version 410 core
 
 in OutputVertex {
-	vec3 ViewPosition;
+	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoords;
 	vec4 SpotlightPosition[1];
@@ -66,7 +66,7 @@ layout (std140) uniform SceneLighting {
 };
 
 vec3 FragToLight(vec3 lightPos) {
-	return normalize(lightPos - inVert.ViewPosition);
+	return normalize(lightPos - inVert.WorldPosition);
 }
 
 vec3 GetDiffuse(vec3 lightDir, vec3 lightColor) {
@@ -112,7 +112,7 @@ bool IsInShadow(vec4 lightSpacePos) {
 
 	// Is in shadow?
 	float depth =  texture(u_ShadowMap, uvz.xy).x;
-	return depth + 0.0025 < uvz.z;
+	return depth + 0.05 < uvz.z;
 }
 
 bool IsInPointShadow(PointLight light, vec3 viewFragPos) {
@@ -120,7 +120,7 @@ bool IsInPointShadow(PointLight light, vec3 viewFragPos) {
     float closestDepth = texture(u_CubeShadowMap, fragToLight).r;
 	closestDepth *= light.FarPlane;
 	float currentDepth = length(fragToLight);
-	return currentDepth - 0.05f > closestDepth ? true : false; 
+	return currentDepth - 0.15f > closestDepth ? true : false; 
 }
 
 void main()
@@ -136,9 +136,9 @@ void main()
 
 	// Point lights
 	for (int i = 0; i < NumPointLights; ++i) {
-		if (!IsInPointShadow(PointLights[i], inVert.ViewPosition.xyz)) {
+		if (!IsInPointShadow(PointLights[i], inVert.WorldPosition.xyz)) {
 			// Attenuation
-			float dist = distance(PointLights[i].Position, inVert.ViewPosition);
+			float dist = distance(PointLights[i].Position, inVert.WorldPosition);
 			float attenuation = CalculateAttenuation(PointLights[i].Attenuation, dist);
 
 			// Diffuse
@@ -151,13 +151,13 @@ void main()
 	for (int i = 0; i < NumSpotlights; ++i) {
 		if (!IsInShadow(inVert.SpotlightPosition[i])) {
 			// Attenuation
-			float dist = distance(Spotlights[i].Position, inVert.ViewPosition);
+			float dist = distance(Spotlights[i].Position, inVert.WorldPosition);
 			float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
 
 			// Diffuse
 			vec3 diffuse = CalculateSpotlight(Spotlights[i]);
 
-			light += diffuse * attenuation;
+			light +=  diffuse * attenuation;
 		}
 	}
 

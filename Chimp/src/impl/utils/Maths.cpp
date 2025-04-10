@@ -267,4 +267,14 @@ namespace Chimp {
 		assert(transformed.w != 0.0f);
 		return Vector3f(transformed) / transformed.w;
 	}
+
+	bool IsIdentityMatrix(const Matrix& m)
+	{
+		for (int y = 0; y < m.length(); ++y) {
+			for (int x = 0; x < m.length(); ++x) {
+				if (!FloatEqual(m[x][y], (float)(x == y))) return false;
+			}
+		}
+		return true;
+	}
 }

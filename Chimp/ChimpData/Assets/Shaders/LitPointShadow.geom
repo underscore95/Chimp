@@ -20,7 +20,7 @@ void main()
         {
             vec4 pos = views[face] * vec4(gl_in[i].gl_Position.x, gl_in[i].gl_Position.y, gl_in[i].gl_Position.z, 1.0f);
             gl_Position = proj * pos;
-            FragPos = pos.xyz / pos.w;
+            FragPos = gl_in[i].gl_Position.xyz;//pos.xyz / pos.w;
             EmitVertex();
         }    
         EndPrimitive();
