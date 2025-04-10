@@ -101,18 +101,29 @@ float CalculateAttenuation(vec3 attenuation, float dist) {
 	return 1.0f / (attenuation.x + attenuation.y * dist + attenuation.z * (dist * dist));
 }
 
-bool IsInShadow(vec4 lightSpacePos) {
+float IsInShadow(vec4 lightSpacePos) {
 	// Get UV coordinates in the shadow map
 	vec3 uvz = lightSpacePos.xyz / lightSpacePos.w;
 	uvz *= 0.5f;
 	uvz += vec3(0.5f, 0.5f, 0.5f);
 
-	// Is in map?
-	if (uvz.x < 0 || uvz.y < 0 || uvz.x > 1 || uvz.y > 1) return false;
+	// Is out of map?
+	if (uvz.x < 0 || uvz.x > 1 || uvz.y < 0 || uvz.y > 1) return 0;
 
 	// Is in shadow?
-	float depth =  texture(u_ShadowMap, uvz.xy).x;
-	return depth + 0.05 < uvz.z;
+	float shadow = 0.0f;
+	vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+	float bias = 0.05f;
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(u_ShadowMap, uvz.xy + vec2(x, y) * texelSize).r; 
+			shadow += uvz.z - bias > pcfDepth ? 1.0 : 0.0;        
+		}    
+	}
+
+	return 1 - shadow / 9.0f;
 }
 
 bool IsInPointShadow(PointLight light, vec3 viewFragPos) {
@@ -149,25 +160,24 @@ void main()
 
 	// Spotlights
 	for (int i = 0; i < NumSpotlights; ++i) {
-		if (!IsInShadow(inVert.SpotlightPosition[i])) {
-			// Attenuation
-			float dist = distance(Spotlights[i].Position, inVert.WorldPosition);
-			float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
+		float shadow = IsInShadow(inVert.SpotlightPosition[i]);
+		// Attenuation
+		float dist = distance(Spotlights[i].Position, inVert.WorldPosition);
+		float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
 
-			// Diffuse
-			vec3 diffuse = CalculateSpotlight(Spotlights[i]);
+		// Diffuse
+		vec3 diffuse = CalculateSpotlight(Spotlights[i]);
 
-			light +=  diffuse * attenuation;
-		}
+		light +=  diffuse * attenuation * shadow;
 	}
 
 	// Directional lights
 	for (int i = 0; i < NumDirectionalLights; ++i) {
-		if (!IsInShadow(inVert.DirectionalPosition[i])) {
-			// Diffuse
-			vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
-			light += diffuse;
-		}
+		float shadow = IsInShadow(inVert.DirectionalPosition[i]);
+		// Diffuse
+		vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
+		light += diffuse * shadow;
+		
 	}
 
 	FragColor.rgb *= light;
