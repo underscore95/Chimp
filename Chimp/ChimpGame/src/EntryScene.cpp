@@ -149,7 +149,7 @@ void EntryScene::UnloadResources()
 void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 {
 	lights.Ambient = { 0.25, 0.25, 0.25 };
-	lights.NumPointLights = 0;
+	lights.NumPointLights = 1;
 
 	lights.PointLights[0] = {
 		{ 0, 0, -3 }, // Position
@@ -160,7 +160,7 @@ void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 		0
 	};
 
-	lights.NumDirectionLights = 1;
+	lights.NumDirectionLights = 0;
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
