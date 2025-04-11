@@ -117,8 +117,8 @@ float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples)
 	uvz *= 0.5f;
 	uvz += vec3(0.5f, 0.5f, 0.5f);
 
-	// Is out of map?
-	if (uvz.x < 0 || uvz.x > 1 || uvz.y < 0 || uvz.y > 1) return 0;
+	// Fragment is past the far plane of the camera used for depth map
+	if (uvz.z > 1) return 1;
 
 	// Is in shadow?
 	float shadow = 0.0f;
