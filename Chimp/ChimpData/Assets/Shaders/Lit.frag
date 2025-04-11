@@ -25,9 +25,9 @@ struct PointLight {
 	float Padding3;
 
 	float FarPlane;
-	float Padding4;
-	float Padding5;
-	float Padding6;
+	int CubeRootNumShadowSamples;
+	float ShadowBias;
+	float ShadowMaxSampleDistance;
 };
 
 struct DirectionalLight {
@@ -127,26 +127,27 @@ float CalculateRegularShadow(vec4 lightSpacePos) {
 }
 
 float CalculatePointShadow(PointLight light, vec3 viewFragPos) {
-	vec3 fragToLight = viewFragPos - light.Position; 
+	vec3 fragToLight = viewFragPos - light.Position;
 	float currentDepth = length(fragToLight);
-
-	float bias = 0.15;
 	float shadow = 0.0f;
-	float dist = 0.01f;
 
-	for (int x = -1; x <= 1; x++) {
-		for (int y = -1; y <= 1; y++) {
-			for (int z = -1; z <= 1; z++) {
-				vec3 offset = dist * vec3(x, y, z);
+	int startingSample = -(light.CubeRootNumShadowSamples / 2);
+	int finalSample = startingSample + light.CubeRootNumShadowSamples;
+
+	for (int x = startingSample; x < finalSample; x++) {
+		for (int y = startingSample; y < finalSample; y++) {
+			for (int z = startingSample; z < finalSample; z++) {
+				vec3 offset = light.ShadowMaxSampleDistance * vec3(x, y, z);
 				float closestDepth = texture(u_CubeShadowMap, fragToLight + offset).r * light.FarPlane;
-				if (currentDepth - bias > closestDepth) {
+				if (currentDepth - light.ShadowBias > closestDepth) {
 					shadow++;
 				}
 			}
 		}
 	}
 
-	return 1 - shadow / (3 * 3 * 3);
+	float totalSamples = light.CubeRootNumShadowSamples * light.CubeRootNumShadowSamples * light.CubeRootNumShadowSamples;
+	return 1 - shadow / totalSamples;
 }
 
 void main()

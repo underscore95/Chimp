@@ -22,10 +22,10 @@ namespace Chimp {
 		Vector3f Attenuation;
 		float Padding3;
 
-		float FarPlane = 20.0f;
-		float Padding4;
-		float Padding5;
-		float Padding6;
+		float FarPlane = 20.0f; 
+		int CubeRootNumShadowSamples = 4;
+		float ShadowBias = 0.15f;
+		float ShadowMaxSampleDistance = 0.15f;
 
 		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f) const {
 			PointLightMatrices matrices = {};
