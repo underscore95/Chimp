@@ -36,6 +36,11 @@ struct DirectionalLight {
 
 	vec3 Color;
 	float Padding2;
+
+	float ShadowBias;
+	int SqrtNumShadowSamples;
+	float Padding3;
+	float Padding4;
 };
 
 struct Spotlight {
@@ -46,11 +51,16 @@ struct Spotlight {
 	float Padding2;
 
 	vec3 Color;
-	float Padding4;
+	float Padding3;
 
 	vec3 Attenuation;
 		
 	float CutoffAngle; // Is Cos(Angle)
+
+	float ShadowBias;
+	int SqrtNumShadowSamples;
+	float Padding4;
+	float Padding5;
 };
 
 layout (std140) uniform SceneLighting {
@@ -101,7 +111,7 @@ float CalculateAttenuation(vec3 attenuation, float dist) {
 	return 1.0f / (attenuation.x + attenuation.y * dist + attenuation.z * (dist * dist));
 }
 
-float CalculateRegularShadow(vec4 lightSpacePos) {
+float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples) {
 	// Get UV coordinates in the shadow map
 	vec3 uvz = lightSpacePos.xyz / lightSpacePos.w;
 	uvz *= 0.5f;
@@ -113,17 +123,20 @@ float CalculateRegularShadow(vec4 lightSpacePos) {
 	// Is in shadow?
 	float shadow = 0.0f;
 	vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
-	float bias = 0.05f;
-	for (int x = -1; x <= 1; ++x)
+	int startingSample = -(sqrtNumSamples / 2);
+	int finalSample = startingSample + sqrtNumSamples;
+
+	for (int x = startingSample; x < finalSample; ++x)
 	{
-		for (int y = -1; y <= 1; ++y)
+		for (int y = startingSample; y < finalSample; ++y)
 		{
 			float pcfDepth = texture(u_ShadowMap, uvz.xy + vec2(x, y) * texelSize).r; 
 			shadow += uvz.z - bias > pcfDepth ? 1.0 : 0.0;        
 		}    
 	}
 
-	return 1 - shadow / 9.0f;
+	float totalSamples = sqrtNumSamples * sqrtNumSamples;
+	return 1 - shadow / totalSamples;
 }
 
 float CalculatePointShadow(PointLight light, vec3 viewFragPos) {
@@ -175,7 +188,7 @@ void main()
 
 	// Spotlights
 	for (int i = 0; i < NumSpotlights; ++i) {
-		float shadow = CalculateRegularShadow(inVert.SpotlightPosition[i]);
+		float shadow = CalculateRegularShadow(inVert.SpotlightPosition[i], Spotlights[i].ShadowBias, Spotlights[i].SqrtNumShadowSamples);
 		// Attenuation
 		float dist = distance(Spotlights[i].Position, inVert.WorldPosition);
 		float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
@@ -188,7 +201,7 @@ void main()
 
 	// Directional lights
 	for (int i = 0; i < NumDirectionalLights; ++i) {
-		float shadow = CalculateRegularShadow(inVert.DirectionalPosition[i]);
+		float shadow = CalculateRegularShadow(inVert.DirectionalPosition[i], DirectionalLights[i].ShadowBias, DirectionalLights[i].SqrtNumShadowSamples);
 		// Diffuse
 		vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
 		light += diffuse * shadow;

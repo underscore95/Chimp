@@ -54,6 +54,11 @@ namespace Chimp {
 		Vector3f Color;
 		float Padding2;
 
+		float ShadowBias = 0.05f;
+		int SqrtNumShadowSamples = 3;
+		float Padding3;
+		float Padding4;
+
 		CameraMatrices CalculateMatrices(Rect bounds, float zNear = 1.0f, float zFar = 20.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
 			matrices.SetProjectionMatrix(CreateOrthographicProjectionMatrix(bounds.GetLeft(), bounds.GetRight(), bounds.GetBottom(), bounds.GetTop(), zNear, zFar));
@@ -78,10 +83,15 @@ namespace Chimp {
 		float Padding2;
 
 		Vector3f Color;
-		float Padding43;
+		float Padding3;
 
 		Vector3f Attenuation;
 		float CutoffAngle; // Should be Cos(angle)
+
+		float ShadowBias = 0.05f;
+		int SqrtNumShadowSamples = 3;
+		float Padding4;
+		float Padding5;
 
 		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 5.0f, float zFar = 50.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
