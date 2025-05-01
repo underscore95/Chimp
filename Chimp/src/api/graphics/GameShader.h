@@ -52,7 +52,7 @@ namespace Chimp {
 
 		static IShaderBuffers::Index CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name);
 
-	private:
+	protected:
 		Reference<ICamera> m_Camera;
 		bool m_UsingCameraMatrices;
 		CameraMatrices m_CameraMatrices;

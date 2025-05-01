@@ -22,11 +22,6 @@ protected:
 	void UnloadResources() override;
 
 private:
-	void ResetLighting(Chimp::SceneLighting& lights);
-	void ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
-	void CubeShadowPass(Chimp::LitPointShadowShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view);
-
-private:
 	Chimp::Engine& m_Engine;
 	Chimp::ECS m_ECS;
 	Chimp::Reference<Chimp::Mesh> m_TestMesh;
@@ -36,6 +31,4 @@ private:
 
 	Chimp::ModelResourcePath m_ModelPath;
 	Chimp::TextureResourcePath m_TexPath;
-	std::unique_ptr<Chimp::IShadowMap> m_ShadowMap;
-	std::unique_ptr<Chimp::IShadowMap> m_CubeMap;
 };
