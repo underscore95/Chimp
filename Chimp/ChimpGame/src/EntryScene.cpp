@@ -54,29 +54,29 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	lights.PointLights[0] = {
 		{ 0, 0, -3 }, // Position
 		0,
-		{ 1,0,0 }, // Colour
+		{ 0.5f,0.5f,0.5f }, // Colour
 		0,
-		{ 1.0f, 0.02f, 0.0f }, // Attenuation
+		{ 1.0f, 0.0f, 0.0f }, // Attenuation
 		0
 	};
 
-	lights.NumDirectionLights = 0;
+	lights.NumDirectionLights = 1;
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
-	{ 0,0,1 }, // Colour
+	{ 0.25f,0.25f,0.25f }, // Colour
 	0
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 0;
+	lights.NumSpotlights = 1;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction
 		0,
 		{ 0, 10, 0 }, // Position
 		0,
-		{0,1,0}, // Color
+		{0.25f,0.25f,0.25f}, // Color
 		0,
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle
