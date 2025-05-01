@@ -1,5 +1,6 @@
 #include "api/graphics/shaders/shaders/LitShader.h"
-#include "api/graphics/shaders/shaders//lit/LitPointShadowShader.h"
+#include "api/graphics/shaders/shaders/lit/LitPointShadowShader.h"
+#include "api/graphics/shaders/shaders/lit/LitShadowShader.h"
 #include "Loggers.h"
 #include "Engine.h"
 
@@ -12,6 +13,7 @@ namespace Chimp {
 		}),
 		m_lighting(),
 		m_lightMatrices(),
+		m_ShadowShader(std::unique_ptr<LitShadowShader>(new LitShadowShader(engine, m_lighting))),
 		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(engine)))
 	{
 		m_SceneLightingBufferIndex = CreateBuffer(engine,*m_Shader, sizeof(SceneLighting), "SceneLighting");

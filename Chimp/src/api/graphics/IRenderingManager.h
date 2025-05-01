@@ -58,9 +58,11 @@ namespace Chimp {
 		// Create a shadow map
 		// width - The width in pixels
 		// height - The height in pixels
+		// numLights - Maximum number of lights
 		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateShadowMap(
 			unsigned int width,
-			unsigned int height
+			unsigned int height,
+			int numLights
 		) const = 0;
 
 		// Create a cube map

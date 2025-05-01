@@ -6,7 +6,7 @@ using namespace Chimp;
 EntryScene::EntryScene(Engine& engine)
 	: m_Engine(engine),
 	m_Controller(m_Camera, m_Engine.GetWindow().GetInputManager()),
-	m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024)),
+	m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024, 2)),
 	m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, 1024))
 {
 	LoadResources();
@@ -70,6 +70,10 @@ void EntryScene::OnRender()
 	m_ShadowMap->BindForReading(1, shader.GetRawShader());
 	m_CubeMap->BindForReading(2, shader.GetRawShader());
 
+	// Reset depth buffer
+	m_ShadowMap->BindForWriting();
+	m_Engine.GetRenderingManager().ClearDepthBuffer();
+
 	// Shadow pass
 	for (int i = 0; i < lights.NumSpotlights; ++i) {
 		auto& spotlight = lights.Spotlights[i];
@@ -78,7 +82,7 @@ void EntryScene::OnRender()
 		auto matrices = spotlight.CalculateMatrices(35, m_ShadowMap->GetAspectRatio());
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetSpotlightMatrix(i, lightMatrix);
-		shader.SetCameraMatrices(matrices);
+		shader.GetShadowShader().SetLight(i, true, matrices);
 
 		ShadowPass(shader, view);
 	}
@@ -88,9 +92,10 @@ void EntryScene::OnRender()
 		assert(lights.DirectionLights.size() == 1);
 
 		auto matrices = light.CalculateMatrices(Rect{ -10,-10,20,20 });
+		shader.GetShadowShader().SetLight(i, false, matrices);
+
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetDirectionalMatrix(i, lightMatrix);
-		shader.SetCameraMatrices(matrices);
 
 		ShadowPass(shader, view);
 	}
@@ -164,19 +169,19 @@ void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
-	{ 1,1, 1 }, // Colour
+	{ 0,0,1 }, // Colour
 	0
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 0;
+	lights.NumSpotlights = 1;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction
 		0,
 		{ 0, 10, 0 }, // Position
 		0,
-		{1,1,1}, // Color
+		{0,1,0}, // Color
 		0,
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle
@@ -185,13 +190,9 @@ void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 
 void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view)
 {
-	// Reset depth buffer
-	m_ShadowMap->BindForWriting();
-	m_Engine.GetRenderingManager().ClearDepthBuffer();
-
 	// Update shader
 
-	shader.BeginFrame();
+	shader.GetShadowShader().BeginFrame();
 
 	// Draw
 	for (auto& [transform, id, mesh] : view)
@@ -203,7 +204,7 @@ void EntryScene::ShadowPass(Chimp::LitShader& shader, Chimp::ECS::View<Chimp::Tr
 			continue;
 		}
 
-		shader.Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera.GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
+		shader.GetShadowShader().Render(*mesh.Mesh, { transform.GetTransformMatrix(), CreateIdentityMatrix() });
 	}
 }
 
