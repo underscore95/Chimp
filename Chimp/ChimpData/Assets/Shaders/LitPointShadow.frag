@@ -11,4 +11,4 @@ void main()
 {
     // get distance between fragment and light source
     gl_FragDepth = length(FragPos.xyz - position.xyz) / farPlane;
-}  
+}

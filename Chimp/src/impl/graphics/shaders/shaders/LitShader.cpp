@@ -169,7 +169,7 @@ namespace Chimp {
 		m_Engine.GetRenderingManager().ClearDepthBuffer();
 
 		// Update shader
-		BeginFrame();
+		GetPointShadowShader().BeginFrame();
 
 		// Draw
 		for (auto& [transform, id, mesh] : view)
@@ -181,7 +181,7 @@ namespace Chimp {
 				continue;
 			}
 
-			Render(*mesh.Mesh, { transform.GetTransformMatrix(), CreateIdentityMatrix() });
+			GetPointShadowShader().Render(*mesh.Mesh, { transform.GetTransformMatrix(), CreateIdentityMatrix() });
 		}
 	}
 }

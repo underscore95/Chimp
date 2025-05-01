@@ -52,7 +52,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	lights.NumPointLights = 1;
 
 	lights.PointLights[0] = {
-		{ 0, 10, 0 }, // Position
+		{ 0, 0, -3 }, // Position
 		0,
 		{ 1,0,0 }, // Colour
 		0,
