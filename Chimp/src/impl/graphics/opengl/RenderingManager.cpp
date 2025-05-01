@@ -5,6 +5,8 @@
 #include "shaders/Shader.h"
 #include "textures/Texture.h"
 #include "Loggers.h"
+#include "shadows/ShadowMap.h"
+#include "shadows/CubeShadowMap.h"
 
 // https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/1.debugging/debugging.cpp
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -49,7 +51,6 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 	case GL_DEBUG_SEVERITY_LOW:          logger.Warning(ss);; break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION: logger.Info(ss); break;
 	}
-
 }
 
 namespace Chimp::GL {
@@ -80,6 +81,16 @@ namespace Chimp::GL {
 		const BindTarget target) const
 	{
 		return std::make_unique<GL::Buffer>(usage, target);
+	}
+
+	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height, int numLights) const
+	{
+		return std::unique_ptr<IShadowMap>(((IShadowMap*) new ShadowMap(width, height, numLights)));
+	}
+
+	std::unique_ptr<IShadowMap> RenderingManager::CreateCubeShadowMap(unsigned int width, unsigned int height) const
+	{
+		return std::unique_ptr<IShadowMap>(((IShadowMap*) new CubeShadowMap(width, height)));
 	}
 
 	std::unique_ptr<IElementArrayLayout> RenderingManager::CreateElementArrayLayout(
@@ -116,6 +127,26 @@ namespace Chimp::GL {
 		return std::make_unique<GL::Texture>(slot, properties, initialData);
 	}
 
+	void RenderingManager::ClearDepthBuffer() const
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	void RenderingManager::ClearColorBuffer() const
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	void RenderingManager::SetFrameBuffer(int id) const
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, id);
+	}
+
+	void RenderingManager::SetViewport(Vector2i position, Vector2f size) const
+	{
+		glViewport(position.x, position.y, size.x, size.y);
+	}
+
 	void RenderingManager::InitOpenGL()
 	{
 		GLenum err = glewInit();
@@ -133,12 +164,19 @@ namespace Chimp::GL {
 
 #ifndef NDEBUG
 		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(glDebugOutput, nullptr);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
 
 		// Depth testing
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
+		glDepthFunc(GL_LESS);
+		glDepthMask(GL_TRUE);
+		glClearDepth(1.0f);
+
+		// Clipping
+		//glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 
 		// Blending
 		glEnable(GL_BLEND);
@@ -146,10 +184,16 @@ namespace Chimp::GL {
 
 		glCullFace(GL_BACK);
 
+		// Other details
+		GLint maxUniformBlocks = 0;
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBlocks);
+
 		Loggers::Rendering().Info("Initialized OpenGL Renderer.");
 		Loggers::Rendering().Info(" OpenGL Version: " + std::string((const char*)glGetString(GL_VERSION)));
 		Loggers::Rendering().Info(" GLSL Version: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 		Loggers::Rendering().Info(" Vendor: " + std::string((const char*)glGetString(GL_VENDOR)));
 		Loggers::Rendering().Info(" Renderer: " + std::string((const char*)glGetString(GL_RENDERER)));
+		Loggers::Rendering().Info(" Max Uniform Blocks: " + std::to_string(maxUniformBlocks));
+
 	}
 }

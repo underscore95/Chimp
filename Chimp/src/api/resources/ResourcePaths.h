@@ -8,5 +8,4 @@ namespace Chimp {
 	typedef ShaderFilePaths ShaderResourcePath;
 	typedef std::string ModelResourcePath;
 	typedef std::string SoundResourcePath;
-	typedef std::string SoundEffectResourcePath;
 }

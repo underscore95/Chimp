@@ -2,7 +2,7 @@
 
 namespace Chimp
 {
-	Camera& IRenderer::GetDefaultCamera()
+	ICamera& IRenderer::GetDefaultCamera()
 	{
 		return *m_DefaultCamera;
 	}

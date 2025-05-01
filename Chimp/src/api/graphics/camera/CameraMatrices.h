@@ -7,6 +7,7 @@ namespace Chimp {
 	class CameraMatrices {
 	public:
 		CameraMatrices();
+		CameraMatrices(Matrix view, Matrix proj);
 		~CameraMatrices() = default;
 
 		void SetViewMatrix(const Matrix& viewMatrix);

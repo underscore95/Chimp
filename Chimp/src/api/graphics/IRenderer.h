@@ -3,7 +3,7 @@
 #include "buffers/IElementArray.h"
 #include "shaders/IShader.h"
 #include "meshes/Mesh.h"
-#include "camera/Camera.h"
+#include "camera/CameraPerspective.h"
 
 namespace Chimp
 {
@@ -18,7 +18,7 @@ namespace Chimp
 		virtual ~IRenderer() = default;
 
 		// Get the default camera
-		[[nodiscard]] Camera& GetDefaultCamera();
+		[[nodiscard]] ICamera& GetDefaultCamera();
 
 		// Set the camera
 		void SetCamera(std::shared_ptr<ICamera> camera);
@@ -41,7 +41,7 @@ namespace Chimp
 		virtual void StartDrawing() const = 0;
 
 	private:
-		std::shared_ptr<Camera> m_DefaultCamera = std::make_shared<Camera>();
+		std::shared_ptr<ICamera> m_DefaultCamera = std::make_shared<CameraPerspective>();
 		std::shared_ptr<ICamera> m_Camera = m_DefaultCamera;
 		std::shared_ptr<IBuffer> m_ModelBuffer;
 	};

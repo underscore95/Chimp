@@ -4,8 +4,9 @@
 #include "api/Engine.h"
 #include "api/window/IWindow.h"
 #include "api/graphics/IRenderingManager.h"
+#include "api/graphics/shaders/shaders/lit/LitShadowShader.h"
 #include "api/graphics/meshes/TexturedQuad.h"
-#include "api/graphics/camera/controllers/DebugCameraController.h"
+#include "api/graphics/camera/controllers/FreeCameraController.h"
 #include "api/ecs/ECS.h"
 #include "api/ecs/Components.h"
 #include "api/networking/PacketTypeRegistry.h"
@@ -13,8 +14,6 @@
 #include "api/audio/IPlayingAudio.h"
 
 // Utils
-#include "api/files/yaml/YAMLBlockParser.h"
-#include "api/files/yaml/YAMLWriter.h"
 #include "api/utils/FileReader.h"
 #include "api/utils/HashCombine.h"
 #include "api/utils/Maths.h"

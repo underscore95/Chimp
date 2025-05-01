@@ -4,7 +4,7 @@
 #include "Loggers.h"
 
 #ifdef CHIMP_LIBSNDFILE
-#include <../vendor/libsndfile/libsndfile-src/include/sndfile.h>
+#include <sndfile.h>
 #endif
 
 namespace Chimp {

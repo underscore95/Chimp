@@ -5,30 +5,26 @@
 
 namespace Chimp {
 	// Represents an orthographic camera in 3D space
-	// if this is too high level or you need a perspective camera, see CameraMatrices
 	// Updating any property of the camera will automatically update the view / projection matrix
 	class Camera : public ICamera {
 	public:
-		// Create a camera positioned at (0, 0, -1) where +z is forward and -y is up and +x is right
+		// Create a camera positioned at (0, 0, -1000) where +z is forward and -y is up and +x is right
 		// The view will be a 1280x720 viewport positioned at (0, 0) with a clipping plane of 0.0 to 1000.0
 		Camera();
 		~Camera() = default;
 
-		// Set the position of the camera
-		void SetPosition(const Vector3f& position);
+		void SetPosition(const Vector3f& position) override;
 
-		// Set the up vector of the camera, this will normalise (a copy of) the input vector
-		void SetUpVector(const Vector3f& up);
+		void SetUpVector(const Vector3f& up) override;
 
-		// Set the forward vector of the camera, this will normalise (a copy of) the input vector
-		void SetForwardVector(const Vector3f& forward);
+		void SetForwardVector(const Vector3f& forward) override;
 
-		// Set the right vector of the camera, this will normalise (a copy of) the input vector
-		void SetRightVector(const Vector3f& right);
+		void SetRightVector(const Vector3f& right) override;
 
-		// Set forward, up, right vectors of the camera all at once, they must already be normalised
-		void SetNormalizedVectors(const Vector3f& forward, const Vector3f& up, const Vector3f& right);
-		void SetNormalizedVectors(const std::array<Vector3f, 3> forwardUpRight);
+		void SetNormalizedVectors(const Vector3f& forward, const Vector3f& up, const Vector3f& right) override;
+		void SetNormalizedVectors(const std::array<Vector3f, 3> forwardUpRight) override;
+
+		void Rotate(const Quaternion& quat) override;
 
 		// Set the top left of the view in screen space
 		// This generally will be (0, 0). (unless split screen!!)
@@ -39,22 +35,17 @@ namespace Chimp {
 
 		// Set the clipping plane of the view.
 		// This is the minimum and maximum z coordinates where objects will be visible. (zNear, zFar)
-		void SetViewClippingPlane(const Vector2f& clippingPlane);
+		void SetViewClippingPlane(const Vector2f& clippingPlane) override;
 
-		// Get the position of the camera
-		[[nodiscard]] const Vector3f& GetPosition() const;
+		[[nodiscard]] const Vector3f& GetPosition() const override;
 
-		// Equivalent to position + forward vector, get the position the camera is looking at
-		[[nodiscard]] const Vector3f GetTarget() const;
+		[[nodiscard]] const Vector3f GetTarget() const override;
 
-		// Get the up vector of the camera
-		[[nodiscard]] const Vector3f& GetUpVector() const;
+		[[nodiscard]] const Vector3f& GetUpVector() const override;
 
-		// Get the forward vector of the camera
-		[[nodiscard]] const Vector3f& GetForwardVector() const;
+		[[nodiscard]] const Vector3f& GetForwardVector() const override;
 
-		// Get the right vector of the camera
-		[[nodiscard]] const Vector3f& GetRightVector() const;
+		[[nodiscard]] const Vector3f& GetRightVector() const override;
 
 		// Get the top left of the view in screen space
 		[[nodiscard]] const Vector2f& GetViewTopLeft() const;
@@ -65,11 +56,8 @@ namespace Chimp {
 		// Get the size of the viewport in screen space
 		[[nodiscard]] const Vector2f GetViewSize() const;
 
-		// Get the clipping plane of the view.
-		// This is the minimum and maximum z coordinates where objects will be visible. (zNear, zFar)
-		[[nodiscard]] const Vector2f& GetViewClippingPlane() const;
+		[[nodiscard]] const Vector2f& GetViewClippingPlane() const override;
 
-		// Get the camera matrices
 		[[nodiscard]] const CameraMatrices& GetCameraMatrices() const override;
 
 	private:

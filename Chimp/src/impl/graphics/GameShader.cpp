@@ -1,35 +1,44 @@
 #include "api/graphics/GameShader.h"
 #include "api/ecs/Components.h"
+#include "api/Engine.h"
 
 namespace Chimp {
 	GameShader::GameShader(Engine& engine,
 		const ShaderFilePaths& shaderFilePaths,
 		const std::string& cameraBufferName,
-		const std::string& modelBufferName) :
+		const std::string& modelBufferName,
+		bool noCamera,
+		bool noActiveTexture) :
 		m_Engine(engine),
 		m_ShaderFilePaths(shaderFilePaths),
-		m_Camera(&engine.GetRenderingManager().GetRenderer().GetDefaultCamera()) {
+		m_Camera(&engine.GetRenderingManager().GetRenderer().GetDefaultCamera()),
+		m_IsNoCamera(noCamera) ,
+		m_IsNoActiveTexture(noActiveTexture) 
+	{
 
 		auto& renderingManager = m_Engine.GetRenderingManager();
 
 		// COMPILE SHADER
+
 		m_Shader = m_Engine.GetResourceManager().GetShaders().ImmediateDepend(m_ShaderFilePaths);
 
 		// CAMERA BUFFER
-		std::shared_ptr<Chimp::IBuffer> cameraBuffer = renderingManager.CreateBuffer(
-			sizeof(Chimp::Matrix),
-			1,
-			{
-				Chimp::Usage::UpdateFrequency::OCCASIONAL,
-				Chimp::Usage::Access::CPU_WRITE
-			},
-			Chimp::BindTarget::SHADER_BUFFER
-		);
-		m_CameraBufferId = m_Shader->GetShaderBuffers().AddBuffer({ cameraBuffer, cameraBufferName });
+		if (!m_IsNoCamera) {
+			std::shared_ptr<Chimp::IBuffer> cameraBuffer = renderingManager.CreateBuffer(
+				sizeof(CameraMatrices),
+				1,
+				{
+					Chimp::Usage::UpdateFrequency::OCCASIONAL,
+					Chimp::Usage::Access::CPU_WRITE
+				},
+				Chimp::BindTarget::SHADER_BUFFER
+			);
+			m_CameraBufferId = m_Shader->GetShaderBuffers().AddBuffer({ cameraBuffer, cameraBufferName });
+		}
 
 		// MODEL BUFFER
 		std::shared_ptr<Chimp::IBuffer> modelBuffer = renderingManager.CreateBuffer(
-			sizeof(Chimp::Matrix),
+			sizeof(Chimp::TransformMatrices),
 			1,
 			{
 				Chimp::Usage::UpdateFrequency::OFTEN,
@@ -45,78 +54,76 @@ namespace Chimp {
 	}
 
 	void GameShader::SetDefaultCamera() {
-		m_Camera = &m_Engine.GetRenderingManager().GetRenderer().GetDefaultCamera();
+		SetCamera(m_Engine.GetRenderingManager().GetRenderer().GetDefaultCamera());
 	}
 
-	void GameShader::SetCamera(Camera& camera) {
+	void GameShader::SetCamera(ICamera& camera) {
 		m_Camera = &camera;
+		m_UsingCameraMatrices = false;
+	}
+
+	void GameShader::SetCameraMatrices(CameraMatrices matrices)
+	{
+		m_CameraMatrices = matrices;
+		m_UsingCameraMatrices = true;
 	}
 
 	void GameShader::BeginFrame() {
 		m_IsFrameBegun = true;
 
 		// Update camera
-		Chimp::Matrix cameraMatrix = m_Camera->GetCameraMatrices().GetProjectionMatrix() * m_Camera->GetCameraMatrices().GetViewMatrix();
-		m_Shader->SetShaderBufferSubData(m_CameraBufferId, &cameraMatrix, sizeof(Chimp::Matrix), 0);
+		if (!m_IsNoCamera) {
+			m_Shader->SetShaderBufferSubData(m_CameraBufferId, GetCameraMatricesPtr(), sizeof(CameraMatrices), 0);
+		}
 	}
 
-	void GameShader::Render(const Mesh& mesh, const Matrix& transform) {
+	void GameShader::Render(const Mesh& mesh, const TransformMatrices& transform) {
 		assert(m_IsFrameBegun);
 
 		// Send transform
-		m_Shader->SetShaderBufferSubData(m_ModelBufferId, &transform, sizeof(Chimp::Matrix), 0);
+		m_Shader->SetShaderBufferSubData(m_ModelBufferId, &transform, sizeof(Chimp::TransformMatrices), 0);
 
 		for (const auto& section : mesh)
 		{
 			// Send the texture
 			assert(section.Texture); // This shader doesn't support no texture
-			m_Shader->SetTextureSampler(
-				"u_ActiveTexture",
-				section.Texture->GetResource()
-			);
+			if (!m_IsNoActiveTexture) {
+				// Just a hacky fix so a shader without colour attachment to the fbo would work (cube shadow map)
+				m_Shader->SetTextureSampler(
+					"u_ActiveTexture",
+					section.Texture->GetResource()
+				);
+			}
 
 			// Draw the section
 			m_Engine.GetRenderingManager().GetRenderer().Draw(section, *m_Shader);
 		}
 	}
 
-	void GameShader::RenderWorld(ECS& ecs) {
-		struct Renderable
-		{
-			float Z;
-			Chimp::Matrix TransformMatrix;
-			Chimp::Mesh* Mesh;
-		};
-		auto zSorter = [](
-			const Renderable& a,
-			const Renderable& b) {
-				return a.Z > b.Z;
-			};
-		std::vector<Renderable> renderQueue;
+	IShader& GameShader::GetRawShader()
+	{
+		return *m_Shader;
+	}
 
-		auto view = ecs.GetEntitiesWithComponents<TransformComponent, EntityIdComponent, MeshComponent>();
-		for (auto& [transform, id, mesh] : view)
-		{
-			// if has health, dont render if dead
-			auto health = ecs.GetComponent<HealthComponent>(id.Id);
-			if (health.HasValue() && health->Health <= 0)
+	const CameraMatrices& GameShader::GetCameraMatrices() 
+	{
+		return m_UsingCameraMatrices ? m_CameraMatrices : m_Camera->GetCameraMatrices();
+	}
+	const CameraMatrices* GameShader::GetCameraMatricesPtr()
+	{
+		return &(GetCameraMatrices());
+	}
+
+	IShaderBuffers::Index GameShader::CreateBuffer(Engine& engine, IShader& shader, size_t size, std::string_view name) {
+		std::shared_ptr<IBuffer> buffer = engine.GetRenderingManager().CreateBuffer(
+			size,
+			1,
 			{
-				continue;
-			}
-
-			Renderable renderable;
-			renderable.TransformMatrix = transform.GetTransformMatrix();
-			assert(mesh.Mesh != nullptr);
-			renderable.Mesh = mesh.Mesh;
-			renderable.Z = transform.GetTranslation().z;
-			renderQueue.push_back(renderable);
-		}
-
-		std::sort(renderQueue.begin(), renderQueue.end(), zSorter);
-
-		for (const auto& renderable : renderQueue)
-		{
-			Render(*renderable.Mesh, renderable.TransformMatrix);
-		}
+				Usage::UpdateFrequency::OCCASIONAL,
+				Usage::Access::CPU_WRITE
+			},
+			BindTarget::SHADER_BUFFER
+		);
+		return shader.GetShaderBuffers().AddBuffer({ buffer, name.data() });
 	}
 }

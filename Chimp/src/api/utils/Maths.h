@@ -2,13 +2,16 @@
 
 #include <vector>
 #include <array>
-#include <../vendor/glm/glm/glm.hpp>
-#include <../vendor/glm/glm/gtc/matrix_transform.hpp>
-#include <../vendor/glm/glm/gtc/type_ptr.hpp>
-#include <../vendor/glm/glm/gtc/constants.hpp>
+#define GLM_FORCE_RADIANS
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/constants.hpp>
 #include <imgui.h>
-#include "api/files/yaml/YAMLSerialisable.h"
 #include "api/utils/preprocessor/Casting.h"
+#include <memory>
+#include "OptionalReference.h"
 
 namespace Chimp {
 	class YAMLSerialiser;
@@ -20,12 +23,14 @@ namespace Chimp {
 	struct Vector3i;
 	struct Vector4i;
 
+	typedef glm::quat Quaternion;
+
 	// Compare two floats for equality, supports floating point error
-	[[nodiscard]] bool FloatEqual(float a, float b);
+	[[nodiscard]] bool FloatEqual(float a, float b, float epsilon = 1e-6);
 
 #pragma region Types
 #pragma region Vectors
-	struct Vector2f : public YAMLSerialisable {
+	struct Vector2f {
 		Vector2f() : x(0), y(0) {}
 		Vector2f(float x, float y) : x(x), y(y) {}
 		Vector2f(int x, int y) : x((float)x), y((float)y) {}
@@ -36,18 +41,6 @@ namespace Chimp {
 		explicit Vector2f(Vector3f vec);
 		explicit Vector2f(Vector3i vec);
 		explicit Vector2f(Vector4f vec);
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Floats["x"] = x;
-			block.Floats["y"] = y;
-		}
-
-		static std::unique_ptr<Vector2f> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector2f>(
-				block.Floats.at("x"),
-				block.Floats.at("y")
-			);
-		}
 
 		operator glm::vec2() const { return glm::vec2(x, y); }
 		operator ImVec2() const { return ImVec2(x, y); }
@@ -104,7 +97,7 @@ namespace Chimp {
 		float y;
 	};
 
-	struct Vector3f : public YAMLSerialisable {
+	struct Vector3f {
 		Vector3f() : x(0), y(0), z(0) {}
 		Vector3f(float x, float y, float z) : x(x), y(y), z(z) {}
 		Vector3f(int x, int y, int z) : x((float)x), y((float)y), z((float)z) {}
@@ -115,21 +108,13 @@ namespace Chimp {
 		Vector3f(glm::vec<3, float> vec) : x(vec.x), y(vec.y), z(vec.z) {}
 		explicit Vector3f(ImVec2 vec, float z = 0.0f) : x(vec.x), y(vec.y), z(z) {}
 
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Floats["x"] = x;
-			block.Floats["y"] = y;
-			block.Floats["z"] = z;
-		}
-
-		static std::unique_ptr<Vector3f> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector3f>(
-				block.Floats.at("x"),
-				block.Floats.at("y"),
-				block.Floats.at("z")
-			);
-		}
-
 		operator glm::vec3() const { return glm::vec3(x, y, z); }
+
+		void operator=(const Vector3f& other) {
+			x = other.x;
+			y = other.y;
+			z = other.z;
+		}
 
 		Vector3f operator*(float scale) const {
 			return Vector3f(x * scale, y * scale, z * scale);
@@ -182,12 +167,30 @@ namespace Chimp {
 			return x >= other.x && y >= other.y && z >= other.z;
 		}
 
+		Vector3f operator*(const glm::quat& q) const {
+			glm::vec3 rotated = q * glm::vec3(x, y, z);
+			return Vector3f(rotated.x, rotated.y, rotated.z);
+		}
+		void operator*=(const glm::quat& q) {
+			glm::vec3 rotated = q * glm::vec3(x, y, z);
+			x = rotated.x;
+			y = rotated.y;
+			z = rotated.z;
+		}
+
+		Vector3f operator*(const glm::mat3x3& m) const {
+			return m * glm::vec3(x, y, z);
+		}
+		void operator*=(const glm::mat3x3& m) {
+			(*this) = (*this) * m;
+		}
+
 		float x;
 		float y;
 		float z;
 	};
 
-	struct Vector4f : public YAMLSerialisable {
+	struct Vector4f {
 		Vector4f() : x(0), y(0), z(0), w(0) {}
 		Vector4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 		Vector4f(int x, int y, int z, int w) : x((float)x), y((float)y), z((float)z), w((float)w) {}
@@ -197,25 +200,17 @@ namespace Chimp {
 		explicit Vector4f(Vector3f vec, float w = 0.0f);
 		Vector4f(glm::vec<4, float> vec) : x(vec.x), y(vec.y), z(vec.z), w(vec.w) {}
 		Vector4f(ImVec2 vec, float z = 0.0f, float w = 0.0f)
-			: x(vec.x), y(vec.y), z(z), w(w) {}
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Floats["x"] = x;
-			block.Floats["y"] = y;
-			block.Floats["z"] = z;
-			block.Floats["w"] = w;
-		}
-
-		static std::unique_ptr<Vector4f> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector4f>(
-				block.Floats.at("x"),
-				block.Floats.at("y"),
-				block.Floats.at("z"),
-				block.Floats.at("w")
-			);
+			: x(vec.x), y(vec.y), z(z), w(w) {
 		}
 
 		operator glm::vec4() const { return glm::vec4(x, y, z, w); }
+
+		void operator=(const Vector4f& other) {
+			x = other.x;
+			y = other.y;
+			z = other.z;
+			w = other.w;
+		}
 
 		Vector4f operator*(float scale) const {
 			return Vector4f(x * scale, y * scale, z * scale, w * scale);
@@ -272,13 +267,20 @@ namespace Chimp {
 			return x >= other.x && y >= other.y && z >= other.z && w >= other.w;
 		}
 
+		Vector4f operator*(const glm::mat4x4& m) const {
+			return m * glm::vec4(x, y, z, w);
+		}
+		void operator*=(const glm::mat4x4& m) {
+			(*this) = (*this) * m;
+		}
+
 		float x;
 		float y;
 		float z;
 		float w;
 	};
 
-	struct Vector2i : public YAMLSerialisable {
+	struct Vector2i {
 		Vector2i() : x(0), y(0) {}
 		Vector2i(int x, int y) : x(x), y(y) {}
 		explicit Vector2i(Vector3i vec);
@@ -288,18 +290,6 @@ namespace Chimp {
 		explicit Vector2i(Vector4f vec);
 		Vector2i(glm::vec<2, int> vec) : x(vec.x), y(vec.y) {}
 		Vector2i(ImVec2 vec) : x((int)vec.x), y((int)vec.y) {}
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Ints["x"] = x;
-			block.Ints["y"] = y;
-		}
-
-		static std::unique_ptr<Vector2i> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector2i>(
-				block.Ints.at("x"),
-				block.Ints.at("y")
-			);
-		}
 
 		operator glm::ivec2() const { return glm::ivec2(x, y); }
 
@@ -355,7 +345,7 @@ namespace Chimp {
 		int y;
 	};
 
-	struct Vector3i : public YAMLSerialisable {
+	struct Vector3i {
 		Vector3i() : x(0), y(0), z(0) {}
 		Vector3i(int x, int y, int z) : x(x), y(y), z(z) {}
 		explicit Vector3i(Vector4i vec);
@@ -365,20 +355,6 @@ namespace Chimp {
 		explicit Vector3i(Vector4f vec);
 		Vector3i(glm::vec<3, int> vec) : x(vec.x), y(vec.y), z(vec.z) {}
 		Vector3i(ImVec2 vec, int z = 0) : x((int)vec.x), y((int)vec.y), z(z) {}
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Ints["x"] = x;
-			block.Ints["y"] = y;
-			block.Ints["z"] = z;
-		}
-
-		static std::unique_ptr<Vector3i> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector3i>(
-				block.Ints.at("x"),
-				block.Ints.at("y"),
-				block.Ints.at("z")
-			);
-		}
 
 		operator glm::ivec3() const { return glm::ivec3(x, y, z); }
 
@@ -439,7 +415,7 @@ namespace Chimp {
 		int z;
 	};
 
-	struct Vector4i : public YAMLSerialisable {
+	struct Vector4i {
 		Vector4i() : x(0), y(0), z(0), w(0) {}
 		Vector4i(int x, int y, int z, int w) : x(x), y(y), z(z), w(w) {}
 		explicit Vector4i(Vector3i vec, int w = 0);
@@ -449,22 +425,6 @@ namespace Chimp {
 		explicit Vector4i(Vector4f vec);
 		Vector4i(glm::vec<4, int> vec) : x(vec.x), y(vec.y), z(vec.z), w(vec.w) {}
 		Vector4i(ImVec2 vec, int z = 0, int w = 0) : x((int)vec.x), y((int)vec.y), z(z), w(w) {}
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			block.Ints["x"] = x;
-			block.Ints["y"] = y;
-			block.Ints["z"] = z;
-			block.Ints["w"] = w;
-		}
-
-		static std::unique_ptr<Vector4i> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Vector4i>(
-				block.Ints.at("x"),
-				block.Ints.at("y"),
-				block.Ints.at("z"),
-				block.Ints.at("w")
-			);
-		}
 
 		operator glm::ivec4() const { return glm::ivec4(x, y, z, w); }
 
@@ -533,11 +493,12 @@ namespace Chimp {
 #pragma endregion
 
 	typedef glm::mat4x4 Matrix;
+	typedef glm::mat3x3 Matrix3x3;
 #pragma endregion
 
 	constexpr float PI = glm::pi<float>();
 
-	struct Rect : public YAMLSerialisable {
+	struct Rect {
 		Vector2f Position;
 		Vector2f Size;
 
@@ -546,19 +507,11 @@ namespace Chimp {
 			assert(size.x >= 0 && size.y >= 0);
 		}
 
+		Rect(float x, float y, float width, float height) : Rect({ x, y }, { width,height }) {
+
+		}
+
 		Rect(std::unique_ptr<Vector2f> position, std::unique_ptr<Vector2f> size) : Rect(*position, *size) {}
-
-		void Serialise(YAMLBlock& block, const SerialiseChildFunc& serialiseChild) const override {
-			serialiseChild("Position", Position);
-			serialiseChild("Size", Size);
-		}
-
-		static std::unique_ptr<Rect> Deserialise(const Chimp::YAMLBlock& block, const DeserialiseChildFunc& deserialiseChild) {
-			return std::make_unique<Rect>(
-				UNIQUE_PTR_CAST_AND_MOVE(Chimp::Vector2f, deserialiseChild("Position")),
-				UNIQUE_PTR_CAST_AND_MOVE(Chimp::Vector2f, deserialiseChild("Size"))
-			);
-		}
 
 		// Check if a point is inside the rectangle
 		[[nodiscard]] bool Contains(Vector2f point) const {
@@ -586,6 +539,18 @@ namespace Chimp {
 		[[nodiscard]] Vector2f GetBottomRight() const {
 			return Position + Size;
 		}
+		[[nodiscard]] float GetLeft() const {
+			return GetTopLeft().x;
+		}
+		[[nodiscard]] float GetRight() const {
+			return GetTopRight().x;
+		}
+		[[nodiscard]] float GetTop() const {
+			return GetTopLeft().y;
+		}
+		[[nodiscard]] float GetBottom() const {
+			return GetBottomLeft().y;
+		}
 
 		// Scale the rectangle around its center
 		void Scale(float scale) {
@@ -598,8 +563,9 @@ namespace Chimp {
 		}
 	};
 
-	// Register serialisable types to a YAMLSerialiser, does not need to be called for the one stored in engine
-	void RegisterYAMLSerialisableMathsTypes(YAMLSerialiser& serialiser);
+	// Unit conversation
+	[[nodiscard]] float ToRadians(float degrees);
+	[[nodiscard]] float ToDegrees(float radians);
 
 	// Cross product of two vectors
 	[[nodiscard]] Vector3f VectorCrossProduct(const Vector3f& a, const Vector3f& b);
@@ -633,13 +599,21 @@ namespace Chimp {
 	[[nodiscard]] Matrix CreateViewMatrix(Vector3f position, Vector3f target, Vector3f up = Vector3f(0.0f, 1.0f, 0.0f));
 
 	// Create an orthographic projection matrix
-	// left - The coordinate of the left vertical clipping plane. This defines the minimum x-coordinate visible in the orthographic projection.
-	// right - The coordinate of the right vertical clipping plane. This defines the maximum x-coordinate visible in the orthographic projection.
-	// bottom - The coordinate of the bottom horizontal clipping plane. This defines the minimum y-coordinate visible in the orthographic projection.
-	// top - The coordinate of the top horizontal clipping plane. This defines the maximum y-coordinate visible in the orthographic projection.
-	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the orthographic projection.
-	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the orthographic projection.
+	// left - The coordinate of the left vertical clipping plane. This defines the minimum x-coordinate visible in the projection.
+	// right - The coordinate of the right vertical clipping plane. This defines the maximum x-coordinate visible in the projection.
+	// bottom - The coordinate of the bottom horizontal clipping plane. This defines the minimum y-coordinate visible in the projection.
+	// top - The coordinate of the top horizontal clipping plane. This defines the maximum y-coordinate visible in the projection.
+	// zNear - The Z value of the near clipping plane. This defines the minimum Z-coordinate visible in the projection.
+	// zFar - The Z value of the far clipping plane. This defines the maximum Z-coordinate visible in the projection.
 	[[nodiscard]] Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar);
+
+	// Create a perspective projection matrix
+	// Reversed projection matrix required for https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
+	// fov - The FOV in degrees
+	// aspectRatio - The aspect ratio (e.g 16/9)
+	// zNear - The Z value of the near clipping plane. This defines the minimum distance visible in the projection.
+	// zNear - The Z value of the far clipping plane. This defines the maximum distance visible in the projection.
+	[[nodiscard]] Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar);
 
 	// Represents a transformation
 	struct Transform {
@@ -723,6 +697,20 @@ namespace Chimp {
 	}
 	inline float SquaredLength(Vector4f a) {
 		return glm::dot((glm::vec4)a, (glm::vec4)a);
+	}
+
+	// Is normalised
+	inline bool IsNormalised(float a) {
+		return FloatEqual(SquaredLength(a), 1);
+	}
+	inline float IsNormalised(Vector2f a) {
+		return FloatEqual(SquaredLength(a), 1);
+	}
+	inline float IsNormalised(Vector3f a) {
+		return FloatEqual(SquaredLength(a), 1);
+	}
+	inline float IsNormalised(Vector4f a) {
+		return FloatEqual(SquaredLength(a), 1);
 	}
 
 	// Returns minimum components of two values (e.g (2,3) and (1,4) would return (1,3))
@@ -922,5 +910,38 @@ namespace Chimp {
 	}
 	[[nodiscard]] inline float Dot(Vector4f a, Vector4f b) {
 		return glm::dot((glm::vec4)a, (glm::vec4)b);
+	}
+
+	// Are two vectors collinear?
+	// Returns true if a and b are parallel directions
+	[[nodiscard]] inline bool IsCollinear(Vector3f a, Vector3f b) {
+		float dot = Dot(a, b);
+		return FloatEqual(dot * dot, SquaredLength(a) * SquaredLength(b));
+	}
+
+	[[nodiscard]] void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward);
+
+	// Quaternions
+	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);
+
+	// Matrices
+	Matrix3x3 To3x3(const Matrix& m);
+
+	Matrix3x3 Inverse(const Matrix3x3& m);
+
+	Matrix3x3 Transpose(const Matrix3x3& m);
+
+	// Convert matrix to a normal matrix (for normal vectors)
+	// Chimp uses world space (so only passing in model matrix) in shaders
+	Matrix3x3 ToNormalMatrix(const Matrix& m);
+
+	Vector3f MatrixTransform(Vector3f v, const Matrix& m);
+
+	bool IsIdentityMatrix(const Matrix& m);
+
+	// Trig
+	inline float Cos(float degrees) {
+		assert(FloatEqual(glm::cos(ToRadians(90)), 0));
+		return glm::cos(ToRadians(degrees));
 	}
 }

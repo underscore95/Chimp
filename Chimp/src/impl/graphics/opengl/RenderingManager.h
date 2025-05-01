@@ -16,7 +16,18 @@ namespace Chimp::GL {
 		std::unique_ptr<IBuffer> CreateBuffer(
 			const Usage& usage,
 			const BindTarget target
-			) const override;
+		) const override;
+
+		[[nodiscard]] std::unique_ptr<IShadowMap> CreateShadowMap(
+			unsigned int width,
+			unsigned int height,
+			int numLights
+		) const override;
+
+		[[nodiscard]] std::unique_ptr<IShadowMap> CreateCubeShadowMap(
+			unsigned int width,
+			unsigned int height
+		) const override;
 
 		std::unique_ptr<IElementArrayLayout> CreateElementArrayLayout(
 			const PrimitiveType primitivesType,
@@ -36,6 +47,14 @@ namespace Chimp::GL {
 			const TextureSlot slot,
 			const TextureProperties& properties,
 			const void* initialData) const override;
+
+		void ClearDepthBuffer() const override;
+
+		void ClearColorBuffer() const override;
+
+		void SetFrameBuffer(int id)const override;
+
+		void SetViewport(Vector2i position, Vector2f size) const override;
 
 	private:
 		void InitOpenGL();

@@ -1,5 +1,5 @@
 #include "api/utils/Maths.h"
-#include "api/files/yaml/YAMLSerialiser.h"
+#include "Loggers.h"
 
 namespace Chimp {
 
@@ -104,22 +104,19 @@ namespace Chimp {
 #pragma endregion
 #pragma endregion
 
-	bool FloatEqual(float a, float b)
+	bool FloatEqual(float a, float b, float epsilon)
 	{
-		return abs(a - b) < std::numeric_limits<float>::epsilon();
+		return abs(a - b) < epsilon;
 	}
 
-	void RegisterYAMLSerialisableMathsTypes(YAMLSerialiser& serialiser)
+	float ToRadians(float degrees)
 	{
-		serialiser.RegisterSerialisable<Vector2f>("Vec2f", Vector2f::Deserialise);
-		serialiser.RegisterSerialisable<Vector3f>("Vec3f", Vector3f::Deserialise);
-		serialiser.RegisterSerialisable<Vector4f>("Vec4f", Vector4f::Deserialise);
+		return glm::radians(degrees);
+	}
 
-		serialiser.RegisterSerialisable<Vector2i>("Vec2i", Vector2i::Deserialise);
-		serialiser.RegisterSerialisable<Vector3i>("Vec3i", Vector3i::Deserialise);
-		serialiser.RegisterSerialisable<Vector4i>("Vec4i", Vector4i::Deserialise);
-
-		serialiser.RegisterSerialisable<Rect>("Rect", Rect::Deserialise);
+	float ToDegrees(float radians)
+	{
+		return glm::degrees(radians);
 	}
 
 	Vector3f VectorCrossProduct(const Vector3f& a, const Vector3f& b)
@@ -199,11 +196,85 @@ namespace Chimp {
 
 	Matrix CreateViewMatrix(Vector3f position, Vector3f target, Vector3f up)
 	{
-		return glm::lookAt((glm::vec3)position, (glm::vec3)target, (glm::vec3)up);
+		return glm::lookAtRH((glm::vec3)position, (glm::vec3)target, (glm::vec3)up);
 	}
 
 	Matrix CreateOrthographicProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar)
 	{
-		return glm::ortho(left, right, bottom, top, zNear, zFar);
+		return glm::orthoRH(left, right, bottom, top, zNear, zFar);
+	}
+
+	Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar)
+	{
+		assert(zNear != 0);
+		assert(zNear < zFar);
+		assert(fov > 2 * PI);
+		return glm::perspectiveRH(ToRadians(fov), aspectRatio, zNear, zFar);
+
+		//// https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
+		//float f = 1.0f / tan(ToRadians(fov) / 2.0f);
+		//return glm::mat4(
+		//	f / aspectRatio, 0.0f, 0.0f, 0.0f,
+		//	0.0f, f, 0.0f, 0.0f,
+		//	0.0f, 0.0f, 0.0f, -1.0f,
+		//	0.0f, 0.0f, zNear, 0.0f);
+	}
+
+	void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward)
+	{
+		assert(IsNormalised(up));
+
+		// Fix forward and up vectors being collinear which means we can't make a right vector
+		if (IsCollinear(*up, forward)) {
+			// TODO handle this better?
+			if (up->x == 0) up->x += 0.001f;
+			else up->y += 0.001f;
+			*up = VectorNormalized(*up);
+		}
+	}
+
+	Quaternion QuatRotation(Vector3f degrees)
+	{
+		return
+			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 1,0,0 }) *
+			glm::angleAxis(ToRadians(degrees.y), glm::vec3{ 0,1,0 }) *
+			glm::angleAxis(ToRadians(degrees.x), glm::vec3{ 0,0,1 });
+	}
+
+	Matrix3x3 To3x3(const Matrix& m)
+	{
+		return m;
+	}
+
+	Matrix3x3 Inverse(const Matrix3x3& m)
+	{
+		return glm::inverse(m);
+	}
+
+	Matrix3x3 Transpose(const Matrix3x3& m)
+	{
+		return glm::transpose(m);
+	}
+
+	Matrix3x3 ToNormalMatrix(const Matrix& m)
+	{
+		return Transpose(Inverse(To3x3(m)));
+	}
+
+	Vector3f MatrixTransform(Vector3f v, const Matrix& m)
+	{
+		Vector4f transformed = Vector4f(v, 1) * m;
+		assert(transformed.w != 0.0f);
+		return Vector3f(transformed) / transformed.w;
+	}
+
+	bool IsIdentityMatrix(const Matrix& m)
+	{
+		for (int y = 0; y < m.length(); ++y) {
+			for (int x = 0; x < m.length(); ++x) {
+				if (!FloatEqual(m[x][y], (float)(x == y))) return false;
+			}
+		}
+		return true;
 	}
 }

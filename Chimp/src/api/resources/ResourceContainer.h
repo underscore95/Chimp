@@ -4,6 +4,7 @@
 #include "ResourcePaths.h"
 
 namespace Chimp {
+
 	template <typename K, typename T>
 	class ResourceContainer {
 	public:
@@ -11,7 +12,7 @@ namespace Chimp {
 		virtual ~ResourceContainer() = default;
 
 		// Depend on a resource, but its not required right now
-		void Depend(const K& path) {
+		const K& Depend(const K& path) {
 			auto iter = m_Resources.find(path);
 			if (iter == m_Resources.end()) {
 				m_DelayedDependencies.insert(path); // Load it later
@@ -20,6 +21,7 @@ namespace Chimp {
 				// Already loaded, depend on it
 				iter->second.RefCount++;
 			}
+			return path;
 		}
 
 		// Immediate depend on a resource, this loads it if it hasn't been loaded yet and increments the reference count
@@ -44,11 +46,12 @@ namespace Chimp {
 
 		// Release a resource, this decrements the reference count
 		void Release(const K& path) {
-			if (m_Resources.find(path) == m_Resources.end()) {
+			auto it = m_Resources.find(path);
+			if (it == m_Resources.end()) {
 				return;
 			}
 
-			m_Resources[path].RefCount--;
+			it->second.RefCount--;
 		}
 
 		// Unload all resources that have a reference count of 0

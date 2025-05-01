@@ -1,6 +1,5 @@
-#include "menu/MenuScene.h"
+#include "EntryScene.h"
 
 std::unique_ptr<Chimp::Scene> CreateEntryScene(Chimp::Engine &engine) {
-	Networking::Init(engine);
-	return std::make_unique<MenuScene>(engine);
+	return std::make_unique<EntryScene>(engine);
 }

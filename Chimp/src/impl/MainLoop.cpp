@@ -5,6 +5,7 @@ namespace Chimp {
 	MainLoop::MainLoop(std::unique_ptr<Scene> entryScene,
 		Engine& engine)
 		: m_Engine(engine) {
+		m_Engine.PostInit();
 		m_Engine.m_SceneManager = std::unique_ptr<SceneManager>(new SceneManager(std::move(entryScene), m_Engine));
 
 		while (!m_Engine.GetSceneManager().m_CurrentScene->ShouldExit(m_Engine)) {

@@ -18,6 +18,7 @@ namespace Chimp::GL {
 
 		for (const auto& [type, path] : pathsMap)
 		{
+			if (path.empty()) continue;
 			const auto result = compiler.Compile(type, FileReader::Read(path));
 			if (!result.Success)
 			{
@@ -46,6 +47,14 @@ namespace Chimp::GL {
 		if (!m_IsValid)
 		{
 			std::cerr << "Failed to link shader program " << m_ProgramID << std::endl;
+			GLint logLength = 0;
+			glGetProgramiv(m_ProgramID, GL_INFO_LOG_LENGTH, &logLength);
+			if (logLength > 0)
+			{
+				std::vector<char> log(logLength);
+				glGetProgramInfoLog(m_ProgramID, logLength, nullptr, log.data());
+				std::cerr << "Shader Program Link Error: " << log.data() << std::endl;
+			}
 			assert(false);
 			HelperDeleteShaders(shaderIds);
 			m_ProgramID = 0;
@@ -85,18 +94,18 @@ namespace Chimp::GL {
 	{
 		const auto& buffer = m_ShaderBuffers.GetBuffer(id);
 		GLuint blockIndex = glGetUniformBlockIndex(m_ProgramID, buffer.Name.c_str()); // TODO: could we put this in the shader buffer struct?
+		assert(blockIndex < std::numeric_limits<unsigned int>().max()); // Your CPU buffer name doesn't match the name in the shader
 		glUniformBlockBinding(m_ProgramID, blockIndex, static_cast<GLuint>(buffer.Index));
 		buffer.Buffer->BindBufferBase(buffer.Index);
 	}
 
-	void Shader::SetTextureSampler(const std::string& name, const ITexture& texture) const
+	void Shader::SetTextureSampler(const std::string& name, TextureSlot slot) const
 	{
 		Bind();
-		texture.Bind(); // Exception here? probably you loaded a texture that didn't exist, check the console!
 
 		const auto location = glGetUniformLocation(m_ProgramID, name.c_str()); // todo cache this maybe?
 		assert(location != -1); // invalid uniform
-		glUniform1i(location, texture.GetSlot());
+		glUniform1i(location, slot);
 	}
 
 	void Shader::HelperDeleteShaders(std::vector<GLuint>& shaderIds)

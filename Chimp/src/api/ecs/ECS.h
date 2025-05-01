@@ -101,7 +101,7 @@ namespace Chimp {
 		// Get a component from an entity
 		// entity - The entity to get the component from
 		template <typename Component>
-		ConstOptionalReference<Component> GetComponent(EntityId entity) {
+		ConstOptionalReference<Component> GetComponent(EntityId entity) const {
 			return ConstOptionalReference<Component>(entity.get<Component>());
 		}
 

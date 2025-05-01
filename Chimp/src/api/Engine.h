@@ -3,7 +3,10 @@
 #include "api/time/TimeManager.h"
 #include "api/window/IWindow.h"
 #include "api/graphics/IRenderingManager.h"
+#include "api/graphics/shaders/shaders/LitShader.h"
+#include "api/graphics/shaders/shaders/lit/LitPointShadowShader.h"
 #include "api/graphics/images/IImageLoader.h"
+#include "api/graphics/camera/CameraPerspective.h"
 #include "api/resources/ResourceManager.h"
 #include "api/networking/EventHandler.h"
 #include "api/networking/IServer.h"
@@ -14,7 +17,6 @@
 #include "api/threading/ThreadPool.h"
 #include "api/utils/TaskScheduler.h"
 #include "api/utils/ImGuiHelper.h"
-#include "api/files/yaml/YAMLSerialiser.h"
 #include "api/utils/Random.h"
 #include "api/audio/AudioManager.h"
 #include "api/audio/music/MusicPlayer.h"
@@ -27,8 +29,11 @@ namespace Chimp {
 		friend class MainLoop;
 	private:
 		Engine();
+		void PostInit();
 
 	public:
+		~Engine();
+
 		[[nodiscard]] TimeManager& GetTimeManager();
 		[[nodiscard]] IWindow& GetWindow();
 		[[nodiscard]] IRenderingManager& GetRenderingManager();
@@ -37,7 +42,6 @@ namespace Chimp {
 		[[nodiscard]] SceneManager& GetSceneManager();
 		[[nodiscard]] ThreadPool& GetThreadPool();
 		[[nodiscard]] ImGuiHelper& GetImGuiHelper();
-		[[nodiscard]] YAMLSerialiser& GetYAMLSerialiser();
 		[[nodiscard]] Random& GetRandom();
 		[[nodiscard]] AudioManager& GetAudioManager();
 		[[nodiscard]] MusicPlayer& GetMusicPlayer();
@@ -79,7 +83,6 @@ namespace Chimp {
 		std::unique_ptr<SceneManager> m_SceneManager; // initialized in MainLoop
 		ThreadPool m_ThreadPool;
 		ImGuiHelper m_ImGuiHelper;
-		YAMLSerialiser m_YAMLSerialiser;
 		Random m_Random;
 	};
 }

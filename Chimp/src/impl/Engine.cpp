@@ -34,11 +34,18 @@ namespace Chimp {
 		m_ResourceManager.InitModelImporter();
 
 		PacketTypeRegistry::RegisterChimpPacketTypes();
+	}
 
-		RegisterYAMLSerialisableMathsTypes(m_YAMLSerialiser);
-		m_YAMLSerialiser.RegisterSerialisable<SoundEffectSettings>("SoundEffectSettings", SoundEffectSettings::Deserialise);
+	void Engine::PostInit()
+	{
+		m_RenderingManager->InitChimpShaders(*this);
 
 		Loggers::Main().Info("Initialized Chimp Engine!");
+	}
+
+	Engine::~Engine()
+	{
+		m_RenderingManager->DestroyChimpShaders();
 	}
 
 	TimeManager& Engine::GetTimeManager()
@@ -81,11 +88,6 @@ namespace Chimp {
 		return m_ImGuiHelper;
 	}
 
-	YAMLSerialiser& Engine::GetYAMLSerialiser()
-	{
-		return m_YAMLSerialiser;
-	}
-
 	Random& Engine::GetRandom()
 	{
 		return m_Random;
@@ -95,12 +97,12 @@ namespace Chimp {
 	{
 		return *m_AudioManager;
 	}
-	
+
 	MusicPlayer& Engine::GetMusicPlayer()
 	{
 		return m_MusicPlayer;
 	}
-	
+
 	std::unique_ptr<TaskScheduler> Engine::CreateTaskScheduler()
 	{
 		return std::make_unique<TaskScheduler>(*this);

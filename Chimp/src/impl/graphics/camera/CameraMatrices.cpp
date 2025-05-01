@@ -7,6 +7,12 @@ namespace Chimp {
 	{
 	}
 
+	CameraMatrices::CameraMatrices(Matrix view, Matrix proj)
+		: m_ViewMatrix(view),
+		m_ProjectionMatrix(proj)
+	{
+	}
+
 	void CameraMatrices::SetViewMatrix(const Matrix& viewMatrix)
 	{
 		m_ViewMatrix = viewMatrix;

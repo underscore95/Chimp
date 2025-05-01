@@ -1,7 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
-
 namespace Chimp {
 	// Essentially a non-owning raw pointer, this class just exists to make it more clear that the pointer isn't owned
 	template <typename T>
