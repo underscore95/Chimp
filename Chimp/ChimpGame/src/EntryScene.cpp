@@ -93,6 +93,7 @@ void EntryScene::OnRender()
 
 		auto matrices = light.CalculateMatrices(Rect{ -10,-10,20,20 });
 		shader.GetShadowShader().SetLight(i, false, matrices);
+
 		auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 		shader.SetDirectionalMatrix(i, lightMatrix);
 
@@ -168,19 +169,19 @@ void EntryScene::ResetLighting(Chimp::SceneLighting& lights)
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
-	{ 1,1, 1 }, // Colour
+	{ 0,0,1 }, // Colour
 	0
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 0;
+	lights.NumSpotlights = 1;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction
 		0,
 		{ 0, 10, 0 }, // Position
 		0,
-		{1,1,1}, // Color
+		{0,1,0}, // Color
 		0,
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle

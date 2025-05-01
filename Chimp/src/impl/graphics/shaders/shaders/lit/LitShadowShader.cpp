@@ -9,7 +9,7 @@ namespace Chimp {
 	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/LitShadow.geom"),
 	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/LitShadow.frag")
 			},
-			"Camera", "Model", true, true),
+			"Camera", "Model", false, true),
 		m_CurrentLayerBuffer(),
 		m_Lighting(lighting)
 	{
