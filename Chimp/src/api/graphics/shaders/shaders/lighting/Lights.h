@@ -46,7 +46,7 @@ namespace Chimp {
 	static_assert(sizeof(PointLight) % 16 == 0);
 
 	// DIRECTIONAL LIGHT
-	static const int MAX_DIRECTIONAL_LIGHTS = 1;
+	static const int MAX_DIRECTIONAL_LIGHTS = 4;
 	struct alignas(16) DirectionalLight {
 		Vector3f Direction;
 		float Padding;
@@ -74,7 +74,7 @@ namespace Chimp {
 	static_assert(sizeof(DirectionalLight) % 16 == 0);
 
 	// SPOTLIGHT
-	static const int MAX_SPOTLIGHTS = 1;
+	static const int MAX_SPOTLIGHTS = 4;
 	struct alignas(16) Spotlight {
 		Vector3f Direction;
 		float Padding;

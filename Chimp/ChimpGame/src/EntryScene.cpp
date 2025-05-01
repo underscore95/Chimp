@@ -69,7 +69,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 1;
+	lights.NumSpotlights = 2;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction
@@ -77,6 +77,18 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 		{ 0, 10, 0 }, // Position
 		0,
 		{0.25f,0.25f,0.25f}, // Color
+		0,
+		{1.0f,0.0f,0.0f}, // Attenuation
+		Cos(35), // Cutoff angle
+	};
+
+	lights.Spotlights[1] =
+	{
+		{ 0, -1, 0 }, // Direction
+		0,
+		{ 0, 10, 5 }, // Position
+		0,
+		{1,0,0}, // Color
 		0,
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle

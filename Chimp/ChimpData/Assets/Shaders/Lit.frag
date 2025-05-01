@@ -4,8 +4,8 @@ in OutputVertex {
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoords;
-	vec4 SpotlightPosition[1];
-	vec4 DirectionalPosition[1];
+	vec4 SpotlightPosition[4];
+	vec4 DirectionalPosition[4];
 } inVert;
 
 out vec4 FragColor;
@@ -67,8 +67,8 @@ layout (std140) uniform SceneLighting {
 	vec3 AmbientLight;
 	float Padding;
 	PointLight PointLights[1];
-	DirectionalLight DirectionalLights[1];
-	Spotlight Spotlights[1];
+	DirectionalLight DirectionalLights[4];
+	Spotlight Spotlights[4];
 	int NumPointLights;
 	int NumDirectionalLights;
 	int NumSpotlights;

@@ -15,8 +15,8 @@ layout (std140) uniform Model {
 };
 
 layout (std140) uniform LightMatrices {
-	mat4 spotlightMatrices[1];
-	mat4 directionalMatrices[1];
+	mat4 spotlightMatrices[4];
+	mat4 directionalMatrices[4];
 	int numSpotlights;
 	int numDirectional;
 	float padding2;
@@ -27,8 +27,8 @@ out OutputVertex {
 	vec3 WorldPosition;
 	vec3 Normal;
 	vec2 TexCoords;
-	vec4 SpotlightPosition[1];
-	vec4 DirectionalPosition[1];
+	vec4 SpotlightPosition[4];
+	vec4 DirectionalPosition[4];
 } outVert;
 
 void main()

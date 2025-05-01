@@ -17,7 +17,7 @@ namespace Chimp {
 		m_lightMatrices(),
 		m_ShadowShader(std::unique_ptr<LitShadowShader>(new LitShadowShader(engine, m_lighting))),
 		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(engine))),
-		m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024, 2)),
+		m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024, MAX_DIRECTIONAL_LIGHTS + MAX_SPOTLIGHTS)),
 		m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, 1024))
 	{
 		m_SceneLightingBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(SceneLighting), "SceneLighting");
