@@ -20,7 +20,8 @@ namespace Chimp::GL {
 
 		[[nodiscard]] std::unique_ptr<IShadowMap> CreateShadowMap(
 			unsigned int width,
-			unsigned int height
+			unsigned int height,
+			int numLights
 		) const override;
 
 		[[nodiscard]] std::unique_ptr<IShadowMap> CreateCubeShadowMap(

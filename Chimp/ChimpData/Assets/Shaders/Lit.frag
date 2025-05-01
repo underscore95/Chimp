@@ -11,7 +11,7 @@ in OutputVertex {
 out vec4 FragColor;
 
 uniform sampler2D u_ActiveTexture;
-uniform sampler2D u_ShadowMap;
+uniform sampler2DArray u_ShadowMaps;
 uniform samplerCube u_CubeShadowMap;
 
 struct PointLight {
@@ -111,7 +111,7 @@ float CalculateAttenuation(vec3 attenuation, float dist) {
 	return 1.0f / (attenuation.x + attenuation.y * dist + attenuation.z * (dist * dist));
 }
 
-float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples) {
+float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples, int mapIndex) {
 	// Get UV coordinates in the shadow map
 	vec3 uvz = lightSpacePos.xyz / lightSpacePos.w;
 	uvz *= 0.5f;
@@ -122,7 +122,7 @@ float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples)
 
 	// Is in shadow?
 	float shadow = 0.0f;
-	vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+	vec2 texelSize = 1.0 / textureSize(u_ShadowMaps, 0).xy;
 	int startingSample = -(sqrtNumSamples / 2);
 	int finalSample = startingSample + sqrtNumSamples;
 
@@ -130,7 +130,7 @@ float CalculateRegularShadow(vec4 lightSpacePos, float bias, int sqrtNumSamples)
 	{
 		for (int y = startingSample; y < finalSample; ++y)
 		{
-			float pcfDepth = texture(u_ShadowMap, uvz.xy + vec2(x, y) * texelSize).r; 
+			float pcfDepth = texture(u_ShadowMaps, vec3(uvz.xy + vec2(x, y) * texelSize, mapIndex)).r; 
 			shadow += uvz.z - bias > pcfDepth ? 1.0 : 0.0;        
 		}    
 	}
@@ -188,7 +188,7 @@ void main()
 
 	// Spotlights
 	for (int i = 0; i < NumSpotlights; ++i) {
-		float shadow = CalculateRegularShadow(inVert.SpotlightPosition[i], Spotlights[i].ShadowBias, Spotlights[i].SqrtNumShadowSamples);
+		float shadow = CalculateRegularShadow(inVert.SpotlightPosition[i], Spotlights[i].ShadowBias, Spotlights[i].SqrtNumShadowSamples, i + NumDirectionalLights);
 		// Attenuation
 		float dist = distance(Spotlights[i].Position, inVert.WorldPosition);
 		float attenuation = CalculateAttenuation(Spotlights[i].Attenuation, dist);
@@ -201,7 +201,7 @@ void main()
 
 	// Directional lights
 	for (int i = 0; i < NumDirectionalLights; ++i) {
-		float shadow = CalculateRegularShadow(inVert.DirectionalPosition[i], DirectionalLights[i].ShadowBias, DirectionalLights[i].SqrtNumShadowSamples);
+		float shadow = CalculateRegularShadow(inVert.DirectionalPosition[i], DirectionalLights[i].ShadowBias, DirectionalLights[i].SqrtNumShadowSamples, i);
 		// Diffuse
 		vec3 diffuse = CalculateDirectionalLight(DirectionalLights[i]);
 		light += diffuse * shadow;

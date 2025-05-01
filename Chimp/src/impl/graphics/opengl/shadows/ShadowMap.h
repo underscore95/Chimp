@@ -5,7 +5,7 @@
 namespace Chimp {
 	class ShadowMap : IShadowMap {
 	public:
-		ShadowMap(unsigned int width, unsigned int height);
+		ShadowMap(unsigned int width, unsigned int height, int numLights);
 
 		void BindForWriting() const;
 		void BindForReading(TextureSlot slot, const IShader& shader) const;
