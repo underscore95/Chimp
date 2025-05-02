@@ -13,6 +13,7 @@
 #include "api/graphics/textures/ITexture.h"
 #include "api/graphics/shaders/shaders/ChimpShaders.h"
 #include "api/graphics/shadows/IShadowMap.h"
+#include "api/graphics/shadows/ICubeShadowMap.h"
 
 namespace Chimp {
 	class Engine;
@@ -62,15 +63,15 @@ namespace Chimp {
 		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateShadowMap(
 			unsigned int width,
 			unsigned int height,
-			int numLights
+			unsigned int numLights
 		) const = 0;
 
 		// Create a cube map
-		// width - The width in pixels
-		// height - The height in pixels
-		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateCubeShadowMap(
-			unsigned int width,
-			unsigned int height
+		// size - The width and height in pixels
+		// numLights - Maximum number of lights
+		[[nodiscard]] virtual std::unique_ptr<ICubeShadowMap> CreateCubeShadowMap(
+			unsigned int size,
+			unsigned int numLights
 		) const = 0;
 
 		// Create an element array layout which defines how the data in an ElementArray is structured

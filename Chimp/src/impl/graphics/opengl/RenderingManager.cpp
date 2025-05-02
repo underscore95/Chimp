@@ -83,14 +83,14 @@ namespace Chimp::GL {
 		return std::make_unique<GL::Buffer>(usage, target);
 	}
 
-	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height, int numLights) const
+	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height, unsigned int numLights) const
 	{
 		return std::unique_ptr<IShadowMap>(((IShadowMap*) new ShadowMap(width, height, numLights)));
 	}
 
-	std::unique_ptr<IShadowMap> RenderingManager::CreateCubeShadowMap(unsigned int width, unsigned int height) const
+	std::unique_ptr<ICubeShadowMap> RenderingManager::CreateCubeShadowMap(unsigned int size, unsigned int numLights) const
 	{
-		return std::unique_ptr<IShadowMap>(((IShadowMap*) new CubeShadowMap(width, height)));
+		return std::unique_ptr<ICubeShadowMap>(((ICubeShadowMap*) new CubeShadowMap(size, numLights)));
 	}
 
 	std::unique_ptr<IElementArrayLayout> RenderingManager::CreateElementArrayLayout(

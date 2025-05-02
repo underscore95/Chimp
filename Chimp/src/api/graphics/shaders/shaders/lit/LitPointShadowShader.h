@@ -14,7 +14,7 @@ namespace Chimp {
 	class LitPointShadowShader : public GameShader {
 		friend class LitShader;
 	private:
-		LitPointShadowShader(Engine& engine);
+		LitPointShadowShader(const SceneLighting& lighting, Engine& engine);
 
 	public:
 		virtual ~LitPointShadowShader();
@@ -22,7 +22,7 @@ namespace Chimp {
 		void BeginFrame() override;
 		void Render(const Mesh& mesh, const TransformMatrices& transform) override;
 
-		void SetPointLight(const PointLight& light);
+		void SetPointLight(unsigned int pointLightIndex);
 
 		static inline int VertexSize() {
 			return 3 * sizeof(float) // position
@@ -35,5 +35,6 @@ namespace Chimp {
 		PointLightFS m_PointLightFS;
 		IShaderBuffers::Index m_PointLightMatricesBufferIndex;
 		IShaderBuffers::Index m_PointLightFSBufferIndex;
+		const SceneLighting& m_Lighting;
 	};
 }

@@ -8,6 +8,10 @@ out vec3 FragPos;
 layout(std140) uniform PointLightMatrices {
 	mat4 proj;
 	mat4 views[6];
+    int startingFaceIndex;
+    float padding1;
+    float padding2;
+    float padding3;
 };
 
 // Basically making a new vertex for each of the "cameras"
@@ -15,7 +19,7 @@ void main()
 {
     for (int face = 0; face < 6; ++face)
     {
-        gl_Layer = face; 
+        gl_Layer = face + startingFaceIndex;
         for (int i = 0; i < 3; ++i) 
         {
             vec4 pos = views[face] * vec4(gl_in[i].gl_Position.x, gl_in[i].gl_Position.y, gl_in[i].gl_Position.z, 1.0f);

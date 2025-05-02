@@ -60,7 +60,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 		0
 	};
 
-	lights.NumDirectionLights = 1;
+	lights.NumDirectionLights = 0;
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
@@ -69,7 +69,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 2;
+	lights.NumSpotlights = 0;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction
