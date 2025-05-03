@@ -9,7 +9,7 @@ Blaboon is a Bloons TD Battles clone developed by me using Chimp v1: https://git
 ## Main Features
 ### Graphics
 - Render textured sprites and 3D models
-- Basic lighting (4 spotlights, 1 point light, 4 directional lights)
+- Basic lighting (4 spotlights, 4 point lights, 4 directional lights)
 - Shadow mapping (including omnidirectional shadow mapping)
 - Supports custom user-written shaders (no lighting in custom shaders though)
 - OpenGL backend
