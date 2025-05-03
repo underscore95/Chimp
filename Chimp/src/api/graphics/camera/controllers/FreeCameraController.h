@@ -14,6 +14,6 @@ namespace Chimp {
 		ICamera& m_Camera;
 		InputManager& m_InputManager;
 		static constexpr float MOVEMENT_SPEED = 20.0f;
-		static constexpr float ROTATION_SPEED = 30.0f;
+		static constexpr float ROTATION_SPEED = 1.0f;
 	};
 }

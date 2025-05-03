@@ -233,12 +233,47 @@ namespace Chimp {
 		}
 	}
 
-	Quaternion QuatRotation(Vector3f degrees)
+	// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+	Quaternion ToQuatRotation(Vector3f degrees)
 	{
-		return
-			glm::angleAxis(ToRadians(degrees.z), glm::vec3{ 1,0,0 }) *
-			glm::angleAxis(ToRadians(degrees.y), glm::vec3{ 0,1,0 }) *
-			glm::angleAxis(ToRadians(degrees.x), glm::vec3{ 0,0,1 });
+		float cr = Cos(degrees.x * 0.5);
+		float sr = Sin(degrees.x * 0.5);
+		float cp = Cos(degrees.y * 0.5);
+		float sp = Sin(degrees.y * 0.5);
+		float cy = Cos(degrees.z * 0.5);
+		float sy = Sin(degrees.z * 0.5);
+
+		Quaternion n= {
+			cr * cp * cy + sr * sp * sy,
+			sr * cp * cy - cr * sp * sy,
+			cr * sp * cy + sr * cp * sy,
+			cr * cp * sy - sr * sp * cy
+		};
+
+		return n;
+	}
+
+	// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Source_code_2
+	Vector3f ToEulerRotation(Quaternion rotation)
+	{
+		Vector3f angles;
+
+		// roll (x-axis rotation)
+		float sinr_cosp = 2 * (rotation.w * rotation.x + rotation.y * rotation.z);
+		float cosr_cosp = 1 - 2 * (rotation.x * rotation.x + rotation.y * rotation.y);
+		angles.x = std::atan2(sinr_cosp, cosr_cosp);
+
+		// pitch (y-axis rotation)
+		float sinp = std::sqrt(1 + 2 * (rotation.w * rotation.y - rotation.x * rotation.z));
+		float cosp = std::sqrt(1 - 2 * (rotation.w * rotation.y - rotation.x * rotation.z));
+		angles.y = 2 * std::atan2(sinp, cosp) - HALF_PI;
+
+		// yaw (z-axis rotation)
+		float siny_cosp = 2 * (rotation.w * rotation.z + rotation.x * rotation.y);
+		float cosy_cosp = 1 - 2 * (rotation.y * rotation.y + rotation.z * rotation.z);
+		angles.z = std::atan2(siny_cosp, cosy_cosp);
+
+		return angles;
 	}
 
 	Matrix3x3 To3x3(const Matrix& m)

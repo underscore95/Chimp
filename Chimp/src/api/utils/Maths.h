@@ -497,6 +497,7 @@ namespace Chimp {
 #pragma endregion
 
 	constexpr float PI = glm::pi<float>();
+	constexpr float HALF_PI = glm::pi<float>() / 2.0f;
 
 	struct Rect {
 		Vector2f Position;
@@ -922,26 +923,32 @@ namespace Chimp {
 	[[nodiscard]] void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward);
 
 	// Quaternions
-	[[nodiscard]] Quaternion QuatRotation(Vector3f degrees);
+	[[nodiscard]] Quaternion ToQuatRotation(Vector3f degrees);
+	[[nodiscard]] Vector3f ToEulerRotation(Quaternion rotation);
 
 	// Matrices
-	Matrix3x3 To3x3(const Matrix& m);
+	[[nodiscard]] Matrix3x3 To3x3(const Matrix& m);
 
-	Matrix3x3 Inverse(const Matrix3x3& m);
+	[[nodiscard]] Matrix3x3 Inverse(const Matrix3x3& m);
 
-	Matrix3x3 Transpose(const Matrix3x3& m);
+	[[nodiscard]] Matrix3x3 Transpose(const Matrix3x3& m);
 
 	// Convert matrix to a normal matrix (for normal vectors)
 	// Chimp uses world space (so only passing in model matrix) in shaders
-	Matrix3x3 ToNormalMatrix(const Matrix& m);
+	[[nodiscard]] Matrix3x3 ToNormalMatrix(const Matrix& m);
 
-	Vector3f MatrixTransform(Vector3f v, const Matrix& m);
+	[[nodiscard]] Vector3f MatrixTransform(Vector3f v, const Matrix& m);
 
-	bool IsIdentityMatrix(const Matrix& m);
+	[[nodiscard]] bool IsIdentityMatrix(const Matrix& m);
 
 	// Trig
-	inline float Cos(float degrees) {
+	[[nodiscard]] inline float Cos(float degrees) {
 		assert(FloatEqual(glm::cos(ToRadians(90)), 0));
 		return glm::cos(ToRadians(degrees));
+	}
+
+	[[nodiscard]] inline float Sin(float degrees) {
+		assert(FloatEqual(glm::sin(ToRadians(90)), 1));
+		return glm::sin(ToRadians(degrees));
 	}
 }
