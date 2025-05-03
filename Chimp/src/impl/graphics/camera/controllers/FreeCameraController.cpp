@@ -46,23 +46,22 @@ namespace Chimp {
 	Vector3f rotation;
 	{
 		if (m_InputManager.IsKeyDown(Keyboard::I)) {
-			rotation.x--;
+			rotation.y++;
 		}
 		if (m_InputManager.IsKeyDown(Keyboard::K)) {
-			rotation.x++;
-		}
-		if (m_InputManager.IsKeyDown(Keyboard::L)) {
 			rotation.y--;
 		}
+		if (m_InputManager.IsKeyDown(Keyboard::L)) {
+			rotation.x++;
+		}
 		if (m_InputManager.IsKeyDown(Keyboard::J)) {
-			rotation.y++;
+			rotation.x--;
 		}
 	}
 
 	if (rotation != Vector3f()) {
 		rotation = VectorNormalized(rotation) * ROTATION_SPEED * deltaTime;
-		Quaternion quat = QuatRotation(rotation);
-		m_Camera.Rotate(quat);
+		m_Camera.SetForwardVector(m_Camera.GetForwardVector() + rotation);
 	}
 }
 }
