@@ -13,12 +13,12 @@ namespace Chimp {
 			CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/Lit.frag")
 		}),
 		m_Engine(engine),
-		m_lighting(),
-		m_lightMatrices(),
-		m_ShadowShader(std::unique_ptr<LitShadowShader>(new LitShadowShader(engine, m_lighting))),
-		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(engine))),
+		m_Lighting(),
+		m_LightMatrices(),
+		m_ShadowShader(std::unique_ptr<LitShadowShader>(new LitShadowShader(engine, m_Lighting))),
+		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(m_Lighting, engine))),
 		m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024, MAX_DIRECTIONAL_LIGHTS + MAX_SPOTLIGHTS)),
-		m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, 1024))
+		m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, MAX_POINT_LIGHTS))
 	{
 		m_SceneLightingBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(SceneLighting), "SceneLighting");
 		m_LightMatricesBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(LightMatrices), "LightMatrices");
@@ -34,11 +34,11 @@ namespace Chimp {
 	{
 		GameShader::BeginFrame();
 
-		m_lightMatrices.NumSpotlights = m_lighting.NumSpotlights;
-		m_lightMatrices.NumDirectionalLights = m_lighting.NumDirectionLights;
+		m_LightMatrices.NumSpotlights = m_Lighting.NumSpotlights;
+		m_LightMatrices.NumDirectionalLights = m_Lighting.NumDirectionLights;
 
-		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &m_lighting, sizeof(SceneLighting));
-		m_Shader->SetShaderBufferSubData(m_LightMatricesBufferIndex, &m_lightMatrices, sizeof(LightMatrices));
+		m_Shader->SetShaderBufferSubData(m_SceneLightingBufferIndex, &m_Lighting, sizeof(SceneLighting));
+		m_Shader->SetShaderBufferSubData(m_LightMatricesBufferIndex, &m_LightMatrices, sizeof(LightMatrices));
 	}
 
 	void LitShader::Render(const Mesh& mesh, const TransformMatrices& transform)
@@ -64,7 +64,7 @@ namespace Chimp {
 				continue;
 			}
 
-			Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
+			Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(transform.GetTransformMatrix()) });
 		}
 	}
 
@@ -76,7 +76,7 @@ namespace Chimp {
 		auto oldCameraMatrices = m_CameraMatrices;
 
 		// Setup
-		m_lighting.IsDepthPass = true;
+		m_Lighting.IsDepthPass = true;
 
 		m_ShadowMap->BindForReading(1, GetRawShader());
 		m_CubeMap->BindForReading(2, GetRawShader());
@@ -86,8 +86,8 @@ namespace Chimp {
 		m_Engine.GetRenderingManager().ClearDepthBuffer();
 
 		// Shadow pass
-		for (int i = 0; i < m_lighting.NumSpotlights; ++i) {
-			auto& spotlight = m_lighting.Spotlights[i];
+		for (int i = 0; i < m_Lighting.NumSpotlights; ++i) {
+			auto& spotlight = m_Lighting.Spotlights[i];
 
 			auto matrices = spotlight.CalculateMatrices(35, m_ShadowMap->GetAspectRatio());
 			auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
@@ -98,8 +98,8 @@ namespace Chimp {
 			ShadowPassPerLight(view, ecs);
 		}
 
-		for (int i = 0; i < m_lighting.NumDirectionLights; ++i) {
-			auto& light = m_lighting.DirectionLights[i];
+		for (int i = 0; i < m_Lighting.NumDirectionLights; ++i) {
+			auto& light = m_Lighting.DirectionLights[i];
 
 			auto matrices = light.CalculateMatrices(Rect{ -10,-10,20,20 });
 			GetShadowShader().SetLight(i, false, matrices);
@@ -111,10 +111,10 @@ namespace Chimp {
 		}
 
 		// Cube shadow pass
-		for (int i = 0; i < m_lighting.NumPointLights; ++i) {
-			auto& pointlight = m_lighting.PointLights[i];
-
-			GetPointShadowShader().SetPointLight(pointlight);
+		m_CubeMap->BindForWriting();
+		m_Engine.GetRenderingManager().ClearDepthBuffer();
+		for (int i = 0; i < m_Lighting.NumPointLights; ++i) {
+			GetPointShadowShader().SetPointLight(i);
 			CubeShadowPassPerLight(view, ecs);
 		}
 
@@ -124,7 +124,7 @@ namespace Chimp {
 		m_Engine.GetRenderingManager().ClearDepthBuffer();
 		m_Engine.GetRenderingManager().ClearColorBuffer();
 
-		m_lighting.IsDepthPass = false;
+		m_Lighting.IsDepthPass = false;
 		if (usingCameraMatrices) {
 			SetCameraMatrices(oldCameraMatrices);
 		}
@@ -135,12 +135,12 @@ namespace Chimp {
 
 	void LitShader::SetSpotlightMatrix(int index, Matrix mat)
 	{
-		m_lightMatrices.Spotlights[index] = mat;
+		m_LightMatrices.Spotlights[index] = mat;
 	}
 
 	void LitShader::SetDirectionalMatrix(int index, Matrix mat)
 	{
-		m_lightMatrices.DirectionalLights[index] = mat;
+		m_LightMatrices.DirectionalLights[index] = mat;
 	}
 
 	void LitShader::ShadowPassPerLight(Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view, const ECS& ecs)
@@ -164,10 +164,6 @@ namespace Chimp {
 
 	void LitShader::CubeShadowPassPerLight(Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view, const ECS& ecs)
 	{
-		// Reset depth buffer
-		m_CubeMap->BindForWriting();
-		m_Engine.GetRenderingManager().ClearDepthBuffer();
-
 		// Update shader
 		GetPointShadowShader().BeginFrame();
 

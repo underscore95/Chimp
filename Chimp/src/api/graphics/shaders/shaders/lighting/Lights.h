@@ -7,11 +7,15 @@ namespace Chimp {
 	struct alignas(16) PointLightMatrices {
 		Matrix Projection;
 		std::array<Matrix, 6> Views;
+		int StartingFaceIndex;
+		float Padding1;
+		float Padding2;
+		float Padding3;
 	};
 	static_assert(sizeof(PointLightMatrices) % 16 == 0);
 
 	// POINT LIGHT
-	static const int MAX_POINT_LIGHTS = 1;
+	static const int MAX_POINT_LIGHTS = 4;
 	struct alignas(16) PointLight {
 		Vector3f Position;
 		float Padding;
@@ -27,7 +31,7 @@ namespace Chimp {
 		float ShadowBias = 0.15f;
 		float ShadowMaxSampleDistance = 0.15f;
 
-		PointLightMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 1.0f) const {
+		PointLightMatrices CalculateMatrices(int lightIndex, float aspectRatio = 1, float zNear = 1.0f) const {
 			PointLightMatrices matrices = {};
 			matrices.Projection = CreatePerspectiveProjectionMatrix(90, aspectRatio, zNear, FarPlane);
 
@@ -39,6 +43,8 @@ namespace Chimp {
 				CreateViewMatrix(Position, Position + Vector3f(0.0f,  0.0f,  1.0f), Vector3f(0.0f, -1.0f,  0.0f)),
 				CreateViewMatrix(Position, Position + Vector3f(0.0f,  0.0f, -1.0f), Vector3f(0.0f, -1.0f,  0.0f))
 			};
+
+			matrices.StartingFaceIndex = lightIndex * 6;
 
 			return matrices;
 		}

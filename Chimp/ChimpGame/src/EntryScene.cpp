@@ -48,19 +48,28 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	auto& shader = m_Engine.GetRenderingManager().GetChimpShaders().GetLitShader();
 
 	SceneLighting& lights = shader.GetLighting();
-	lights.Ambient = { 0.25, 0.25, 0.25 };
-	lights.NumPointLights = 1;
+	lights.Ambient = { 0,0,0 };
+	lights.NumPointLights = 2;
 
 	lights.PointLights[0] = {
 		{ 0, 0, -3 }, // Position
 		0,
-		{ 0.5f,0.5f,0.5f }, // Colour
+		{ 1,0,0 }, // Colour
 		0,
 		{ 1.0f, 0.0f, 0.0f }, // Attenuation
 		0
 	};
 
-	lights.NumDirectionLights = 1;
+	lights.PointLights[1] = {
+		{ 3, 0, -3 }, // Position
+		0,
+		{ 0,0,1 }, // Colour
+		0,
+		{ 1.0f, 0.0f, 0.0f }, // Attenuation
+		0
+	};
+
+	lights.NumDirectionLights = 0;
 	lights.DirectionLights[0] = {
 	{ 0.5f, -1.0f, 0.0f }, // Direction
 	0,
@@ -69,7 +78,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	};
 	lights.DirectionLights[0].Direction = VectorNormalized(lights.DirectionLights[0].Direction);
 
-	lights.NumSpotlights = 2;
+	lights.NumSpotlights = 0;
 	lights.Spotlights[0] =
 	{
 		{ 0, -1, 0 }, // Direction

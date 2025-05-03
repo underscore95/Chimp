@@ -3,7 +3,9 @@
 #include "Engine.h"
 
 namespace Chimp {
-	LitPointShadowShader::LitPointShadowShader(Engine& engine) : GameShader(
+	LitPointShadowShader::LitPointShadowShader(
+		const SceneLighting& lighting,
+		Engine& engine) : GameShader(
 		engine, ShaderFilePaths{
 	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/LitPointShadow.vert"),
 	CHIMP_DATA_FOLDER + std::string("/Assets/Shaders/LitPointShadow.geom"),
@@ -11,7 +13,8 @@ namespace Chimp {
 		},
 		"Camera", "Model", true, true),
 		m_PointLightMatrices(),
-		m_PointLightFS()
+		m_PointLightFS(),
+		m_Lighting(lighting)
 	{
 		m_PointLightMatricesBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(PointLightMatrices), "PointLightMatrices");
 		m_PointLightFSBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(PointLightFS), "PointLightFS");
@@ -38,9 +41,11 @@ namespace Chimp {
 		GameShader::Render(mesh, transform);
 	}
 
-	void LitPointShadowShader::SetPointLight(const PointLight& light)
+	void LitPointShadowShader::SetPointLight(unsigned int pointLightIndex)
 	{
-		m_PointLightMatrices = light.CalculateMatrices();
+		assert(pointLightIndex < m_Lighting.NumPointLights);
+		const PointLight& light = m_Lighting.PointLights[pointLightIndex];
+		m_PointLightMatrices = light.CalculateMatrices(pointLightIndex);
 		m_PointLightFS.LightPosition = light.Position;
 		m_PointLightFS.FarPlane = 20;
 	}

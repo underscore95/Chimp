@@ -18,7 +18,7 @@ namespace Chimp {
 	public:
 		virtual ~LitShader();
 
-		SceneLighting& GetLighting() { return m_lighting; }
+		SceneLighting& GetLighting() { return m_Lighting; }
 		void BeginFrame() override;
 		void Render(const Mesh& mesh, const TransformMatrices& transform) override;
 
@@ -49,8 +49,8 @@ namespace Chimp {
 
 	private:
 		Engine& m_Engine;
-		SceneLighting m_lighting;
-		LightMatrices m_lightMatrices;
+		SceneLighting m_Lighting;
+		LightMatrices m_LightMatrices;
 		std::unique_ptr<LitPointShadowShader> m_PointShadowShader;
 		std::unique_ptr<LitShadowShader> m_ShadowShader;
 		IShaderBuffers::Index m_SceneLightingBufferIndex;
