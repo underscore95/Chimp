@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "api/utils/OptionalReference.h"
 #include "EntityId.h"
-#include "components/TracksChildrenComponent.h"
+#include "components/ChildrenComponent.h"
 #include "components/ParentComponent.h"
 
 namespace Chimp {
@@ -34,7 +34,7 @@ namespace Chimp {
 			~View() = default;
 
 			// Remove all entities from the view that do not satisfy the predicate
-			void WithPredicate(const std::function<bool(ComponentTuple&)> &predicate) {
+			void WithPredicate(const std::function<bool(ComponentTuple&)>& predicate) {
 				for (auto it = m_Components.begin(); it != m_Components.end();) {
 					if (!predicate(*it)) {
 						it = m_Components.erase(it);
@@ -72,11 +72,11 @@ namespace Chimp {
 				if (parentComp) {
 					// TODO: Do nothing if the parent is the same?
 					// We have a parent, let them know their child is leaving if they track children
-					auto trackChildrenComp = parentComp->Parent.get_mut< TracksChildrenComponent>();
-					if (trackChildrenComp) {
-						auto& children = trackChildrenComp->Children;
-						children.erase(child);
-					}
+					auto trackChildrenComp = parentComp->Parent.get_mut< ChildrenComponent>();
+					assert(trackChildrenComp);
+					auto& children = trackChildrenComp->Children;
+					children.erase(child);
+
 				}
 			}
 
@@ -84,34 +84,22 @@ namespace Chimp {
 			child.set(ParentComponent{ parent });
 
 			// Does the new parent track children?
-			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
-			if (trackChildrenComp) {
-				auto& children = trackChildrenComp->Children;
-				children.insert(child);
-			}
-		}
+			auto trackChildrenComp = parent.get_mut< ChildrenComponent>();
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			children.insert(child);
 
-		void AddChild(EntityId parent, EntityId child) {
-			assert(!IsChildOf(parent, child));
-			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
-			trackChildrenComp->Children.insert(child);
-		}
-
-		void RemoveChild(EntityId parent, EntityId child) {
-			assert(IsChildOf(parent, child));
-			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
-			trackChildrenComp->Children.erase(child);
 		}
 
 		bool IsChildOf(EntityId parent, EntityId possibleChild) const {
-			auto trackChildrenComp = parent.get< TracksChildrenComponent>();
+			auto trackChildrenComp = parent.get< ChildrenComponent>();
 			assert(trackChildrenComp);
 			auto& children = trackChildrenComp->Children;
 			return children.contains(possibleChild);
 		}
 
 		const std::set<EntityId>& GetChildren(EntityId parent) const {
-			auto trackChildrenComp = parent.get< TracksChildrenComponent>();
+			auto trackChildrenComp = parent.get< ChildrenComponent>();
 			assert(trackChildrenComp);
 			return trackChildrenComp->Children;
 		}
@@ -127,23 +115,26 @@ namespace Chimp {
 			return m_EntityCount;
 		}
 
-		// Create an entity with no components
+		// Create an entity with minimal components
 		EntityId CreateEntity() {
 			m_EntityCount++;
-			return m_World.entity();
-		}
-
-		// Create an entity with a TracksChildrenComponent
-		EntityId CreateEntityAndTrackChildren() {
-			EntityId ent = CreateEntity();
-			ent.set(TracksChildrenComponent{});
+			auto ent = m_World.entity();
+			ent.set(ChildrenComponent{});
 			return ent;
 		}
 
 		// Remove an entity from the world
 		void RemoveEntity(EntityId entity) {
-			m_EntityCount--;
-			entity.destruct();
+			auto parentComp = entity.get<ParentComponent>();
+			if (parentComp) {
+				// Let the parent know they don't have this child anymore
+				auto trackChildrenComp = parentComp->Parent.get_mut< ChildrenComponent>();
+				assert(trackChildrenComp);
+				auto& children = trackChildrenComp->Children;
+				children.erase(entity);
+			}
+
+			RemoveEntityRecursive(entity);
 		}
 
 		// Is entity alive
@@ -186,11 +177,24 @@ namespace Chimp {
 			return View<Components...>(m_World);
 		}
 
-		private:
-			template <typename Component>
-			inline static constexpr bool IsHierachyComponent_v =
-				std::is_base_of<TracksChildrenComponent, Component>::value ||
-				std::is_base_of<ParentComponent, Component>::value;
+	private:
+		template <typename Component>
+		inline static constexpr bool IsHierachyComponent_v =
+			std::is_base_of<ChildrenComponent, Component>::value ||
+			std::is_base_of<ParentComponent, Component>::value;
+
+		void RemoveEntityRecursive(EntityId entity) {
+			// Remove any children
+			auto trackChildrenComp = entity.get<ChildrenComponent>();
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			for (auto& child : children) {
+				RemoveEntityRecursive(child);
+			}
+
+			m_EntityCount--;
+			entity.destruct();
+		}
 
 	private:
 		flecs::world m_World;

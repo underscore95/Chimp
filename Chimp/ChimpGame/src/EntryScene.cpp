@@ -43,9 +43,9 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 
 	assert(parent == m_ECS.GetParent(child));
 
-	auto parent2 = m_ECS.CreateEntityAndTrackChildren();
+	auto parent2 = m_ECS.CreateEntity();
 
-	auto child1a = m_ECS.CreateEntityAndTrackChildren();
+	auto child1a = m_ECS.CreateEntity();
 	auto child1b = m_ECS.CreateEntity();
 	auto child2a = m_ECS.CreateEntity();
 
@@ -61,8 +61,17 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	assert(m_ECS.IsChildOf(parent2, child1b));
 	assert(m_ECS.IsChildOf(child1a, child2a));
 
-	auto children1 = m_ECS.GetChildren(parent2);
-	auto children2 = m_ECS.GetChildren(child1a);
+	m_ECS.SetParent(child1a, parent);
+
+	assert(!m_ECS.IsChildOf(parent2, child1a));
+	assert(m_ECS.IsChildOf(parent, child1a));
+
+	m_ECS.RemoveEntity(parent);
+	assert(!m_ECS.IsEntityAlive(parent));
+	assert(!m_ECS.IsEntityAlive(child1a));
+	assert(!m_ECS.IsEntityAlive(child2a));
+	assert(m_ECS.IsEntityAlive(child1b));
+	assert(m_ECS.IsEntityAlive(parent2));
 
 #pragma endregion
 

@@ -4,7 +4,7 @@
 #include "api/ecs/EntityId.h"
 
 namespace Chimp {
-	struct TracksChildrenComponent {
+	struct ChildrenComponent {
 		std::set<EntityId> Children;
 	};
 }
