@@ -1,5 +1,6 @@
 #include "api/utils/Maths.h"
 #include "Loggers.h"
+#include <glm/gtx/quaternion.hpp>
 
 namespace Chimp {
 
@@ -109,6 +110,32 @@ namespace Chimp {
 		return abs(a - b) < epsilon;
 	}
 
+	std::string ToString(float v)
+	{
+		return std::to_string(v);
+	}
+
+	std::string ToString(Vector2f v)
+	{
+		std::stringstream ss;
+		ss << "Vector2f(" << v.x << ", " << v.y << ")";
+		return ss.str();
+	}
+
+	std::string ToString(Vector3f v)
+	{
+		std::stringstream ss;
+		ss << "Vector3f(" << v.x << ", " << v.y << ", " << v.z << ")";
+		return ss.str();
+	}
+
+	std::string ToString(Vector4f v)
+	{
+		std::stringstream ss;
+		ss << "Vector4f(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
+		return ss.str();
+	}
+
 	float ToRadians(float degrees)
 	{
 		return glm::radians(degrees);
@@ -149,11 +176,9 @@ namespace Chimp {
 		return glm::scale(CreateIdentityMatrix(), (glm::vec3)scale);
 	}
 
-	Matrix CreateRotationMatrixYawPitchRoll(Vector3f yawPitchRoll)
+	Matrix CreateRotationMatrix(Quaternion rotation)
 	{
-		return glm::rotate(CreateIdentityMatrix(), yawPitchRoll.x, glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::rotate(CreateIdentityMatrix(), yawPitchRoll.y, glm::vec3(1.0f, 0.0f, 0.0f)) *
-			glm::rotate(CreateIdentityMatrix(), yawPitchRoll.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		return glm::toMat4(rotation);
 	}
 
 	std::array<Vector3f, 3> GetForwardUpRightVectors(const Vector3f yawPitchRoll)
@@ -233,6 +258,18 @@ namespace Chimp {
 		}
 	}
 
+	std::string ToString(const Quaternion& q)
+	{
+		std::stringstream ss;
+		ss << "Quaternion{"
+			<< "w: " << q.w
+			<< ", x: " << q.x
+			<< ", y: " << q.y
+			<< ", z: " << q.z
+			<< "}";
+		return ss.str();
+	}
+
 	// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 	Quaternion ToQuatRotation(Vector3f degrees)
 	{
@@ -243,7 +280,7 @@ namespace Chimp {
 		float cy = Cos(degrees.z * 0.5);
 		float sy = Sin(degrees.z * 0.5);
 
-		Quaternion n= {
+		Quaternion n = {
 			cr * cp * cy + sr * sp * sy,
 			sr * cp * cy - cr * sp * sy,
 			cr * sp * cy + sr * cp * sy,
@@ -273,7 +310,32 @@ namespace Chimp {
 		float cosy_cosp = 1 - 2 * (rotation.y * rotation.y + rotation.z * rotation.z);
 		angles.z = std::atan2(siny_cosp, cosy_cosp);
 
+		// to degrees
+		angles.x = ToDegrees(angles.x);
+		angles.y = ToDegrees(angles.y);
+		angles.z = ToDegrees(angles.z);
+
 		return angles;
+	}
+
+	std::string ToString(const Matrix& m)
+	{
+		std::stringstream ss;
+		ss << "Matrix{\n";
+		for (int i = 0; i < 4; ++i)
+		{
+			ss << "  { ";
+			for (int j = 0; j < 4; ++j)
+			{
+				ss << m[i][j];
+				if (j < 3) ss << ", ";
+			}
+			ss << " }";
+			if (i < 3) ss << ",";
+			ss << "\n";
+		}
+		ss << "}";
+		return ss.str();
 	}
 
 	Matrix3x3 To3x3(const Matrix& m)

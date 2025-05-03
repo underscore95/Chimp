@@ -40,7 +40,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	m_ECS.SetComponent(ent, MeshComponent{ &m_TestMesh });
 
 	ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,-5,0}, { 0.0f,ToRadians(90.0f),0.0f},{100,100,1} });
+	m_ECS.SetComponent(ent, TransformComponent{ {0,-5,0}, { 90,0,0},{100,100,1} });
 	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
 	m_ECS.SetComponent(ent, MeshComponent{ &m_TestSprite });
 
