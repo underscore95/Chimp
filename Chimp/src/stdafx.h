@@ -39,7 +39,6 @@
 #include <climits>
 #include <typeindex>
 #include <iterator>
-#include <filesystem>
 #include <random>
 #include <optional>
 #include <utility>

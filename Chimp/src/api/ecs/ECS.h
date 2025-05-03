@@ -2,14 +2,12 @@
 
 #include "stdafx.h"
 #include "api/utils/OptionalReference.h"
-
-#ifdef CHIMP_FLECS
-#include <flecs.h>
-#endif
+#include "EntityId.h"
+#include "components/TracksChildrenComponent.h"
+#include "components/ParentComponent.h"
 
 namespace Chimp {
 #ifdef CHIMP_FLECS
-	typedef flecs::entity EntityId;
 	class ECS {
 	public:
 		ECS() = default;
@@ -67,6 +65,63 @@ namespace Chimp {
 
 	public:
 
+		void SetParent(EntityId child, EntityId parent) {
+			{
+				// Check if we have a parent
+				auto parentComp = GetComponent<ParentComponent>(child);
+				if (parentComp) {
+					// TODO: Do nothing if the parent is the same?
+					// We have a parent, let them know their child is leaving if they track children
+					auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+					if (trackChildrenComp) {
+						auto& children = trackChildrenComp->Children;
+						children.erase(child);
+					}
+				}
+			}
+
+			// Set the new parent
+			SetComponent(child, ParentComponent{ parent });
+
+			// Does the new parent track children?
+			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			if (trackChildrenComp) {
+				auto& children = trackChildrenComp->Children;
+				children.insert(child);
+			}
+		}
+
+		void AddChild(EntityId parent, EntityId child) {
+			assert(!IsChildOf(parent, child));
+			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			trackChildrenComp->Children.insert(child);
+		}
+
+		void RemoveChild(EntityId parent, EntityId child) {
+			assert(IsChildOf(parent, child));
+			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			trackChildrenComp->Children.erase(child);
+		}
+
+		bool IsChildOf(EntityId parent, EntityId possibleChild) const {
+			auto trackChildrenComp = GetComponent<TracksChildrenComponent>(parent);
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			return children.contains(possibleChild);
+		}
+
+		const std::set<EntityId>& GetChildren(EntityId parent) const {
+			auto trackChildrenComp = GetComponent<TracksChildrenComponent>(parent);
+			assert(trackChildrenComp);
+			return trackChildrenComp->Children;
+		}
+
+		EntityId GetParent(EntityId child) {
+			auto parent = GetComponent<ParentComponent>(child);
+			assert(parent);
+			return parent->Parent;
+		}
+
 		// Get number of alive entities
 		[[nodiscard]] size_t GetEntityCount() {
 			return m_EntityCount;
@@ -76,6 +131,13 @@ namespace Chimp {
 		EntityId CreateEntity() {
 			m_EntityCount++;
 			return m_World.entity();
+		}
+
+		// Create an entity with a TracksChildrenComponent
+		EntityId CreateEntityAndTrackChildren() {
+			EntityId ent = CreateEntity();
+			ent.set(TracksChildrenComponent{});
+			return ent;
 		}
 
 		// Remove an entity from the world
@@ -95,6 +157,10 @@ namespace Chimp {
 		// component - The value to set the component to
 		template <typename Component>
 		void SetComponent(EntityId entity, const Component& component) {
+			// You can not add this component at run time because we have no idea what children it already has.
+			// Instead create the entity using CreateEntityAndTrackChildren
+			static_assert(!std::is_base_of<TracksChildrenComponent, Component>::value);
+
 			entity.set(component);
 		}
 

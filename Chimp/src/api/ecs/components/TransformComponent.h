@@ -6,7 +6,8 @@
 namespace Chimp {
 
 	struct TransformComponent {
-		TransformComponent() = default;
+		TransformComponent() : TransformComponent({}, {}, {}) {}
+
 		TransformComponent(const Vector3f& translation, 
 			const Vector3f& rotation, 
 			const Vector3f& scale) :
