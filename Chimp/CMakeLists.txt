@@ -17,6 +17,9 @@ if(WIN32)
     add_compile_definitions(CHIMP_PLATFORM=CHIMP_PLATFORM_WINDOWS)
 endif()
 
+# Version
+set(CHIMP_VERSION "2.1.0")
+
 # Chimp
 project ("Chimp")
 
