@@ -15,7 +15,7 @@ namespace Chimp {
 	static_assert(sizeof(PointLightMatrices) % 16 == 0);
 
 	// POINT LIGHT
-	static const int MAX_POINT_LIGHTS = 1;
+	static const int MAX_POINT_LIGHTS = 4;
 	struct alignas(16) PointLight {
 		Vector3f Position;
 		float Padding;

@@ -18,7 +18,7 @@ namespace Chimp {
 		m_ShadowShader(std::unique_ptr<LitShadowShader>(new LitShadowShader(engine, m_Lighting))),
 		m_PointShadowShader(std::unique_ptr<LitPointShadowShader>(new LitPointShadowShader(m_Lighting, engine))),
 		m_ShadowMap(engine.GetRenderingManager().CreateShadowMap(1024, 1024, MAX_DIRECTIONAL_LIGHTS + MAX_SPOTLIGHTS)),
-		m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, 1))
+		m_CubeMap(engine.GetRenderingManager().CreateCubeShadowMap(1024, MAX_POINT_LIGHTS))
 	{
 		m_SceneLightingBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(SceneLighting), "SceneLighting");
 		m_LightMatricesBufferIndex = CreateBuffer(engine, *m_Shader, sizeof(LightMatrices), "LightMatrices");
@@ -64,7 +64,7 @@ namespace Chimp {
 				continue;
 			}
 
-			Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(m_Camera->GetCameraMatrices().GetViewMatrix() * transform.GetTransformMatrix()) });
+			Render(*mesh.Mesh, { transform.GetTransformMatrix(), ToNormalMatrix(transform.GetTransformMatrix()) });
 		}
 	}
 
@@ -111,6 +111,8 @@ namespace Chimp {
 		}
 
 		// Cube shadow pass
+		m_CubeMap->BindForWriting();
+		m_Engine.GetRenderingManager().ClearDepthBuffer();
 		for (int i = 0; i < m_Lighting.NumPointLights; ++i) {
 			GetPointShadowShader().SetPointLight(i);
 			CubeShadowPassPerLight(view, ecs);
@@ -162,10 +164,6 @@ namespace Chimp {
 
 	void LitShader::CubeShadowPassPerLight(Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view, const ECS& ecs)
 	{
-		// Reset depth buffer
-		m_CubeMap->BindForWriting();
-		m_Engine.GetRenderingManager().ClearDepthBuffer();
-
 		// Update shader
 		GetPointShadowShader().BeginFrame();
 

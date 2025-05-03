@@ -15,7 +15,7 @@ namespace Chimp {
 		// Setup depth cubemap
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_texId);
 
-		GLint filterType = GL_NEAREST; // hard shadows
+		GLint filterType = GL_LINEAR; // soft shadows
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, filterType);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, filterType);
@@ -56,10 +56,5 @@ namespace Chimp {
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_texId);
 
 		shader.SetTextureSampler("u_CubeShadowMap", slot);
-	}
-
-	void CubeShadowMap::SetIndexToWriteTo(unsigned int index)
-	{
-		m_currentIndexToWriteTo = index;
 	}
 }

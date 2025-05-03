@@ -66,7 +66,7 @@ struct Spotlight {
 layout (std140) uniform SceneLighting {
 	vec3 AmbientLight;
 	float Padding;
-	PointLight PointLights[1];
+	PointLight PointLights[4];
 	DirectionalLight DirectionalLights[4];
 	Spotlight Spotlights[4];
 	int NumPointLights;
