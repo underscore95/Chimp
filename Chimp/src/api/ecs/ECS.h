@@ -68,11 +68,11 @@ namespace Chimp {
 		void SetParent(EntityId child, EntityId parent) {
 			{
 				// Check if we have a parent
-				auto parentComp = GetComponent<ParentComponent>(child);
+				auto parentComp = child.get<ParentComponent>();
 				if (parentComp) {
 					// TODO: Do nothing if the parent is the same?
 					// We have a parent, let them know their child is leaving if they track children
-					auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+					auto trackChildrenComp = parentComp->Parent.get_mut< TracksChildrenComponent>();
 					if (trackChildrenComp) {
 						auto& children = trackChildrenComp->Children;
 						children.erase(child);
@@ -81,10 +81,10 @@ namespace Chimp {
 			}
 
 			// Set the new parent
-			SetComponent(child, ParentComponent{ parent });
+			child.set(ParentComponent{ parent });
 
 			// Does the new parent track children?
-			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
 			if (trackChildrenComp) {
 				auto& children = trackChildrenComp->Children;
 				children.insert(child);
@@ -93,31 +93,31 @@ namespace Chimp {
 
 		void AddChild(EntityId parent, EntityId child) {
 			assert(!IsChildOf(parent, child));
-			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
 			trackChildrenComp->Children.insert(child);
 		}
 
 		void RemoveChild(EntityId parent, EntityId child) {
 			assert(IsChildOf(parent, child));
-			auto trackChildrenComp = GetMutableComponent<TracksChildrenComponent>(parent);
+			auto trackChildrenComp = parent.get_mut< TracksChildrenComponent>();
 			trackChildrenComp->Children.erase(child);
 		}
 
 		bool IsChildOf(EntityId parent, EntityId possibleChild) const {
-			auto trackChildrenComp = GetComponent<TracksChildrenComponent>(parent);
+			auto trackChildrenComp = parent.get< TracksChildrenComponent>();
 			assert(trackChildrenComp);
 			auto& children = trackChildrenComp->Children;
 			return children.contains(possibleChild);
 		}
 
 		const std::set<EntityId>& GetChildren(EntityId parent) const {
-			auto trackChildrenComp = GetComponent<TracksChildrenComponent>(parent);
+			auto trackChildrenComp = parent.get< TracksChildrenComponent>();
 			assert(trackChildrenComp);
 			return trackChildrenComp->Children;
 		}
 
 		EntityId GetParent(EntityId child) {
-			auto parent = GetComponent<ParentComponent>(child);
+			auto parent = child.get<ParentComponent>();
 			assert(parent);
 			return parent->Parent;
 		}
@@ -157,10 +157,7 @@ namespace Chimp {
 		// component - The value to set the component to
 		template <typename Component>
 		void SetComponent(EntityId entity, const Component& component) {
-			// You can not add this component at run time because we have no idea what children it already has.
-			// Instead create the entity using CreateEntityAndTrackChildren
-			static_assert(!std::is_base_of<TracksChildrenComponent, Component>::value);
-
+			static_assert(!IsHierachyComponent_v<Component>);
 			entity.set(component);
 		}
 
@@ -168,12 +165,14 @@ namespace Chimp {
 		// entity - The entity to get the component from
 		template <typename Component>
 		ConstOptionalReference<Component> GetComponent(EntityId entity) const {
+			static_assert(!IsHierachyComponent_v<Component>);
 			return ConstOptionalReference<Component>(entity.get<Component>());
 		}
 
 		// Get a component from an entity
 		template <typename Component>
 		OptionalReference<Component> GetMutableComponent(EntityId entity) {
+			static_assert(!IsHierachyComponent_v<Component>);
 			return OptionalReference<Component>(entity.get_mut<Component>());
 		}
 
@@ -186,6 +185,12 @@ namespace Chimp {
 			// but it's only about 20-25% difference in release mode and imo the api is much nicer.
 			return View<Components...>(m_World);
 		}
+
+		private:
+			template <typename Component>
+			inline static constexpr bool IsHierachyComponent_v =
+				std::is_base_of<TracksChildrenComponent, Component>::value ||
+				std::is_base_of<ParentComponent, Component>::value;
 
 	private:
 		flecs::world m_World;
