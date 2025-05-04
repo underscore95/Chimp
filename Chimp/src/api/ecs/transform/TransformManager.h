@@ -28,6 +28,7 @@ namespace Chimp {
 		Vector3f GetLocalScale(EntityId entity);
 		void SetLocalScale(EntityId entity, Vector3f scale);
 
+		void UpdateAllMatrices();
 	private:
 		[[nodiscard]] OptionalReference<TransformComponent> GetMutableTransform(EntityId entity);
 

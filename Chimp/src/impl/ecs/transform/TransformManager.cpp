@@ -80,6 +80,14 @@ namespace Chimp {
 		transform->m_IsDirty = true;
 	}
 
+	void TransformManager::UpdateAllMatrices()
+	{
+		auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
+		for (auto& [entityId, transform] : view) {
+			auto _ = GetMutableTransform(entityId.Id);
+		}
+	}
+
 	OptionalReference<TransformComponent> TransformManager::GetMutableTransform(EntityId entity)
 	{
 		auto transform = m_ECS.GetMutableComponent<TransformComponent>(entity);

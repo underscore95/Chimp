@@ -54,10 +54,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	m_ECS.SetComponent(entChild, MeshComponent{ &m_TestMesh });
 	m_ECS.SetParent(entChild, ent);
 
-	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
-	for (auto& [entityId, transform] : view) {
-		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
-	}
+	m_ECS.GetTransformManager().UpdateAllMatrices();
 	auto parentTransform = m_ECS.GetTransformManager().GetTransformSnapshot(ent);
 	auto childTransform = m_ECS.GetTransformManager().GetTransformSnapshot(entChild);
 	GetLogger().Info(std::format("Parent pos: {} and child pos: {}",
@@ -175,10 +172,7 @@ void EntryScene::OnUpdate()
 {
 	m_Controller.OnUpdate(m_Engine.GetTimeManager().GetDeltaTime());
 
-	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
-	for (auto& [entityId, transform] : view) {
-		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
-	}
+	m_ECS.GetTransformManager().UpdateAllMatrices();
 }
 
 void EntryScene::OnRender()
