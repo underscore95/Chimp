@@ -18,7 +18,7 @@ if(WIN32)
 endif()
 
 # Version
-set(CHIMP_VERSION "2.2.0")
+set(CHIMP_VERSION "2.2.1")
 
 # Chimp
 project ("Chimp")

@@ -15,7 +15,7 @@ namespace Chimp {
 
 		UnorderedPossiblyUniqueCollection(const UnorderedPossiblyUniqueCollection& other) : m_ActiveIndex(other.m_ActiveIndex) {
 			if (other.IsUsingSet()) {
-				new (&m_Set) std::set<T>(other.m_Set);
+				new (&m_Set) std::vector<T>(other.m_Set);
 			}
 			else {
 				new (&m_Array) std::array<T, SmallNumElements>(other.m_Array);
@@ -27,7 +27,7 @@ namespace Chimp {
 			this->~UnorderedPossiblyUniqueCollection();
 			m_ActiveIndex = other.m_ActiveIndex;
 			if (other.IsUsingSet()) {
-				new (&m_Set) std::set<T>(other.m_Set);
+				new (&m_Set) std::vector<T>(other.m_Set);
 			}
 			else {
 				new (&m_Array) std::array<T, SmallNumElements>(other.m_Array);
@@ -37,7 +37,7 @@ namespace Chimp {
 
 		~UnorderedPossiblyUniqueCollection() {
 			if (IsUsingSet()) {
-				reinterpret_cast<std::set<T>*>(&m_Set)->~set();
+				reinterpret_cast<std::vector<T>*>(&m_Set)->~vector();
 			}
 			else {
 				reinterpret_cast<std::array<T, SmallNumElements>*>(&m_Array)->~array();
@@ -46,7 +46,7 @@ namespace Chimp {
 
 		void Insert(const T& value) {
 			if (IsUsingSet()) {
-				GetSet().insert(value);
+				GetSet().push_back(value);
 				return;
 			}
 
@@ -62,23 +62,34 @@ namespace Chimp {
 				// Transition to set
 				std::array<T, SmallNumElements> tmp = arr;
 				arr.~array();
-				new (&m_Set) std::set<T>();
+				new (&m_Set) std::vector<T>();
 				auto& s = GetSet();
-				for (const auto& val : tmp) s.insert(val);
-				s.insert(value);
+				for (const auto& val : tmp) s.push_back(val);
+				s.push_back(value);
 				m_ActiveIndex = USE_SET_FLAG;
 			}
 		}
 
 		bool Contains(const T& value) const {
-			return IsUsingSet()
-				? GetSet().find(value) != GetSet().end()
-				: std::find(GetArray().begin(), GetArray().begin() + m_ActiveIndex, value) != GetArray().begin() + m_ActiveIndex;
+			if (IsUsingSet()) {
+				const auto& vec = GetSet();
+				return std::find(vec.begin(), vec.end(), value) != vec.end();
+			}
+			else {
+				return std::find(GetArray().begin(), GetArray().begin() + m_ActiveIndex, value) != GetArray().begin() + m_ActiveIndex;
+			}
 		}
 
 		void Remove(const T& value) {
 			if (IsUsingSet()) {
-				GetSet().erase(value);
+				auto& vec = GetSet();
+				for (size_t i = 0; i < vec.size(); ++i) {
+					if (vec[i] == value) {
+						vec[i] = vec.back();
+						vec.pop_back();
+						return;
+					}
+				}
 			}
 			else {
 				auto& arr = GetArray();
@@ -91,11 +102,11 @@ namespace Chimp {
 			}
 		}
 
-		#pragma region Iterators
+#pragma region Iterators
 		template <bool IsConst>
 		class Iterator {
 			using ArrayIter = typename std::conditional<IsConst, typename std::array<T, SmallNumElements>::const_iterator, typename std::array<T, SmallNumElements>::iterator>::type;
-			using SetIter = typename std::conditional<IsConst, typename std::set<T>::const_iterator, typename std::set<T>::iterator>::type;
+			using SetIter = typename std::conditional<IsConst, typename std::vector<T>::const_iterator, typename std::vector<T>::iterator>::type;
 
 			enum class Type { Array, Set };
 			union {
@@ -187,14 +198,14 @@ namespace Chimp {
 
 		union {
 			std::array<T, SmallNumElements> m_Array;
-			std::set<T> m_Set;
+			std::vector<T> m_Set;
 		};
 
 		bool IsUsingSet() const { return m_ActiveIndex == USE_SET_FLAG; }
 		std::array<T, SmallNumElements>& GetArray() { return *reinterpret_cast<std::array<T, SmallNumElements>*>(&m_Array); }
 		const std::array<T, SmallNumElements>& GetArray() const { return *reinterpret_cast<const std::array<T, SmallNumElements>*>(&m_Array); }
-		std::set<T>& GetSet() { return *reinterpret_cast<std::set<T>*>(&m_Set); }
-		const std::set<T>& GetSet() const { return *reinterpret_cast<const std::set<T>*>(&m_Set); }
+		std::vector<T>& GetSet() { return *reinterpret_cast<std::vector<T>*>(&m_Set); }
+		const std::vector<T>& GetSet() const { return *reinterpret_cast<const std::vector<T>*>(&m_Set); }
 	};
 
 

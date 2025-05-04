@@ -27,7 +27,7 @@ namespace Chimp {
 		Vector3f currentPosition = MatrixTransform({}, transform->WorldTransformMatrix);
 		Vector3f deltaPosition = position - currentPosition;
 		transform->LocalTranslation += deltaPosition;
-		transform->m_IsDirty = true;
+		MarkDirty(entity, transform);
 	}
 
 	Vector3f TransformManager::GetLocalPosition(EntityId entity)
@@ -42,7 +42,7 @@ namespace Chimp {
 		auto transform = GetMutableTransform(entity);
 		assert(transform);
 		transform->LocalTranslation = position;
-		transform->m_IsDirty = true;
+		MarkDirty(entity, transform);
 	}
 
 	Quaternion TransformManager::GetLocalRotation(EntityId entity)
@@ -57,7 +57,7 @@ namespace Chimp {
 		auto transform = GetMutableTransform(entity);
 		assert(transform);
 		transform->LocalRotation = rotation;
-		transform->m_IsDirty = true;
+		MarkDirty(entity, transform);
 	}
 
 	void TransformManager::SetLocalRotation(EntityId entity, Vector3f eulerRotationDegrees)
@@ -77,7 +77,7 @@ namespace Chimp {
 		auto transform = GetMutableTransform(entity);
 		assert(transform);
 		transform->LocalScale = scale;
-		transform->m_IsDirty = true;
+		MarkDirty(entity, transform);
 	}
 
 	void TransformManager::UpdateAllMatrices()
@@ -117,5 +117,18 @@ namespace Chimp {
 
 		transform->m_IsDirty = false;
 		return transform;
+	}
+
+	void TransformManager::MarkDirty(EntityId entity, OptionalReference<TransformComponent> transform)
+	{
+		if (transform) {
+			if (transform->m_IsDirty) return; // all children will already be dirty
+			transform->m_IsDirty = true;
+		}
+
+		const auto& children = m_ECS.GetChildren(entity);
+		for (auto& child : children) {
+			MarkDirty(entity, m_ECS.GetMutableComponent<TransformComponent>(child));
+		}
 	}
 }
