@@ -34,7 +34,36 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	renderingManager.GetRenderer().SetClearColor(0.1, 0.1, 0.5);
 	renderingManager.GetChimpShaders().GetLitShader().SetCamera(m_Camera);
 
+#pragma region Entities
+	auto ent = m_ECS.CreateEntity();
+	m_ECS.SetComponent(ent, TransformComponent{ Vector3f{0,-3,-2},CreateIdentityQuaternion(),Vector3f{1,1,1} });
+	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
+	m_ECS.SetComponent(ent, MeshComponent{ &m_TestMesh });
+
+	auto ent2 = m_ECS.CreateEntity();
+	m_ECS.SetComponent(ent2, TransformComponent{ {0,-5,0}, { 90,0,0},{100,100,1} });
+	m_ECS.SetComponent(ent2, EntityIdComponent{ ent2 });
+	m_ECS.SetComponent(ent2, MeshComponent{ &m_TestSprite });
+#pragma endregion
+
 #pragma region TestHierarchy
+
+	auto entChild = m_ECS.CreateEntity();
+	m_ECS.SetComponent(entChild, TransformComponent{ Vector3f{0.0f,0.0f,1.0f},CreateIdentityQuaternion(),Vector3f{1,1,1} });
+	m_ECS.SetComponent(entChild, EntityIdComponent{ entChild });
+	m_ECS.SetComponent(entChild, MeshComponent{ &m_TestMesh });
+	m_ECS.SetParent(entChild, ent);
+
+	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
+	for (auto& [entityId, transform] : view) {
+		m_ECS.GetTransformManager().GetTransform(entityId.Id);
+	}
+	auto parentTransform = m_ECS.GetTransformManager().GetTransform(ent);
+	auto childTransform = m_ECS.GetTransformManager().GetTransform(entChild);
+	GetLogger().Info(std::format("Parent pos: {} and child pos: {}",
+		ToString(MatrixTransform({}, parentTransform->WorldTransformMatrix)),
+		ToString(MatrixTransform({}, childTransform->WorldTransformMatrix))
+	));
 
 	auto parent = m_ECS.CreateEntity();
 
@@ -73,18 +102,6 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	assert(m_ECS.IsEntityAlive(child1b));
 	assert(m_ECS.IsEntityAlive(parent2));
 
-#pragma endregion
-
-#pragma region Entities
-	auto ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,-3,-2},{},{1,1,1} });
-	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
-	m_ECS.SetComponent(ent, MeshComponent{ &m_TestMesh });
-
-	ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,-5,0}, { 90,0,0},{100,100,1} });
-	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
-	m_ECS.SetComponent(ent, MeshComponent{ &m_TestSprite });
 #pragma endregion
 
 #pragma region Lighting
@@ -155,6 +172,11 @@ void EntryScene::OnDeactivate()
 void EntryScene::OnUpdate()
 {
 	m_Controller.OnUpdate(m_Engine.GetTimeManager().GetDeltaTime());
+
+	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
+	for (auto& [entityId, transform] : view) {
+		m_ECS.GetTransformManager().GetTransform(entityId.Id);
+	}
 }
 
 void EntryScene::OnRender()

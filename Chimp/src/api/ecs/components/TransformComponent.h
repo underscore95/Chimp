@@ -5,59 +5,41 @@
 
 namespace Chimp {
 
+	class ECS;
+	class TransformManager;
+
 	struct TransformComponent {
-		TransformComponent() : TransformComponent({}, {}, {}) {}
+		friend class ECS;
+		friend class TransformManager;
+	public:
+		TransformComponent() : TransformComponent({}, CreateIdentityQuaternion(), {}) {}
 
-		TransformComponent(const Vector3f& translation, 
-			const Vector3f& rotation, 
+		TransformComponent(const Vector3f& translation,
+			const Vector3f& eulerRotationDegrees,
+			const Vector3f& scale) : TransformComponent(translation, ToQuatRotation(eulerRotationDegrees), scale)
+		{ }
+
+		TransformComponent(const Vector3f& translation,
+			const Quaternion& rotation,
 			const Vector3f& scale) :
-		m_Translation(translation),
-			m_Rotation(ToQuatRotation(rotation)),
-			m_Scale(scale)
+			LocalTranslation(translation),
+			LocalRotation(rotation),
+			LocalScale(scale)
 		{
-			UpdateTransform();
+			m_IsDirty = true;
 		}
 
-		const Vector3f& GetTranslation() const { return m_Translation; }
-		const Quaternion& GetRotation() const { return m_Rotation; }
-		const Vector3f& GetScale() const { return m_Scale; }
+	public:
+		Vector3f LocalTranslation;
+		Vector3f LocalScale;
+		Quaternion LocalRotation;
 
-		void Move(const float x, const float y, const float z) {
-			SetTranslation(m_Translation + Vector3f{ x, y, z });
-		}
-		void SetTranslation(const float x, const float y, const float z) {
-			SetTranslation({ x, y, z });
-		}
-		void SetTranslation(const Vector3f& translation) {
-			m_Translation = translation;
-			UpdateTransform();
-		}
-		void SetTranslationXY(const Vector2f& translation) {
-			SetTranslation({ translation.x, translation.y, m_Translation.z });
-		}
-		void SetRotation(const Quaternion& rotation) {
-			m_Rotation = rotation;
-			UpdateTransform();
-		}
-		void SetScale(const Vector3f& scale) {
-			m_Scale = scale;
-			UpdateTransform();
-		}
+		Matrix WorldTransformMatrix;
+		Matrix LocalTransformMatrix;
 
-		const Matrix& GetTransformMatrix() const { return m_TransformMatrix; }
+		inline bool IsDirty() const { return m_IsDirty; }
 
 	private:
-		void UpdateTransform() {
-			m_TransformMatrix = 
-				CreateTranslationMatrix(m_Translation) *
-				CreateRotationMatrix(m_Rotation) *
-				CreateScaleMatrix(m_Scale);
-		}
-
-	private:
-		Vector3f m_Translation;
-		Vector3f m_Scale;
-		Quaternion m_Rotation;
-		Matrix m_TransformMatrix;
+		bool m_IsDirty;
 	};
 }

@@ -318,6 +318,11 @@ namespace Chimp {
 		return angles;
 	}
 
+	Quaternion CreateIdentityQuaternion()
+	{
+		return glm::identity<glm::quat>();
+	}
+
 	std::string ToString(const Matrix& m)
 	{
 		std::stringstream ss;
@@ -336,6 +341,23 @@ namespace Chimp {
 		}
 		ss << "}";
 		return ss.str();
+	}
+
+	Matrix CreateTransformMatrix(const Vector3f translation, const Quaternion& quat, const Vector3f& scale)
+	{
+		Matrix multiplicative = CreateTranslationMatrix(translation)
+			* CreateRotationMatrix(quat)
+			* CreateScaleMatrix(scale);
+
+		Matrix transformMatrix = CreateRotationMatrix(quat);
+		transformMatrix[0] *= scale.x;
+		transformMatrix[1] *= scale.y;
+		transformMatrix[2] *= scale.z;
+		transformMatrix[3] = glm::vec4(translation.x,translation.y,translation.z, 1.0f);
+
+		assert(transformMatrix == multiplicative);
+
+		return transformMatrix;
 	}
 
 	Matrix3x3 To3x3(const Matrix& m)

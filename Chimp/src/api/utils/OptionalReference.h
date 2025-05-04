@@ -18,6 +18,7 @@ namespace Chimp {
 		bool HasValue() const { return m_Value != nullptr; }
 		T& Get() { assert(HasValue()); return *m_Value; }
 		const T& Get() const { assert(HasValue()); return *m_Value; }
+		const T* GetPtr() const { assert(HasValue()); return m_Value; }
 
 		operator bool() const { return HasValue(); }
 
@@ -25,11 +26,13 @@ namespace Chimp {
 		T* m_Value;
 	};
 
+	// Essentially a non-owning raw pointer, this class just exists to make it more clear that the pointer isn't owned
 	template <typename T>
 	class ConstOptionalReference {
 	public:
 		ConstOptionalReference() : m_Value(nullptr) {}
 		ConstOptionalReference(const T* value) : m_Value(value) {}
+		ConstOptionalReference(const OptionalReference<T> value) : m_Value(value.GetPtr()) {}
 
 		const T* operator->() const {
 			assert(HasValue());

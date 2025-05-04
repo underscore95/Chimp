@@ -915,8 +915,12 @@ namespace Chimp {
 	[[nodiscard]] Quaternion ToQuatRotation(Vector3f degrees);
 	[[nodiscard]] Vector3f ToEulerRotation(Quaternion rotation);
 
+	[[nodiscard]] Quaternion CreateIdentityQuaternion();
+
 	// Matrices
 	[[nodiscard]] std::string ToString(const Matrix& m);
+
+	[[nodiscard]] Matrix CreateTransformMatrix(const Vector3f translation, const Quaternion& quat, const Vector3f& scale);
 
 	[[nodiscard]] Matrix3x3 To3x3(const Matrix& m);
 
