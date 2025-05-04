@@ -15,10 +15,10 @@ target_include_directories(ChimpGame PUBLIC "src/")
 # Include chimp
 add_compile_definitions(CHIMP_FLECS=1)
 add_compile_definitions(CHIMP_LIBSNDFILE=1)
-target_include_directories(ChimpGame PUBLIC "../src/")
+target_include_directories(ChimpGame PUBLIC "../ChimpFramework/src/")
 
-  find_package(flecs CONFIG REQUIRED)
-  find_package(imgui CONFIG REQUIRED)
+find_package(flecs CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 target_link_libraries(ChimpGame PRIVATE imgui flecs::flecs_static)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
