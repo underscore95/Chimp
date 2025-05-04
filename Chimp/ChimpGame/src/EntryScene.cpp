@@ -56,14 +56,16 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 
 	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
 	for (auto& [entityId, transform] : view) {
-		m_ECS.GetTransformManager().GetTransform(entityId.Id);
+		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
 	}
-	auto parentTransform = m_ECS.GetTransformManager().GetTransform(ent);
-	auto childTransform = m_ECS.GetTransformManager().GetTransform(entChild);
+	auto parentTransform = m_ECS.GetTransformManager().GetTransformSnapshot(ent);
+	auto childTransform = m_ECS.GetTransformManager().GetTransformSnapshot(entChild);
 	GetLogger().Info(std::format("Parent pos: {} and child pos: {}",
 		ToString(MatrixTransform({}, parentTransform->WorldTransformMatrix)),
 		ToString(MatrixTransform({}, childTransform->WorldTransformMatrix))
 	));
+
+	m_ECS.GetTransformManager().SetGlobalPosition(entChild, { 3.0f, -3.0f,-1.0f });
 
 	auto parent = m_ECS.CreateEntity();
 
@@ -175,7 +177,7 @@ void EntryScene::OnUpdate()
 
 	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
 	for (auto& [entityId, transform] : view) {
-		m_ECS.GetTransformManager().GetTransform(entityId.Id);
+		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
 	}
 }
 

@@ -345,17 +345,11 @@ namespace Chimp {
 
 	Matrix CreateTransformMatrix(const Vector3f translation, const Quaternion& quat, const Vector3f& scale)
 	{
-		Matrix multiplicative = CreateTranslationMatrix(translation)
-			* CreateRotationMatrix(quat)
-			* CreateScaleMatrix(scale);
-
 		Matrix transformMatrix = CreateRotationMatrix(quat);
 		transformMatrix[0] *= scale.x;
 		transformMatrix[1] *= scale.y;
 		transformMatrix[2] *= scale.z;
 		transformMatrix[3] = glm::vec4(translation.x,translation.y,translation.z, 1.0f);
-
-		assert(transformMatrix == multiplicative);
 
 		return transformMatrix;
 	}

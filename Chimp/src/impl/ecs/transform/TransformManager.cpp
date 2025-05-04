@@ -8,9 +8,76 @@ namespace Chimp {
 
 	}
 
-	TemporaryTransform TransformManager::GetTransform(EntityId entity)
+	TransformSnapshot TransformManager::GetTransformSnapshot(EntityId entity)
 	{
 		return GetMutableTransform(entity);
+	}
+
+	Vector3f TransformManager::GetGlobalPosition(EntityId entity)
+	{
+		auto transform = GetTransformSnapshot(entity);
+		assert(transform);
+		return MatrixTransform({}, transform->WorldTransformMatrix);
+	}
+
+	void TransformManager::SetGlobalPosition(EntityId entity, Vector3f position)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		Vector3f currentPosition = MatrixTransform({}, transform->WorldTransformMatrix);
+		Vector3f deltaPosition = position - currentPosition;
+		transform->LocalTranslation += deltaPosition;
+		transform->m_IsDirty = true;
+	}
+
+	Vector3f TransformManager::GetLocalPosition(EntityId entity)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		return transform->LocalTranslation;
+	}
+
+	void TransformManager::SetLocalPosition(EntityId entity, Vector3f position)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		transform->LocalTranslation = position;
+		transform->m_IsDirty = true;
+	}
+
+	Quaternion TransformManager::GetLocalRotation(EntityId entity)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		return transform->LocalRotation;
+	}
+
+	void TransformManager::SetLocalRotation(EntityId entity, Quaternion rotation)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		transform->LocalRotation = rotation;
+		transform->m_IsDirty = true;
+	}
+
+	void TransformManager::SetLocalRotation(EntityId entity, Vector3f eulerRotationDegrees)
+	{
+		SetLocalRotation(entity, ToQuatRotation(eulerRotationDegrees));
+	}
+
+	Vector3f TransformManager::GetLocalScale(EntityId entity)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		return transform->LocalScale;
+	}
+
+	void TransformManager::SetLocalScale(EntityId entity, Vector3f scale)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		transform->LocalScale = scale;
+		transform->m_IsDirty = true;
 	}
 
 	OptionalReference<TransformComponent> TransformManager::GetMutableTransform(EntityId entity)
@@ -34,7 +101,8 @@ namespace Chimp {
 
 			// Calculate the world matrix
 			auto parentTransform = GetMutableTransform(parent);
-			transform->WorldTransformMatrix = parentTransform ? (parentTransform->WorldTransformMatrix * transform->LocalTransformMatrix) : transform->LocalTransformMatrix; }
+			transform->WorldTransformMatrix = parentTransform ? (parentTransform->WorldTransformMatrix * transform->LocalTransformMatrix) : transform->LocalTransformMatrix;
+		}
 		else {
 			transform->WorldTransformMatrix = transform->LocalTransformMatrix;
 		}
