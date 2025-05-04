@@ -23,6 +23,10 @@ Blaboon is a Bloons TD Battles clone developed by me using Chimp v1: https://git
 - Networking happens on a dedicated thread, but events and callbacks are on main thread
 - ENet backend
 
+### Entities
+- Chimp provides an ECS which wraps FLECS
+- Entities can have parents and children, transforms respect this hierarchy
+
 ### Resource Management
 - Resources can be loaded and then will automatically be unloaded when nothing is referencing them
 - Won't reload shared resources when switching scenes
