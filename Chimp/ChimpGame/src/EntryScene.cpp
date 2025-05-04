@@ -34,22 +34,84 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 	renderingManager.GetRenderer().SetClearColor(0.1, 0.1, 0.5);
 	renderingManager.GetChimpShaders().GetLitShader().SetCamera(m_Camera);
 
+#pragma region Entities
 	auto ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,-3,-2},{},{1,1,1} });
+	m_ECS.SetComponent(ent, TransformComponent{ Vector3f{0,-3,-2},CreateIdentityQuaternion(),Vector3f{1,1,1} });
 	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
 	m_ECS.SetComponent(ent, MeshComponent{ &m_TestMesh });
 
-	ent = m_ECS.CreateEntity();
-	m_ECS.SetComponent(ent, TransformComponent{ {0,-5,0}, { 0.0f,ToRadians(90.0f),0.0f},{100,100,1} });
-	m_ECS.SetComponent(ent, EntityIdComponent{ ent });
-	m_ECS.SetComponent(ent, MeshComponent{ &m_TestSprite });
+	auto ent2 = m_ECS.CreateEntity();
+	m_ECS.SetComponent(ent2, TransformComponent{ {0,-5,0}, { 90,0,0},{100,100,1} });
+	m_ECS.SetComponent(ent2, EntityIdComponent{ ent2 });
+	m_ECS.SetComponent(ent2, MeshComponent{ &m_TestSprite });
+#pragma endregion
 
-	// Setup lighting
+#pragma region TestHierarchy
+
+	auto entChild = m_ECS.CreateEntity();
+	m_ECS.SetComponent(entChild, TransformComponent{ Vector3f{0.0f,0.0f,1.0f},CreateIdentityQuaternion(),Vector3f{1,1,1} });
+	m_ECS.SetComponent(entChild, EntityIdComponent{ entChild });
+	m_ECS.SetComponent(entChild, MeshComponent{ &m_TestMesh });
+	m_ECS.SetParent(entChild, ent);
+
+	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
+	for (auto& [entityId, transform] : view) {
+		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
+	}
+	auto parentTransform = m_ECS.GetTransformManager().GetTransformSnapshot(ent);
+	auto childTransform = m_ECS.GetTransformManager().GetTransformSnapshot(entChild);
+	GetLogger().Info(std::format("Parent pos: {} and child pos: {}",
+		ToString(MatrixTransform({}, parentTransform->WorldTransformMatrix)),
+		ToString(MatrixTransform({}, childTransform->WorldTransformMatrix))
+	));
+
+	m_ECS.GetTransformManager().SetGlobalPosition(entChild, { 3.0f, -3.0f,-1.0f });
+
+	auto parent = m_ECS.CreateEntity();
+
+	auto child = m_ECS.CreateEntity();
+	m_ECS.SetParent(child, parent);
+
+	assert(parent == m_ECS.GetParent(child));
+
+	auto parent2 = m_ECS.CreateEntity();
+
+	auto child1a = m_ECS.CreateEntity();
+	auto child1b = m_ECS.CreateEntity();
+	auto child2a = m_ECS.CreateEntity();
+
+	m_ECS.SetParent(child1a, parent2);
+	m_ECS.SetParent(child1b, parent2);
+	m_ECS.SetParent(child2a, child1a);
+
+	assert(parent2 == m_ECS.GetParent(child1a));
+	assert(parent2 == m_ECS.GetParent(child1b));
+	assert(child1a == m_ECS.GetParent(child2a));
+
+	assert(m_ECS.IsChildOf(parent2, child1a));
+	assert(m_ECS.IsChildOf(parent2, child1b));
+	assert(m_ECS.IsChildOf(child1a, child2a));
+
+	m_ECS.SetParent(child1a, parent);
+
+	assert(!m_ECS.IsChildOf(parent2, child1a));
+	assert(m_ECS.IsChildOf(parent, child1a));
+
+	m_ECS.RemoveEntity(parent);
+	assert(!m_ECS.IsEntityAlive(parent));
+	assert(!m_ECS.IsEntityAlive(child1a));
+	assert(!m_ECS.IsEntityAlive(child2a));
+	assert(m_ECS.IsEntityAlive(child1b));
+	assert(m_ECS.IsEntityAlive(parent2));
+
+#pragma endregion
+
+#pragma region Lighting
 	auto& shader = m_Engine.GetRenderingManager().GetChimpShaders().GetLitShader();
 
 	SceneLighting& lights = shader.GetLighting();
-	lights.Ambient = { 0,0,0 };
-	lights.NumPointLights = 2;
+	lights.Ambient = { 1,1,1 };
+	lights.NumPointLights = 0;
 
 	lights.PointLights[0] = {
 		{ 0, 0, -3 }, // Position
@@ -102,6 +164,7 @@ void EntryScene::OnActivate(std::unique_ptr<Scene> previousScene)
 		{1.0f,0.0f,0.0f}, // Attenuation
 		Cos(35), // Cutoff angle
 	};
+#pragma endregion
 }
 
 void EntryScene::OnDeactivate()
@@ -111,6 +174,11 @@ void EntryScene::OnDeactivate()
 void EntryScene::OnUpdate()
 {
 	m_Controller.OnUpdate(m_Engine.GetTimeManager().GetDeltaTime());
+
+	auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();
+	for (auto& [entityId, transform] : view) {
+		m_ECS.GetTransformManager().GetTransformSnapshot(entityId.Id);
+	}
 }
 
 void EntryScene::OnRender()

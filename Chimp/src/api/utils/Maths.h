@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -12,6 +13,7 @@
 #include "api/utils/preprocessor/Casting.h"
 #include <memory>
 #include "OptionalReference.h"
+#include <string>
 
 namespace Chimp {
 	class YAMLSerialiser;
@@ -564,6 +566,12 @@ namespace Chimp {
 		}
 	};
 
+	// Vector to string
+	[[nodiscard]] std::string ToString(float v);
+	[[nodiscard]] std::string ToString(Vector2f v);
+	[[nodiscard]] std::string ToString(Vector3f v);
+	[[nodiscard]] std::string ToString(Vector4f v);
+
 	// Unit conversation
 	[[nodiscard]] float ToRadians(float degrees);
 	[[nodiscard]] float ToDegrees(float radians);
@@ -586,9 +594,8 @@ namespace Chimp {
 	// scale - The scale vector
 	[[nodiscard]] Matrix CreateScaleMatrix(Vector3f scale);
 
-	// Create rotation matrix from yaw, pitch and roll (in radians)
-	// y, x, z axis rotation
-	[[nodiscard]] Matrix CreateRotationMatrixYawPitchRoll(Vector3f yawPitchRoll);
+	// Create rotation matrix from quaternion
+	[[nodiscard]] Matrix CreateRotationMatrix(Quaternion rotation);
 
 	// Get the forward, up and right vectors from a yaw, pitch and roll (in radians)
 	[[nodiscard]] std::array<Vector3f, 3> GetForwardUpRightVectors(const Vector3f yawPitchRoll);
@@ -615,26 +622,6 @@ namespace Chimp {
 	// zNear - The Z value of the near clipping plane. This defines the minimum distance visible in the projection.
 	// zNear - The Z value of the far clipping plane. This defines the maximum distance visible in the projection.
 	[[nodiscard]] Matrix CreatePerspectiveProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar);
-
-	// Represents a transformation
-	struct Transform {
-		Vector3f Translation = Vector3f(0.0f, 0.0f, 0.0f);
-		Vector3f Rotation = Vector3f(0.0f, 0.0f, 0.0f);
-		Vector3f Scale = Vector3f(1.0f, 1.0f, 1.0f);
-
-		Transform(Vector3f translation = { 0,0,0 }, Vector3f rotation = { 0,0,0 }, Vector3f scale = { 1,1,1 }) :
-			Translation{ translation }, Rotation{ rotation }, Scale{ scale } {
-		}
-		Transform(Vector2f translation) :
-			Transform((Vector3f)translation) {
-		}
-
-		Matrix CreateTransformMatrix(Vector3f translationOffset = { 0,0,0 }) const {
-			return CreateTranslationMatrix(Translation + translationOffset) *
-				CreateRotationMatrixYawPitchRoll(Rotation) *
-				CreateScaleMatrix(Scale);
-		}
-	};
 
 	// Get distance between two points
 	inline float GetDistanceBetween(float a, float b) {
@@ -923,10 +910,18 @@ namespace Chimp {
 	[[nodiscard]] void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward);
 
 	// Quaternions
+	[[nodiscard]] std::string ToString(const Quaternion& q);
+
 	[[nodiscard]] Quaternion ToQuatRotation(Vector3f degrees);
 	[[nodiscard]] Vector3f ToEulerRotation(Quaternion rotation);
 
+	[[nodiscard]] Quaternion CreateIdentityQuaternion();
+
 	// Matrices
+	[[nodiscard]] std::string ToString(const Matrix& m);
+
+	[[nodiscard]] Matrix CreateTransformMatrix(const Vector3f translation, const Quaternion& quat, const Vector3f& scale);
+
 	[[nodiscard]] Matrix3x3 To3x3(const Matrix& m);
 
 	[[nodiscard]] Matrix3x3 Inverse(const Matrix3x3& m);

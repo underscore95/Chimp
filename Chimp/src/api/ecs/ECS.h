@@ -2,17 +2,17 @@
 
 #include "stdafx.h"
 #include "api/utils/OptionalReference.h"
-
-#ifdef CHIMP_FLECS
-#include <flecs.h>
-#endif
+#include "EntityId.h"
+#include "components/HierarchyComponent.h"
+#include "Loggers.h"
+#include "transform/TransformManager.h"
 
 namespace Chimp {
+
 #ifdef CHIMP_FLECS
-	typedef flecs::entity EntityId;
 	class ECS {
 	public:
-		ECS() = default;
+		ECS() : m_TransformManager(new TransformManager(*this)) {}
 
 	public:
 		// A view represents a set of entities each with the same common set of components
@@ -36,7 +36,7 @@ namespace Chimp {
 			~View() = default;
 
 			// Remove all entities from the view that do not satisfy the predicate
-			void WithPredicate(const std::function<bool(ComponentTuple&)> &predicate) {
+			void WithPredicate(const std::function<bool(ComponentTuple&)>& predicate) {
 				for (auto it = m_Components.begin(); it != m_Components.end();) {
 					if (!predicate(*it)) {
 						it = m_Components.erase(it);
@@ -66,22 +66,98 @@ namespace Chimp {
 		};
 
 	public:
+		void SetParent(EntityId child, EntityId parent) {
+			if (child == parent) {
+				Loggers::Main().Error(std::format("Attempted to make {} a parent of itself.", child.id()));
+				assert(false);
+				return;
+			}
+
+			// Check if we have a parent
+			auto hierarchyComp = child.get_mut<HierarchyComponent>();
+			assert(hierarchyComp);
+			if (hierarchyComp->HasParent) {
+				// TODO: Do nothing if the parent is the same?
+				// We have a parent, let them know their child is leaving if they track children
+				auto oldParentsComp = hierarchyComp->Parent.get_mut<HierarchyComponent>();
+				assert(oldParentsComp);
+				auto& children = oldParentsComp->Children;
+				children.Remove(child);
+			}
+
+			// Set the new parent
+			hierarchyComp->Parent = parent;
+			hierarchyComp->HasParent = true;
+
+			auto trackChildrenComp = parent.get_mut<HierarchyComponent>();
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			children.Insert(child);
+		}
+
+		bool IsChildOf(EntityId parent, EntityId possibleChild) const {
+			auto trackChildrenComp = parent.get<HierarchyComponent>();
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			return children.Contains(possibleChild);
+		}
+
+		void RemoveChild(EntityId parent, EntityId child) const {
+			assert(IsChildOf(parent, child));
+			auto parentComp = parent.get_mut<HierarchyComponent>();
+			auto childComp = child.get_mut<HierarchyComponent>();
+			childComp->HasParent = false;
+			parentComp->Children.Remove(child);
+		}
+
+		const UnorderedPossiblyUniqueCollection<EntityId, HierarchyComponent::SMALL_CHILDREN_SIZE>& GetChildren(EntityId parent) const {
+			auto hierarchyComp = parent.get<HierarchyComponent>();
+			assert(hierarchyComp);
+			return hierarchyComp->Children;
+		}
+
+		EntityId GetParent(EntityId child) {
+			auto hierarchy = child.get<HierarchyComponent>();
+			assert(hierarchy);
+			return hierarchy->Parent;
+		}
+
+		bool TryGetParent(EntityId child, EntityId& outParent) {
+			auto hierarchy = child.get<HierarchyComponent>();
+			assert(hierarchy);
+			if (hierarchy->HasParent) {
+				outParent = hierarchy->Parent;
+				return true;
+			}
+			return false;
+		}
 
 		// Get number of alive entities
 		[[nodiscard]] size_t GetEntityCount() {
 			return m_EntityCount;
 		}
 
-		// Create an entity with no components
+		// Create an entity with minimal components
 		EntityId CreateEntity() {
 			m_EntityCount++;
-			return m_World.entity();
+			auto ent = m_World.entity();
+			ent.set(HierarchyComponent{});
+			return ent;
 		}
 
 		// Remove an entity from the world
 		void RemoveEntity(EntityId entity) {
-			m_EntityCount--;
-			entity.destruct();
+			auto childComp = entity.get<HierarchyComponent>();
+			assert(childComp);
+			if (childComp->HasParent) {
+				// Let the parent know they don't have this child anymore
+				auto parentComp = childComp->Parent.get_mut< HierarchyComponent>();
+				assert(parentComp);
+				auto& children = parentComp->Children;
+				children.Remove(entity);
+			}
+
+			RemoveEntityRecursive(entity);
 		}
 
 		// Is entity alive
@@ -95,6 +171,7 @@ namespace Chimp {
 		// component - The value to set the component to
 		template <typename Component>
 		void SetComponent(EntityId entity, const Component& component) {
+			static_assert(!IsHierachyComponent_v<Component>);
 			entity.set(component);
 		}
 
@@ -102,12 +179,14 @@ namespace Chimp {
 		// entity - The entity to get the component from
 		template <typename Component>
 		ConstOptionalReference<Component> GetComponent(EntityId entity) const {
+			static_assert(!IsHierachyComponent_v<Component>);
 			return ConstOptionalReference<Component>(entity.get<Component>());
 		}
 
 		// Get a component from an entity
 		template <typename Component>
 		OptionalReference<Component> GetMutableComponent(EntityId entity) {
+			static_assert(!IsHierachyComponent_v<Component>);
 			return OptionalReference<Component>(entity.get_mut<Component>());
 		}
 
@@ -121,9 +200,31 @@ namespace Chimp {
 			return View<Components...>(m_World);
 		}
 
+		TransformManager& GetTransformManager() {
+			return *m_TransformManager;
+		}
+
+	private:
+		template <typename Component>
+		inline static constexpr bool IsHierachyComponent_v = std::is_base_of<HierarchyComponent, Component>::value;
+
+		void RemoveEntityRecursive(EntityId entity) {
+			// Remove any children
+			auto trackChildrenComp = entity.get<HierarchyComponent>();
+			assert(trackChildrenComp);
+			auto& children = trackChildrenComp->Children;
+			for (auto& child : children) {
+				RemoveEntityRecursive(child);
+			}
+
+			m_EntityCount--;
+			entity.destruct();
+		}
+
 	private:
 		flecs::world m_World;
 		size_t m_EntityCount = 0;
+		std::unique_ptr<TransformManager> m_TransformManager;
 	};
 #endif
 }

@@ -5,66 +5,41 @@
 
 namespace Chimp {
 
+	class ECS;
+	class TransformManager;
+
 	struct TransformComponent {
-		TransformComponent() = default;
-		TransformComponent(const Vector3f& translation, const Vector3f& rotation, const Vector3f& scale)
-			: m_Transform{ translation, rotation, scale } {
-			UpdateTransform();
-		}
-		TransformComponent(const Transform& transform)
-			: m_Transform(transform) {
-			UpdateTransform();
+		friend class ECS;
+		friend class TransformManager;
+	public:
+		TransformComponent() : TransformComponent({}, CreateIdentityQuaternion(), {}) {}
+
+		TransformComponent(const Vector3f& translation,
+			const Vector3f& eulerRotationDegrees,
+			const Vector3f& scale) : TransformComponent(translation, ToQuatRotation(eulerRotationDegrees), scale)
+		{ }
+
+		TransformComponent(const Vector3f& translation,
+			const Quaternion& rotation,
+			const Vector3f& scale) :
+			LocalTranslation(translation),
+			LocalRotation(rotation),
+			LocalScale(scale)
+		{
+			m_IsDirty = true;
 		}
 
-		const Vector3f& GetTranslation() const { return m_Transform.Translation; }
-		const Vector3f& GetRotation() const { return m_Transform.Rotation; }
-		const Vector3f& GetScale() const { return m_Transform.Scale; }
+	public:
+		Vector3f LocalTranslation;
+		Vector3f LocalScale;
+		Quaternion LocalRotation;
 
-		void Move(const float x, const float y, const float z) {
-			SetTranslation(m_Transform.Translation + Vector3f{ x, y, z });
-		}
-		void SetTranslation(const float x, const float y, const float z) {
-			SetTranslation({ x, y, z });
-		}
-		void SetTranslation(const Vector3f& translation) {
-			m_Transform.Translation = translation;
-			UpdateTransform();
-		}
-		void SetTranslationXY(const Vector2f& translation) {
-			SetTranslation({ translation.x, translation.y, m_Transform.Translation.z });
-		}
-		// yaw, pitch, roll in radians
-		void SetRotation(const Vector3f& rotation) {
-			m_Transform.Rotation = rotation;
-			UpdateTransform();
-		}
-		void SetYaw(const float yaw) {
-			m_Transform.Rotation.y = yaw;
-			UpdateTransform();
-		}
-		void SetPitch(const float pitch) {
-			m_Transform.Rotation.x = pitch;
-			UpdateTransform();
-		}
-		void SetRoll(const float roll) {
-			m_Transform.Rotation.z = roll;
-			UpdateTransform();
-		}
-		void SetScale(const Vector3f& scale) {
-			m_Transform.Scale = scale;
-			UpdateTransform();
-		}
+		Matrix WorldTransformMatrix;
+		Matrix LocalTransformMatrix;
 
-		const Matrix& GetTransformMatrix() const { return m_TransformMatrix; }
-		const Transform& GetTransform() const { return m_Transform; } // Can't be changed since it wouldn't update our matrix
+		inline bool IsDirty() const { return m_IsDirty; }
 
 	private:
-		void UpdateTransform() {
-			m_TransformMatrix = m_Transform.CreateTransformMatrix();
-		}
-
-	private:
-		Transform m_Transform;
-		Matrix m_TransformMatrix;
+		bool m_IsDirty;
 	};
 }
