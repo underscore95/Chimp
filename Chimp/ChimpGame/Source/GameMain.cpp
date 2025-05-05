@@ -1,5 +1,9 @@
-#include "EntryScene.h"
+#pragma message("Compiling GameMain.cpp")
 
-std::unique_ptr<Chimp::Scene> CreateEntryScene(Chimp::Engine &engine) {
-	return std::make_unique<EntryScene>(engine);
+#include "EntryScene.h"
+#include "Main.h"
+#include <iostream>
+
+int main(int argc, char** argv) {
+	return Chimp::EntryPoint::RunChimp([](Chimp::Engine& engine) { return std::make_unique<EntryScene>(engine); }, argc, argv);
 }

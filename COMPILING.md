@@ -9,6 +9,7 @@ Chimp (the engine) and ChimpGame (the game) are separate projects.
 
 - 64-bit Windows
 - GPU supports at least OpenGL 4.6
+- An audio device
 
 ## How do I build it then?
 
@@ -16,7 +17,7 @@ Chimp (the engine) and ChimpGame (the game) are separate projects.
 - `vcpkg install imgui[opengl3-binding,glfw-binding] assimp opengl openal glfw enet flecs stb libsndfile glm`
 - Set cacheVariables.CMAKE_TOOLCHAIN_FILE in CMakePresets.json to package manager path.
 - Set VCPKG_ROOT in environment variables
-- Copy imgui.lib to your output directory (where the exe will be generated) (this will hopefully be automated in the future)
+- Reload the ChimpGame CMakeLists, in visual studio you can do this by saving it
+- First build will fail because of missing dlls, don't panic. After it fails, reload the CMakeLists.txt again and it should compile.
 
-Simply use visual studio to run the "Chimp.exe" target.
-You may need to generate the build configurations prior to this, which can be done by reloading both CMakeLists.txt files.
+Simply use visual studio to run the "ChimpGame.exe" target.

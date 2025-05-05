@@ -2,12 +2,12 @@
 #include "MainLoop.h"
 #include "api/Engine.h"
 
-std::unique_ptr<Chimp::Engine> Chimp::EntryPoint::Engine = std::unique_ptr<Chimp::Engine>(new Chimp::Engine());
+std::unique_ptr<Chimp::Engine> Chimp::EntryPoint::Engine = nullptr;
 
-int main(int argc, char** argv)
+int Chimp::EntryPoint::RunChimp(std::function< std::unique_ptr<Chimp::Scene>(Chimp::Engine&)> entrySceneCreator, int argc, char** argv)
 {
 	using namespace Chimp;
-	std::unique_ptr<Scene> entryScene = CreateEntryScene(*EntryPoint::Engine);
-	MainLoop mainLoop(std::move(entryScene), *EntryPoint::Engine);
+	Engine = std::unique_ptr<Chimp::Engine>(new Chimp::Engine());
+	MainLoop mainLoop(entrySceneCreator(*Engine), *Engine);
     return 0;
 }

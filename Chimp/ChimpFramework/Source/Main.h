@@ -7,9 +7,7 @@ namespace Chimp {
 	class EntryPoint {
 	public:
 		static std::unique_ptr<Engine> Engine;
+
+		static int RunChimp(std::function<std::unique_ptr<Chimp::Scene>(Chimp::Engine&)> entrySceneCreator, int argc, char** argv);
 	};
 }
-
-int main(int argc, char** argv);
-
-extern std::unique_ptr<Chimp::Scene> CreateEntryScene(Chimp::Engine &engine);
