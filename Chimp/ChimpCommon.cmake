@@ -1,4 +1,13 @@
 function(setup_chimp_target target_name)
+    target_include_directories(${target_name} PUBLIC "Source/") # So you don't need to put Source/ at the start of any includes
+    target_link_libraries(${target_name} PRIVATE Chimp)
+
+    add_custom_command(TARGET ${target_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+       $<TARGET_FILE:Chimp>
+       $<TARGET_FILE_DIR:${target_name}>
+    )
+
     target_compile_definitions(${target_name} PUBLIC
         CHIMP_FLECS=1
         CHIMP_LIBSNDFILE=1
@@ -19,6 +28,16 @@ function(setup_chimp_target target_name)
     else()
         target_compile_definitions(${target_name} PUBLIC GAME_DATA_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/Data")
     endif()
+
+    # Copy data folder in release
+    if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Data)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/Data ${CMAKE_BINARY_DIR}/Data
+    )
+endif()
+
 endfunction()
 
 function(link_chimp_dependencies target_name)

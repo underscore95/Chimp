@@ -1,5 +1,3 @@
-#pragma message("Compiling GameMain.cpp")
-
 #include "EntryScene.h"
 #include "Main.h"
 #include <iostream>
