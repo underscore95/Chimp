@@ -6,6 +6,7 @@
 namespace Chimp {
 	class ECS;
 	class TransformComponent;
+	class HierarchyComponent;
 	typedef ConstOptionalReference<TransformComponent> TransformSnapshot;
 
 	class TransformManager {
@@ -29,8 +30,11 @@ namespace Chimp {
 		void SetLocalScale(EntityId entity, Vector3f scale);
 
 		void UpdateAllMatrices();
+
 	private:
 		[[nodiscard]] OptionalReference<TransformComponent> GetMutableTransform(EntityId entity);
+
+		void MarkDirty(EntityId entity, OptionalReference<TransformComponent> transform);
 
 	private:
 		ECS& m_ECS;
