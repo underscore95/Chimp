@@ -16,7 +16,7 @@ namespace Chimp {
 	void ImGuiHandler::Init(IWindow& window)
 	{
 		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
+		m_Context = ImGui::CreateContext();
 
 		ImGui::StyleColorsDark();
 
@@ -38,7 +38,7 @@ namespace Chimp {
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 #endif
-		ImGui::DestroyContext();
+		ImGui::DestroyContext(m_Context);
 	}
 
 	void ImGuiHandler::StartImGuiFrame()
@@ -56,5 +56,10 @@ namespace Chimp {
 #if defined(CHIMP_OPENGL) && defined(CHIMP_GLFW)
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #endif
+	}
+
+	ImGuiContext* ImGuiHandler::GetImGuiContext()
+	{
+		return m_Context;
 	}
 }

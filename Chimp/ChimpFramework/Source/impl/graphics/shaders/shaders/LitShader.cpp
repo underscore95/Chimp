@@ -3,7 +3,7 @@
 #include "api/graphics/shaders/shaders/lit/LitShadowShader.h"
 #include "Loggers.h"
 #include "Engine.h"
-#include "api/graphics/shadows/IShadowMap.h"
+#include "api/graphics/utils/IRenderTexture.h"
 
 namespace Chimp {
 	LitShader::LitShader(Engine& engine) : GameShader(
@@ -79,8 +79,8 @@ namespace Chimp {
 		// Setup
 		m_Lighting.IsDepthPass = true;
 
-		m_ShadowMap->BindForReading(1, GetRawShader());
-		m_CubeMap->BindForReading(2, GetRawShader());
+		m_ShadowMap->BindForReading(1, GetRawShader(), "u_ShadowMap");
+		m_CubeMap->BindForReading(2, GetRawShader(), "u_CubeShadowMap");
 
 		// Reset depth buffer
 		m_ShadowMap->BindForWriting();

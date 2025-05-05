@@ -3,9 +3,11 @@
 #include "Loggers.h"
 #include "api/graphics/shaders/IShader.h"
 
+// https://www.youtube.com/watch?v=kCCsko29pv0
+
 namespace Chimp {
 	ShadowMap::ShadowMap(unsigned int width, unsigned int height, int numLights)
-		: IShadowMap(width, height) {
+		: IRenderTexture(width, height) {
 
 		glGenFramebuffers(1, &m_fbo);
 		assert(m_fbo != 0);
@@ -17,7 +19,7 @@ namespace Chimp {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_texId);
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32, width, height, numLights, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
-		GLint filterType = GL_NEAREST; // hard shadows
+		GLint filterType = GL_LINEAR; // hard shadows
 
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, filterType);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, filterType);
@@ -47,12 +49,12 @@ namespace Chimp {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	}
 
-	void ShadowMap::BindForReading(TextureSlot slot, const IShader& shader) const
+	void ShadowMap::BindForReading(TextureSlot slot, const IShader& shader, const std::string& samplerName) const
 	{
 		assert(slot != 0);
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_texId);
 
-		shader.SetTextureSampler("u_ShadowMaps", slot);
+		shader.SetTextureSampler(samplerName, slot);
 	}
 }

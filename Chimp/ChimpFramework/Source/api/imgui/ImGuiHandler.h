@@ -16,5 +16,9 @@ namespace Chimp {
 
 		void StartImGuiFrame();
 		void EndImGuiFrame();
+
+		ImGuiContext* GetImGuiContext();
+	private:
+		ImGuiContext* m_Context;
 	};
 }

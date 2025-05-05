@@ -8,7 +8,7 @@ namespace Chimp {
 	class ChimpShaders;
 	class LitPointShadowShader;
 	class LitShadowShader;
-	class IShadowMap;
+	class IRenderTexture;
 
 	class LitShader : public GameShader {
 		friend class ChimpShaders;
@@ -55,7 +55,7 @@ namespace Chimp {
 		std::unique_ptr<LitShadowShader> m_ShadowShader;
 		IShaderBuffers::Index m_SceneLightingBufferIndex;
 		IShaderBuffers::Index m_LightMatricesBufferIndex;
-		std::unique_ptr<Chimp::IShadowMap> m_ShadowMap;
-		std::unique_ptr<Chimp::IShadowMap> m_CubeMap;
+		std::unique_ptr<Chimp::IRenderTexture> m_ShadowMap;
+		std::unique_ptr<Chimp::IRenderTexture> m_CubeMap;
 	};
 }

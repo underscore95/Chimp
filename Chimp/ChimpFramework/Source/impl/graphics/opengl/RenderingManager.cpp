@@ -5,8 +5,9 @@
 #include "shaders/Shader.h"
 #include "textures/Texture.h"
 #include "Loggers.h"
-#include "shadows/ShadowMap.h"
-#include "shadows/CubeShadowMap.h"
+#include "utils/shadows/ShadowMap.h"
+#include "utils/shadows/CubeShadowMap.h"
+#include "utils/RenderTexture.h"
 
 // https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/7.in_practice/1.debugging/debugging.cpp
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
@@ -83,9 +84,14 @@ namespace Chimp::GL {
 		return std::make_unique<GL::Buffer>(usage, target);
 	}
 
-	std::unique_ptr<IShadowMap> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height, unsigned int numLights) const
+	std::unique_ptr<IRenderTexture> RenderingManager::CreateRenderTexture(unsigned int width, unsigned int height) const
 	{
-		return std::unique_ptr<IShadowMap>(((IShadowMap*) new ShadowMap(width, height, numLights)));
+		return std::unique_ptr<IRenderTexture>(((IRenderTexture*) new RenderTexture(width, height)));
+	}
+
+	std::unique_ptr<IRenderTexture> RenderingManager::CreateShadowMap(unsigned int width, unsigned int height, unsigned int numLights) const
+	{
+		return std::unique_ptr<IRenderTexture>(((IRenderTexture*) new ShadowMap(width, height, numLights)));
 	}
 
 	std::unique_ptr<ICubeShadowMap> RenderingManager::CreateCubeShadowMap(unsigned int size, unsigned int numLights) const

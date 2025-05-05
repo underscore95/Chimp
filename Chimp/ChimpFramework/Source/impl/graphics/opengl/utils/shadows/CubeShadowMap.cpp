@@ -49,12 +49,12 @@ namespace Chimp {
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	}
 
-	void CubeShadowMap::BindForReading(TextureSlot slot, const IShader& shader) const
+	void CubeShadowMap::BindForReading(TextureSlot slot, const IShader& shader, const std::string& samplerName) const
 	{
 		assert(slot != 0);
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_texId);
 
-		shader.SetTextureSampler("u_CubeShadowMap", slot);
+		shader.SetTextureSampler(samplerName, slot);
 	}
 }

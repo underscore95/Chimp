@@ -18,7 +18,12 @@ namespace Chimp::GL {
 			const BindTarget target
 		) const override;
 
-		[[nodiscard]] std::unique_ptr<IShadowMap> CreateShadowMap(
+		[[nodiscard]] std::unique_ptr<IRenderTexture> CreateRenderTexture(
+			unsigned int width,
+			unsigned int height
+		) const override;
+
+		[[nodiscard]] std::unique_ptr<IRenderTexture> CreateShadowMap(
 			unsigned int width,
 			unsigned int height,
 			unsigned int numLights

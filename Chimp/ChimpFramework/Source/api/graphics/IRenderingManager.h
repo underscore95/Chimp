@@ -12,8 +12,8 @@
 #include "api/graphics/images/IImageLoader.h"
 #include "api/graphics/textures/ITexture.h"
 #include "api/graphics/shaders/shaders/ChimpShaders.h"
-#include "api/graphics/shadows/IShadowMap.h"
-#include "api/graphics/shadows/ICubeShadowMap.h"
+#include "api/graphics/utils/IRenderTexture.h"
+#include "api/graphics/utils/shadows/ICubeShadowMap.h"
 
 namespace Chimp {
 	class Engine;
@@ -56,11 +56,19 @@ namespace Chimp {
 			const BindTarget target
 		) const = 0;
 
+		// Create a render texture
+		// width - The width in pixels
+		// height - The height in pixels
+		[[nodiscard]] virtual std::unique_ptr<IRenderTexture> CreateRenderTexture(
+			unsigned int width,
+			unsigned int height
+		) const = 0;
+
 		// Create a shadow map
 		// width - The width in pixels
 		// height - The height in pixels
 		// numLights - Maximum number of lights
-		[[nodiscard]] virtual std::unique_ptr<IShadowMap> CreateShadowMap(
+		[[nodiscard]] virtual std::unique_ptr<IRenderTexture> CreateShadowMap(
 			unsigned int width,
 			unsigned int height,
 			unsigned int numLights

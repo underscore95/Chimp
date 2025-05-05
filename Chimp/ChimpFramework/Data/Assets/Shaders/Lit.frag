@@ -12,7 +12,7 @@ out vec4 FragColor;
 
 uniform sampler2D u_ActiveTexture;
 uniform sampler2DArray u_ShadowMaps;
-uniform samplerCubeArray u_CubeShadowMap;
+uniform samplerCubeArray u_CubeShadowMaps;
 
 struct PointLight {
 	vec3 Position;
@@ -151,7 +151,7 @@ float CalculatePointShadow(PointLight light, vec3 viewFragPos, int mapIndex) {
 		for (int y = startingSample; y < finalSample; y++) {
 			for (int z = startingSample; z < finalSample; z++) {
 				vec3 offset = light.ShadowMaxSampleDistance * vec3(x, y, z);
-				float closestDepth = texture(u_CubeShadowMap, vec4(fragToLight + offset, mapIndex)).r * light.FarPlane;
+				float closestDepth = texture(u_CubeShadowMaps, vec4(fragToLight + offset, mapIndex)).r * light.FarPlane;
 				if (currentDepth - light.ShadowBias > closestDepth) {
 					shadow++;
 				}
