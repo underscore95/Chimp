@@ -5,7 +5,7 @@ function(setup_chimp_target target_name)
     )
 
     target_include_directories(${target_name} PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/../ChimpFramework/src/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../ChimpFramework/Source/"
     )
 
     find_package(flecs CONFIG REQUIRED)

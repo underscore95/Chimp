@@ -1,15 +1,14 @@
-﻿# Include shared config
-include(${CMAKE_SOURCE_DIR}/ChimpCommon.cmake)
+﻿include(${CMAKE_SOURCE_DIR}/ChimpCommon.cmake)
 
 add_library(ChimpGame STATIC 
-    "src/GameMain.cpp"
-    "src/EntryScene.h"
-    "src/EntryScene.cpp"
-    "src/stdafx.h"
-    "src/Logger.h"
+    "Source/GameMain.cpp"
+    "Source/EntryScene.h"
+    "Source/EntryScene.cpp"
+    "Source/stdafx.h"
+    "Source/Logger.h"
 )
 
-target_include_directories(ChimpGame PUBLIC "src/")
+target_include_directories(ChimpGame PUBLIC "Source/")
 setup_chimp_target(ChimpGame)
 
 # Copy data folder in release
