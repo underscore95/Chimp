@@ -43,6 +43,12 @@ namespace Chimp {
 		Loggers::Main().Info("Initialized Chimp Engine!");
 	}
 
+	void Engine::Destroy()
+	{
+		// Can't destroy an OpenAL context in a thread destructor
+		m_AudioManager = nullptr;
+	}
+
 	Engine::~Engine()
 	{
 		m_RenderingManager->DestroyChimpShaders();

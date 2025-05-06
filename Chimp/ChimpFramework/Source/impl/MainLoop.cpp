@@ -31,5 +31,7 @@ namespace Chimp {
 
 			m_Engine.GetSceneManager().CheckForSceneChange();
 		}
+
+		m_Engine.Destroy();
 	}
 }

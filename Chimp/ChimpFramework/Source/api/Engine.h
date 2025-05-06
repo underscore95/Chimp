@@ -30,6 +30,7 @@ namespace Chimp {
 	private:
 		Engine();
 		void PostInit();
+		void Destroy();
 
 	public:
 		~Engine();
