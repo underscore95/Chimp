@@ -55,7 +55,7 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 namespace Chimp::GL {
-	RenderingManager::RenderingManager(Engine* engine,
+	RenderingManager::RenderingManager(Reference<Engine> engine,
 		IImageLoader& imageLoader) :
 		IRenderingManager(engine, imageLoader)
 	{
@@ -66,7 +66,7 @@ namespace Chimp::GL {
 		m_ShaderCompiler = std::make_unique<ShaderCompiler>();
 
 		// Renderer
-		m_Renderer = std::make_unique<GL::Renderer>();
+		m_Renderer = std::make_unique<GL::Renderer>(engine);
 	}
 
 	RenderingManager::~RenderingManager() {

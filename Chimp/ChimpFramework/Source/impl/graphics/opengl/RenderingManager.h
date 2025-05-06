@@ -8,7 +8,7 @@
 namespace Chimp::GL {
 	class RenderingManager : public IRenderingManager {
 	public:
-		RenderingManager(Engine* engine, IImageLoader& imageLoader);
+		RenderingManager(Reference<Engine> engine, IImageLoader& imageLoader);
 		~RenderingManager();
 
 		IRenderer& GetRenderer() const override;

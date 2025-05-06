@@ -8,12 +8,15 @@
 namespace Chimp
 {
 	class MainLoop;
+	class Engine;
 
 	class IRenderer
 	{
 		friend class MainLoop;
 	protected:
-		IRenderer() = default;
+		IRenderer(Reference<Engine> engine) :
+			m_engine(engine) {
+		}
 	public:
 		virtual ~IRenderer() = default;
 
@@ -38,7 +41,10 @@ namespace Chimp
 
 		// Prepare the renderer for drawing
 		// clear color buffer, etc
-		virtual void StartDrawing() const = 0;
+		virtual void StartDrawing() = 0;
+
+	protected:
+		Reference<Engine> m_engine;
 
 	private:
 		std::shared_ptr<ICamera> m_DefaultCamera = std::make_shared<CameraPerspective>();

@@ -2,7 +2,7 @@
 #include "api/Engine.h"
 
 namespace Chimp {
-	IRenderingManager::IRenderingManager(Engine* engine, IImageLoader& imageLoader) :
+	IRenderingManager::IRenderingManager(Reference<Engine> engine, IImageLoader& imageLoader) :
 		m_ImageLoader(imageLoader),
 		m_Engine(engine)
 	{

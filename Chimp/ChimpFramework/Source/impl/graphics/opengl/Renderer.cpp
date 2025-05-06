@@ -2,6 +2,7 @@
 
 #include "Renderer.h"
 #include "Translations.h"
+#include "api/Engine.h"
 
 namespace Chimp::GL {
 	constexpr void* INDICES_BOUND_IN_VAO = nullptr;
@@ -27,7 +28,7 @@ namespace Chimp::GL {
 		glClearColor(r, g, b, 1.0f);
 	}
 
-	void Renderer::StartDrawing() const
+	void Renderer::StartDrawing()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}

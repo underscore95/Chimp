@@ -20,7 +20,7 @@ namespace Chimp {
 	class IRenderingManager {
 		friend class Engine;
 	protected:
-		IRenderingManager(Engine* engine, IImageLoader& imageLoader);
+		IRenderingManager(Reference<Engine> engine, IImageLoader& imageLoader);
 
 	public:
 		~IRenderingManager() = default;
@@ -168,6 +168,6 @@ namespace Chimp {
 		IImageLoader& m_ImageLoader;
 		std::unique_ptr<ChimpShaders> m_ChimpShaders;
 		std::weak_ptr<IRenderTexture> m_DefaultRenderTarget;
-		Engine* m_Engine;
+		Reference<Engine> m_Engine;
 	};
 }

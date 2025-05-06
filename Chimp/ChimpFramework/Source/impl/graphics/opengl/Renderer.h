@@ -6,7 +6,7 @@ namespace Chimp::GL {
 	class Renderer : public IRenderer
 	{
 	public:
-		Renderer() = default;
+		Renderer(Reference<Engine> engine) : IRenderer(engine) {}
 		~Renderer() override = default;
 
 		void Draw(const Mesh::Section& meshSection, const IShader& shader) const override;
@@ -14,6 +14,6 @@ namespace Chimp::GL {
 		void SetClearColor(float r, float g, float b) const override;
 
 	protected:
-		void StartDrawing() const override;
+		void StartDrawing() override;
 	};
 }

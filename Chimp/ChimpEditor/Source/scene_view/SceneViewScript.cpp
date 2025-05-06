@@ -24,6 +24,7 @@ namespace ChimpEditor {
 		rm.GetRenderer().SetClearColor(0.3f, 0.3f, 0.6f);
 		rm.ClearColorBuffer();
 		rm.ClearDepthBuffer();
+		// TODO: clear stencil buffer
 	}
 
 	void SceneViewScript::OnRenderUI()

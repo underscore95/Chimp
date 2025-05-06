@@ -22,7 +22,7 @@ namespace ChimpEditor {
 
 	void EditorScene::OnInit() {
 		m_sceneView = m_ecs->CreateEntity();
-		
+
 		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_sceneView, m_engine, *m_ecs)));
 
 		m_ecs->GetSystems().OnInit();
@@ -41,11 +41,9 @@ namespace ChimpEditor {
 
 		auto& rm = m_engine.GetRenderingManager();
 
-		rm.SetFrameBuffer();
 		rm.SetViewport({ 0,0 }, m_engine.GetWindow().GetSize());
-
+		rm.SetFrameBuffer();
 		rm.GetRenderer().SetClearColor(0, 0, 0);
-		rm.ClearDepthBuffer();
 		rm.ClearColorBuffer();
 	}
 
@@ -54,7 +52,7 @@ namespace ChimpEditor {
 		ImGui::SetNextWindowSize(m_engine.GetWindow().GetSize());
 		ImGui::Begin("Chimp Editor", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-		m_ecs->GetSystems().OnRender();
+		m_ecs->GetSystems().OnRenderUI();
 
 		ImGui::End();
 	}
