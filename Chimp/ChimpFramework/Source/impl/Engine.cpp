@@ -163,6 +163,11 @@ namespace Chimp {
 		return std::make_unique<Logger>(name, level);
 	}
 
+	std::unique_ptr<ECS> Engine::CreateECS()
+	{
+		return std::unique_ptr<ECS>(new ECS(*this));
+	}
+
 	std::unique_ptr<IWindow> Engine::CreateWindow() const
 	{
 		std::unique_ptr<IWindow> window = nullptr;

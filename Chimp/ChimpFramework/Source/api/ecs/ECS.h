@@ -6,13 +6,23 @@
 #include "components/HierarchyComponent.h"
 #include "Loggers.h"
 #include "transform/TransformManager.h"
+#include "SystemContainerSystem.h"
+#include "scripting/EntityScriptingSystem.h"
 
 namespace Chimp {
+	class Engine;
 
 #ifdef CHIMP_FLECS
 	class ECS {
-	public:
-		ECS() : m_TransformManager(new TransformManager(*this)) {}
+		friend class Engine;
+	private:
+		ECS(Engine& engine)
+			: m_TransformManager(new TransformManager(*this)),
+			m_SystemContainer(engine, *this),
+			m_EntityScripting(*new EntityScriptingSystem(engine, *this))
+		{
+			m_SystemContainer.RegisterSystem(UNIQUE_PTR_CAST_FROM_RAW_PTR(ISystem, &m_EntityScripting));
+		}
 
 	public:
 		// A view represents a set of entities each with the same common set of components
@@ -66,6 +76,9 @@ namespace Chimp {
 		};
 
 	public:
+		SystemContainerSystem& GetSystems() { return m_SystemContainer; }
+		EntityScriptingSystem& GetScripts() { return m_EntityScripting; }
+
 		void SetParent(EntityId child, EntityId parent) {
 			if (child == parent) {
 				Loggers::Main().Error(std::format("Attempted to make {} a parent of itself.", child.id()));
@@ -171,7 +184,6 @@ namespace Chimp {
 		// component - The value to set the component to
 		template <typename Component>
 		void SetComponent(EntityId entity, const Component& component) {
-			static_assert(!IsHierachyComponent_v<Component>);
 			entity.set(component);
 		}
 
@@ -179,14 +191,12 @@ namespace Chimp {
 		// entity - The entity to get the component from
 		template <typename Component>
 		ConstOptionalReference<Component> GetComponent(EntityId entity) const {
-			static_assert(!IsHierachyComponent_v<Component>);
 			return ConstOptionalReference<Component>(entity.get<Component>());
 		}
 
 		// Get a component from an entity
 		template <typename Component>
 		OptionalReference<Component> GetMutableComponent(EntityId entity) {
-			static_assert(!IsHierachyComponent_v<Component>);
 			return OptionalReference<Component>(entity.get_mut<Component>());
 		}
 
@@ -205,9 +215,6 @@ namespace Chimp {
 		}
 
 	private:
-		template <typename Component>
-		inline static constexpr bool IsHierachyComponent_v = std::is_base_of<HierarchyComponent, Component>::value;
-
 		void RemoveEntityRecursive(EntityId entity) {
 			// Remove any children
 			auto trackChildrenComp = entity.get<HierarchyComponent>();
@@ -225,6 +232,8 @@ namespace Chimp {
 		flecs::world m_World;
 		size_t m_EntityCount = 0;
 		std::unique_ptr<TransformManager> m_TransformManager;
+		SystemContainerSystem m_SystemContainer;
+		EntityScriptingSystem& m_EntityScripting;
 	};
 #endif
 }

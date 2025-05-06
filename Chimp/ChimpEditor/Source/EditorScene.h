@@ -6,6 +6,7 @@ namespace ChimpEditor {
 	class EditorScene : public Chimp::Scene {
 	public:
 		EditorScene(Chimp::Engine& engine);
+		~EditorScene();
 
 		void OnInit() override;
 		void OnActivate(std::unique_ptr<Scene> previousScene = nullptr) override;
@@ -18,6 +19,7 @@ namespace ChimpEditor {
 
 	private:
 		Chimp::Engine& m_engine;
-		std::shared_ptr<Chimp::IRenderTexture> m_sceneView;
+		std::unique_ptr<Chimp::ECS> m_ecs;
+		Chimp::EntityId m_sceneView;
 	};
 }

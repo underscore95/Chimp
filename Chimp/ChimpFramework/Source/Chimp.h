@@ -3,12 +3,19 @@
 #include "api/scenes/SceneManager.h"
 #include "api/Engine.h"
 #include "api/window/IWindow.h"
+
+// Graphics
 #include "api/graphics/IRenderingManager.h"
 #include "api/graphics/shaders/shaders/lit/LitShadowShader.h"
 #include "api/graphics/meshes/TexturedQuad.h"
 #include "api/graphics/camera/controllers/FreeCameraController.h"
+
+// ECS
 #include "api/ecs/ECS.h"
 #include "api/ecs/Components.h"
+#include "api/ecs/scripting/EntityScriptingSystem.h"
+#include "api/ecs/scripting/IEntityScript.h"
+
 #include "api/networking/PacketTypeRegistry.h"
 #include "api/graphics/GameShader.h"
 #include "api/audio/IPlayingAudio.h"

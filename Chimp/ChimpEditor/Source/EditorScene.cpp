@@ -1,33 +1,45 @@
 #include "EditorScene.h"
+#include "scene_view/SceneViewScript.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
 		m_engine(engine),
-		m_sceneView(engine.GetRenderingManager().CreateRenderTexture(1920, 1080))
+		m_ecs(engine.CreateECS())
 	{
 		m_engine.GetWindow().SetTitle("Chimp Editor");
 		m_engine.GetWindow().SetSize({ 1280, 720 });
 		m_engine.GetWindow().SetResizable(true);
 
 		GetLogger().Info("Editor launched.");
+
+		LoadResources();
+	}
+
+	EditorScene::~EditorScene()
+	{
+		UnloadResources();
 	}
 
 	void EditorScene::OnInit() {
-		m_engine.GetRenderingManager().SetDefaultRenderTarget(m_sceneView);
+		m_sceneView = m_ecs->CreateEntity();
+		
+		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_sceneView, m_engine, *m_ecs)));
+
+		m_ecs->GetSystems().OnInit();
 	}
 
 	void EditorScene::OnActivate(std::unique_ptr<Scene> previousScene) {}
 
 	void EditorScene::OnDeactivate() {}
 
-	void EditorScene::OnUpdate() {}
+	void EditorScene::OnUpdate() {
+		m_ecs->GetSystems().OnUpdate();
+	}
 
 	void EditorScene::OnRender() {
+		m_ecs->GetSystems().OnRender();
+
 		auto& rm = m_engine.GetRenderingManager();
-		rm.BindDefaultRenderTarget();
-		rm.GetRenderer().SetClearColor(0.3f, 0.3f, 0.6f);
-		rm.ClearColorBuffer();
-		rm.ClearDepthBuffer();
 
 		rm.SetFrameBuffer();
 		rm.SetViewport({ 0,0 }, m_engine.GetWindow().GetSize());
@@ -42,10 +54,7 @@ namespace ChimpEditor {
 		ImGui::SetNextWindowSize(m_engine.GetWindow().GetSize());
 		ImGui::Begin("Chimp Editor", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-		ImVec2 sceneViewSize = m_engine.GetWindow().GetSize() * 0.5f;
-		ImGui::Begin("Scene View");
-		ImGui::Image(m_sceneView->GetImGuiImageHandle(), sceneViewSize);
-		ImGui::End();
+		m_ecs->GetSystems().OnRender();
 
 		ImGui::End();
 	}

@@ -59,6 +59,9 @@ namespace Chimp {
 		// level - minimum log level to log
 		[[nodiscard]] std::unique_ptr<Logger> CreateLogger(const std::string& name, LogLevel level = LogLevel::INFO);
 
+		// Create an ECS world
+		[[nodiscard]] std::unique_ptr<ECS> CreateECS();
+
 		// Create an event handler that can be used to send and receive events
 		// EventType - enum representing event type
 		// Event - struct representing event data, inheritance is supported

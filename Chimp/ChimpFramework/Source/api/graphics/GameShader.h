@@ -5,7 +5,7 @@
 #include "api/graphics/shaders/IShaderBuffers.h"
 #include "api/utils/OptionalReference.h"
 #include "api/ecs/ECS.h"
-#include "api/ecs/components/TransformComponent.h"
+#include "api/ecs/transform/TransformComponent.h"
 #include "api/graphics/camera/CameraMatrices.h"
 
 namespace Chimp {
