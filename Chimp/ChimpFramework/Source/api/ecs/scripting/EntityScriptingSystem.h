@@ -19,16 +19,16 @@ namespace Chimp {
 		void DetachScript(EntityId entity, ScriptId script);
 
 		// returns the first script on the entity which matches the predicate
-		OptionalReference<IEntityScript> GetFirstScript(EntityId entity, std::function<bool(const IEntityScript&)> predicate);
+		OptionalReference<IEntityScript> GetFirstScript(EntityId entity, std::function<bool(IEntityScript*)> predicate);
 
 		// returns the first script on the entity which is of type T
 		template <typename T>
 		OptionalReference<T> GetFirstScript(EntityId entity) {
 			static_assert(std::is_base_of<IEntityScript, T>::value);
-			OptionalReference<IEntityScript> script = GetFirstScript(entity, [](const IEntityScript& script) {
-				return typeid(script) == typeid(T); // TODO: This is bad but dynamic_cast wasn't working :(
+			OptionalReference<IEntityScript> script = GetFirstScript(entity, [](IEntityScript* script) {
+				return dynamic_cast<T*>(script) != nullptr;
 				});
-			return { (T*)(script.GetNullablePtr()) };
+			return { static_cast<T*>(script.GetNullablePtr()) };
 		}
 
 	private:

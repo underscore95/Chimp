@@ -7,6 +7,7 @@ namespace Chimp {
 	class ISystem {
 	public:
 		ISystem(Engine& engine, ECS& ecs) : m_Engine(engine), m_ECS(ecs) {}
+		virtual ~ISystem() = default;
 
 		virtual void OnInit() {};
 		virtual void OnUpdate() {};

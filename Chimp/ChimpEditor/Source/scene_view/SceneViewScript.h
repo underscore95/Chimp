@@ -3,7 +3,7 @@
 #include "Chimp.h"
 
 namespace ChimpEditor {
-	class SceneViewScript : Chimp::IEntityScript {
+	class SceneViewScript : public Chimp::IEntityScript {
 	public:
 		SceneViewScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs);
 

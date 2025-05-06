@@ -64,12 +64,12 @@ namespace Chimp {
 		scripts.Scripts.remove_if([script](const std::shared_ptr<IEntityScript>& s) { return s.get() == script; });
 	}
 
-	OptionalReference<IEntityScript> EntityScriptingSystem::GetFirstScript(EntityId entity, std::function<bool(const IEntityScript&)> predicate)
+	OptionalReference<IEntityScript> EntityScriptingSystem::GetFirstScript(EntityId entity, std::function<bool(IEntityScript*)> predicate)
 	{
 		auto scripts = GetECS().GetComponent<ScriptableComponent>(entity);
 		if (scripts) {
 			for (auto& script : scripts->Scripts) {
-				if (predicate(*script)) {
+				if (predicate(script.get())) {
 					return script.get();
 				}
 			}

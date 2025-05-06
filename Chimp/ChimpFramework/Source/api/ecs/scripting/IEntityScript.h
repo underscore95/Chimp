@@ -13,7 +13,7 @@ namespace Chimp {
 			EntityId(entityId) {
 		}
 
-		virtual ~IEntityScript() = default;
+		virtual ~IEntityScript() {};
 
 	protected:
 		const EntityId EntityId;
