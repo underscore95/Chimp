@@ -6,8 +6,8 @@
 namespace Chimp {
 	struct HierarchyComponent {
 		static constexpr int SMALL_CHILDREN_SIZE = 3;
-		UnorderedPossiblyUniqueCollection<EntityId, SMALL_CHILDREN_SIZE> Children;
 		EntityId Parent;
-		bool HasParent = false;
+		int HierarchyLevel = 0; // 0 = no parent, 1 = 1 parent, etc
+		UnorderedPossiblyUniqueCollection<EntityId, SMALL_CHILDREN_SIZE> Children;
 	};
 }

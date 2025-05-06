@@ -1,6 +1,6 @@
 #pragma once
 
-#include "api/ecs/ECS.h"
+#include "api/ecs/EntityId.h"
 
 namespace Chimp {
 	struct EntityIdComponent {

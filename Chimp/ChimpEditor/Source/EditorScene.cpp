@@ -1,10 +1,13 @@
 #include "EditorScene.h"
 #include "scene_view/SceneViewScript.h"
+#include "scene_hierarchy/SceneHierarchyScript.h"
+#include "scene_hierarchy/EntityNameComponent.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
 		m_engine(engine),
-		m_ecs(engine.CreateECS())
+		m_ecs(engine.CreateECS()),
+		m_gameEcs(engine.CreateECS())
 	{
 		m_engine.GetWindow().SetTitle("Chimp Editor");
 		m_engine.GetWindow().SetSize({ 1280, 720 });
@@ -21,9 +24,18 @@ namespace ChimpEditor {
 	}
 
 	void EditorScene::OnInit() {
-		m_sceneView = m_ecs->CreateEntity();
 
+		// Scene view
+		m_sceneView = m_ecs->CreateEntity();
 		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_sceneView, m_engine, *m_ecs)));
+
+		// Scene hierarchy
+		m_sceneView = m_ecs->CreateEntity();
+		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneHierarchyScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+
+		// Testing
+		m_gameEcs->SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
+		m_gameEcs->SetComponent<EntityNameComponent>(m_gameEcs->CreateEntity(), { "MyNamedEntity" });
 
 		m_ecs->GetSystems().OnInit();
 	}
@@ -33,6 +45,12 @@ namespace ChimpEditor {
 	void EditorScene::OnDeactivate() {}
 
 	void EditorScene::OnUpdate() {
+		auto view = m_gameEcs->GetEntitiesWithComponents<Chimp::EntityIdComponent, Chimp::HierarchyComponent>();
+		for (auto& [id, hi] : view) {
+			long longId = id.Id.id();
+			int i = 3;
+		}
+
 		m_ecs->GetSystems().OnUpdate();
 	}
 

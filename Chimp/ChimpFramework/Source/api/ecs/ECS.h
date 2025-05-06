@@ -8,6 +8,7 @@
 #include "transform/TransformManager.h"
 #include "SystemContainerSystem.h"
 #include "scripting/EntityScriptingSystem.h"
+#include "components/EntityIdComponent.h"
 
 namespace Chimp {
 	class Engine;
@@ -45,18 +46,6 @@ namespace Chimp {
 		public:
 			~View() = default;
 
-			// Remove all entities from the view that do not satisfy the predicate
-			void WithPredicate(const std::function<bool(ComponentTuple&)>& predicate) {
-				for (auto it = m_Components.begin(); it != m_Components.end();) {
-					if (!predicate(*it)) {
-						it = m_Components.erase(it);
-					}
-					else {
-						++it;
-					}
-				}
-			}
-
 		public:
 			using iterator = typename std::vector<ComponentTuple>::iterator;
 
@@ -89,7 +78,7 @@ namespace Chimp {
 			// Check if we have a parent
 			auto hierarchyComp = child.get_mut<HierarchyComponent>();
 			assert(hierarchyComp);
-			if (hierarchyComp->HasParent) {
+			if (hierarchyComp->HierarchyLevel > 0) {
 				// TODO: Do nothing if the parent is the same?
 				// We have a parent, let them know their child is leaving if they track children
 				auto oldParentsComp = hierarchyComp->Parent.get_mut<HierarchyComponent>();
@@ -100,12 +89,13 @@ namespace Chimp {
 
 			// Set the new parent
 			hierarchyComp->Parent = parent;
-			hierarchyComp->HasParent = true;
 
-			auto trackChildrenComp = parent.get_mut<HierarchyComponent>();
-			assert(trackChildrenComp);
-			auto& children = trackChildrenComp->Children;
+			auto parentComp = parent.get_mut<HierarchyComponent>();
+			assert(parentComp);
+			auto& children = parentComp->Children;
 			children.Insert(child);
+
+			hierarchyComp->HierarchyLevel = parentComp->HierarchyLevel + 1;
 		}
 
 		bool IsChildOf(EntityId parent, EntityId possibleChild) const {
@@ -115,11 +105,12 @@ namespace Chimp {
 			return children.Contains(possibleChild);
 		}
 
-		void RemoveChild(EntityId parent, EntityId child) const {
-			assert(IsChildOf(parent, child));
-			auto parentComp = parent.get_mut<HierarchyComponent>();
+		void OrphanChild(EntityId child) const {
 			auto childComp = child.get_mut<HierarchyComponent>();
-			childComp->HasParent = false;
+			assert(childComp);
+			if (childComp->HierarchyLevel <= 0) return;
+			auto parentComp = childComp->Parent.get_mut<HierarchyComponent>();
+			childComp->HierarchyLevel = 0;
 			parentComp->Children.Remove(child);
 		}
 
@@ -138,7 +129,7 @@ namespace Chimp {
 		bool TryGetParent(EntityId child, EntityId& outParent) {
 			auto hierarchy = child.get<HierarchyComponent>();
 			assert(hierarchy);
-			if (hierarchy->HasParent) {
+			if (hierarchy->HierarchyLevel > 0) {
 				outParent = hierarchy->Parent;
 				return true;
 			}
@@ -155,6 +146,7 @@ namespace Chimp {
 			m_EntityCount++;
 			auto ent = m_World.entity();
 			ent.set(HierarchyComponent{});
+			ent.set(EntityIdComponent{ ent });
 			return ent;
 		}
 
@@ -162,7 +154,7 @@ namespace Chimp {
 		void RemoveEntity(EntityId entity) {
 			auto childComp = entity.get<HierarchyComponent>();
 			assert(childComp);
-			if (childComp->HasParent) {
+			if (childComp->HierarchyLevel > 0) {
 				// Let the parent know they don't have this child anymore
 				auto parentComp = childComp->Parent.get_mut< HierarchyComponent>();
 				assert(parentComp);

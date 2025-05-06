@@ -44,6 +44,11 @@ namespace Chimp {
 			}
 		}
 
+		size_t Size() {
+			size_t size = IsUsingSet() ? GetSet().size() : m_ActiveIndex;
+			return size;
+		}
+
 		void Insert(const T& value) {
 			if (IsUsingSet()) {
 				GetSet().push_back(value);
