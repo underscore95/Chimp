@@ -1,8 +1,10 @@
 #include "api/graphics/IRenderingManager.h"
+#include "api/Engine.h"
 
 namespace Chimp {
-	IRenderingManager::IRenderingManager(IImageLoader& imageLoader) :
-		m_ImageLoader(imageLoader)
+	IRenderingManager::IRenderingManager(Engine* engine, IImageLoader& imageLoader) :
+		m_ImageLoader(imageLoader),
+		m_Engine(engine)
 	{
 	}
 
@@ -38,7 +40,7 @@ namespace Chimp {
 	std::unique_ptr<ITexture> IRenderingManager::CreateTextureFromImage(
 		const std::string& filePath,
 		const TextureProperties& properties
-		) const
+	) const
 	{
 		// Load image
 		std::unique_ptr<IImageLoader::LoadedImage> image = m_ImageLoader.LoadImage(filePath);
@@ -55,6 +57,22 @@ namespace Chimp {
 
 		// Create texture
 		return CreateCustomisedTextureFromImage(CHIMP_TEXTURE_SLOT, thisTextureProperties, std::move(image));
+	}
+
+	void IRenderingManager::SetDefaultRenderTarget(std::weak_ptr<IRenderTexture> renderTarget)
+	{
+		m_DefaultRenderTarget = renderTarget;
+	}
+
+	void IRenderingManager::BindDefaultRenderTarget()
+	{
+		if (auto ptr = m_DefaultRenderTarget.lock()) {
+			ptr->BindForWriting();
+		}
+		else {
+			SetViewport({ 0,0 }, m_Engine->GetWindow().GetSize());
+			SetFrameBuffer();
+		}
 	}
 
 	ChimpShaders& IRenderingManager::GetChimpShaders() const

@@ -20,7 +20,7 @@ namespace Chimp {
 	class IRenderingManager {
 		friend class Engine;
 	protected:
-		IRenderingManager(IImageLoader& imageLoader);
+		IRenderingManager(Engine* engine, IImageLoader& imageLoader);
 
 	public:
 		~IRenderingManager() = default;
@@ -152,6 +152,12 @@ namespace Chimp {
 		// Set frame buffer
 		virtual void SetFrameBuffer(int id = 0) const = 0;
 
+		// Set the default render target, pass in nullptr to render to the back buffer
+		void SetDefaultRenderTarget(std::weak_ptr<IRenderTexture> renderTarget);
+
+		// Set render target to the default
+		void BindDefaultRenderTarget();
+
 		// Set view port
 		virtual void SetViewport(Vector2i position, Vector2f size) const = 0;
 
@@ -161,5 +167,7 @@ namespace Chimp {
 	protected:
 		IImageLoader& m_ImageLoader;
 		std::unique_ptr<ChimpShaders> m_ChimpShaders;
+		std::weak_ptr<IRenderTexture> m_DefaultRenderTarget;
+		Engine* m_Engine;
 	};
 }

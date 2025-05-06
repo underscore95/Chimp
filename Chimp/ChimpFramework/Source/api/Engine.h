@@ -68,7 +68,7 @@ namespace Chimp {
 
 	private:
 		[[nodiscard]] std::unique_ptr<IWindow> CreateWindow() const;
-		[[nodiscard]] std::unique_ptr<IRenderingManager> CreateRenderingManager() const;
+		[[nodiscard]] std::unique_ptr<IRenderingManager> CreateRenderingManager();
 		[[nodiscard]] std::unique_ptr<IImageLoader> CreateImageLoader() const;
 
 	private:

@@ -8,7 +8,7 @@
 namespace Chimp::GL {
 	class RenderingManager : public IRenderingManager {
 	public:
-		RenderingManager(IImageLoader& imageLoader);
+		RenderingManager(Engine* engine, IImageLoader& imageLoader);
 		~RenderingManager();
 
 		IRenderer& GetRenderer() const override;
@@ -57,7 +57,7 @@ namespace Chimp::GL {
 
 		void ClearColorBuffer() const override;
 
-		void SetFrameBuffer(int id)const override;
+		void SetFrameBuffer(int id) const override;
 
 		void SetViewport(Vector2i position, Vector2f size) const override;
 

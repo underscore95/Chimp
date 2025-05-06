@@ -55,8 +55,9 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 }
 
 namespace Chimp::GL {
-	RenderingManager::RenderingManager(IImageLoader& imageLoader) :
-		IRenderingManager(imageLoader)
+	RenderingManager::RenderingManager(Engine* engine,
+		IImageLoader& imageLoader) :
+		IRenderingManager(engine, imageLoader)
 	{
 		// Initialise OpenGL
 		InitOpenGL();

@@ -18,6 +18,6 @@ namespace ChimpEditor {
 
 	private:
 		Chimp::Engine& m_engine;
-		std::unique_ptr<Chimp::IRenderTexture> m_sceneView;
+		std::shared_ptr<Chimp::IRenderTexture> m_sceneView;
 	};
 }

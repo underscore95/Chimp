@@ -171,12 +171,12 @@ namespace Chimp {
 		return std::move(window);
 	}
 
-	std::unique_ptr<IRenderingManager> Engine::CreateRenderingManager() const
+	std::unique_ptr<IRenderingManager> Engine::CreateRenderingManager()
 	{
 		assert(m_ImageLoader);
 		std::unique_ptr<IRenderingManager> renderingManager = nullptr;
 #ifdef CHIMP_OPENGL
-		renderingManager = std::make_unique<GL::RenderingManager>(*m_ImageLoader);
+		renderingManager = std::make_unique<GL::RenderingManager>(this, *m_ImageLoader);
 #endif
 
 		if (!renderingManager) {

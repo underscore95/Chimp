@@ -13,7 +13,7 @@ namespace ChimpEditor {
 	}
 
 	void EditorScene::OnInit() {
-
+		m_engine.GetRenderingManager().SetDefaultRenderTarget(m_sceneView);
 	}
 
 	void EditorScene::OnActivate(std::unique_ptr<Scene> previousScene) {}
@@ -23,16 +23,18 @@ namespace ChimpEditor {
 	void EditorScene::OnUpdate() {}
 
 	void EditorScene::OnRender() {
-		m_sceneView->BindForWriting(); // TODO this won't work cause in shadow mapping we set back to the back buffer as render target
-		m_engine.GetRenderingManager().GetRenderer().SetClearColor(0.3f, 0.3f, 0.6f);
-		m_engine.GetRenderingManager().ClearColorBuffer();
-		m_engine.GetRenderingManager().ClearDepthBuffer();
+		auto& rm = m_engine.GetRenderingManager();
+		rm.BindDefaultRenderTarget();
+		rm.GetRenderer().SetClearColor(0.3f, 0.3f, 0.6f);
+		rm.ClearColorBuffer();
+		rm.ClearDepthBuffer();
 
-		m_engine.GetRenderingManager().SetFrameBuffer();
-		m_engine.GetRenderingManager().SetViewport({ 0,0 }, m_engine.GetWindow().GetSize());
-		m_engine.GetRenderingManager().ClearDepthBuffer();
-		m_engine.GetRenderingManager().GetRenderer().SetClearColor(0, 0, 0);
-		m_engine.GetRenderingManager().ClearColorBuffer();
+		rm.SetFrameBuffer();
+		rm.SetViewport({ 0,0 }, m_engine.GetWindow().GetSize());
+
+		rm.GetRenderer().SetClearColor(0, 0, 0);
+		rm.ClearDepthBuffer();
+		rm.ClearColorBuffer();
 	}
 
 	void EditorScene::OnRenderUI() {
