@@ -51,6 +51,14 @@ namespace Chimp {
 		return *scripts;
 	}
 
+	void EntityScriptingSystem::ForEachScriptedEntity(const std::function<void(EntityId entity, ScriptableComponent&)>& func)
+	{
+		auto view = GetECS().GetEntitiesWithComponents<EntityIdComponent, ScriptableComponent>();
+		for (auto& [id, scripts] : view) {
+			func(id.Id, scripts);
+		}
+	}
+
 	ScriptId EntityScriptingSystem::AttachScript(EntityId entity, std::unique_ptr<IEntityScript> script)
 	{
 		auto& scripts = GetScriptsOn(entity);

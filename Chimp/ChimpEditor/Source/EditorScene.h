@@ -22,6 +22,5 @@ namespace ChimpEditor {
 		std::unique_ptr<Chimp::ECS> m_ecs;
 		std::unique_ptr<Chimp::ECS> m_gameEcs;
 		Chimp::EntityId m_sceneView;
-		Chimp::EntityId m_sceneHierarchy;
 	};
 }

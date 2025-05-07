@@ -11,6 +11,16 @@ namespace ChimpEditor {
 	{
 	}
 
+	Chimp::EntityId SceneHierarchyScript::GetSelectedEntity()
+	{
+		return m_selectedEntity;
+	}
+
+	bool SceneHierarchyScript::HasSelectedEntity()
+	{
+		return m_selectedEntity != Chimp::EntityId{};
+	}
+
 	void SceneHierarchyScript::OnInit()
 	{
 	}
@@ -36,7 +46,7 @@ namespace ChimpEditor {
 
 		for (auto& [entityId, hierarchy] : view) {
 			if (hierarchy.HierarchyLevel > 0) continue;
-				RenderUI(entityId.Id, hierarchy, ImGui::GetCursorPosX());
+			RenderUI(entityId.Id, hierarchy, ImGui::GetCursorPosX());
 		}
 
 		ImGui::End();
@@ -51,19 +61,37 @@ namespace ChimpEditor {
 		auto nameComp = m_gameECS.GetComponent<EntityNameComponent>(entity);
 		auto entityIdString = entity.str();
 		auto entityName = nameComp ? nameComp->Name.c_str() : entityIdString.c_str();
-		
-		// Prevent opening if has no children
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
-		if (hierarchyComp.Children.Size() <= 0) flags |= ImGuiTreeNodeFlags_Leaf;
 
-		// Draw ui
-		if (ImGui::CollapsingHeader(entityName, flags)) {
+		// Draw UI
+		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-			// Recurse children
-			for (auto& child : hierarchyComp.Children) {
-				RenderUI(child, m_gameECS.GetMutableComponent<Chimp::HierarchyComponent>(child).Get(), cursorPosX + 8);
+		if (hierarchyComp.Children.Size() == 0) {
+			// Leaf node
+			if (ImGui::Selectable(entityName, m_selectedEntity == entity)) {
+				m_selectedEntity = entity;
+				GetLogger().Info("Selected ");
 			}
 		}
+		else {
+			// Node with children
+			bool isSelected = (m_selectedEntity == entity);
+			if (isSelected)
+				nodeFlags |= ImGuiTreeNodeFlags_Selected;
+
+			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, entityName);
+			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
+				m_selectedEntity = entity;
+				GetLogger().Info("Selected ");
+			}
+
+			if (nodeOpen) {
+				for (auto& child : hierarchyComp.Children) {
+					RenderUI(child, m_gameECS.GetMutableComponent<Chimp::HierarchyComponent>(child).Get(), cursorPosX + 8);
+				}
+				ImGui::TreePop();
+			}
+		}
+
 
 		// Reset cursor
 		ImGui::SetCursorPosX(oldCursorPosX);

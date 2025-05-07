@@ -7,6 +7,10 @@ namespace ChimpEditor {
 	public:
 		SceneHierarchyScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameECS);
 
+	public:
+		Chimp::EntityId GetSelectedEntity();
+		bool HasSelectedEntity();
+
 	private:
 		void OnInit() override;
 		void OnUpdate() override;
@@ -18,5 +22,6 @@ namespace ChimpEditor {
 	private:
 		std::shared_ptr<Chimp::IRenderTexture> m_sceneViewTexture;
 		Chimp::ECS& m_gameECS;
+		Chimp::EntityId m_selectedEntity;
 	};
 }

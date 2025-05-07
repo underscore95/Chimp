@@ -8,6 +8,14 @@
 namespace Chimp {
 	typedef void* ScriptId;
 
+	// T is script class
+	template <typename T>
+	struct ScriptAndEntity {
+		Reference<T> Script;
+		EntityId Entity;
+		ScriptAndEntity(Reference<T> script, EntityId entity) : Script(script), Entity(entity) {}
+	};
+
 	class EntityScriptingSystem : public ISystem {
 	public:
 		EntityScriptingSystem(Engine& engine, ECS& ecs)
@@ -31,6 +39,18 @@ namespace Chimp {
 			return { static_cast<T*>(script.GetNullablePtr()) };
 		}
 
+		// returns the first entity with the script, also returns the script
+		template <typename T>
+		std::unique_ptr<ScriptAndEntity<T>> GetFirstEntityWithScript() {
+			std::unique_ptr<ScriptAndEntity<T>> found = nullptr;
+			ForEachScriptedEntity([&found, this](EntityId entity, ScriptableComponent scripts) {
+				if (found) return;
+				OptionalReference<T> script = GetFirstScript<T>(entity);
+				if (script) found = std::make_unique<ScriptAndEntity<T>>(script, entity);
+				});
+			return found;
+		}
+
 	private:
 		void OnInit() override;
 		void OnUpdate() override;
@@ -38,5 +58,6 @@ namespace Chimp {
 		void OnRenderUI() override;
 
 		ScriptableComponent& GetScriptsOn(EntityId entity);
+		void ForEachScriptedEntity(const std::function<void(EntityId entity, ScriptableComponent&)>& func);
 	};
 }

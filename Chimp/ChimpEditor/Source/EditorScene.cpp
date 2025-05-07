@@ -2,6 +2,7 @@
 #include "scene_view/SceneViewScript.h"
 #include "scene_hierarchy/SceneHierarchyScript.h"
 #include "scene_hierarchy/EntityNameComponent.h"
+#include "inspector/InspectorScript.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -30,8 +31,10 @@ namespace ChimpEditor {
 		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_sceneView, m_engine, *m_ecs)));
 
 		// Scene hierarchy
-		m_sceneView = m_ecs->CreateEntity();
-		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneHierarchyScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneHierarchyScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+		
+		// Inspector
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
 
 		// Testing
 		m_gameEcs->SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
