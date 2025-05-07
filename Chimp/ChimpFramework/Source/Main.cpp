@@ -2,6 +2,7 @@
 #include "MainLoop.h"
 #include "api/Engine.h"
 #include <stdlib.h>
+#include "api/ecs/components/ComponentRegistry.h"
 
 std::unique_ptr<Chimp::Engine> Chimp::EntryPoint::Engine = nullptr;
 
