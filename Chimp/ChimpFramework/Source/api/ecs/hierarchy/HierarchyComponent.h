@@ -13,6 +13,6 @@ namespace Chimp {
 	};
 
 	namespace Unused {
-		static ComponentRegister<HierarchyComponent> Register;
+		static ComponentRegister<HierarchyComponent> RegisterHierarchyComponent;
 	}
 }

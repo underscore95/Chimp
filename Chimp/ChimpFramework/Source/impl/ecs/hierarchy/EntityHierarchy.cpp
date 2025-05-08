@@ -1,6 +1,7 @@
 #include "api/ecs/hierarchy/EntityHierarchy.h"
 #include "api/ecs/hierarchy/HierarchyComponent.h"
 #include "api/ecs/ECS.h"
+#include "api/ecs/components/EntityIdComponent.h"
 
 namespace Chimp {
 	EntityHierarchy::EntityHierarchy(ECS& ecs) : m_ECS(ecs)
@@ -83,6 +84,7 @@ namespace Chimp {
 
 	void EntityHierarchy::OnCreateEntity(EntityId createdEntity)
 	{
+		m_ECS.SetComponent(createdEntity, EntityIdComponent{ createdEntity });
 		m_ECS.SetComponent(createdEntity, HierarchyComponent{});
 	}
 	void EntityHierarchy::RemoveEntityAndChildren(EntityId entity)

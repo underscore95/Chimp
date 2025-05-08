@@ -1,5 +1,6 @@
 #include "api/ecs/scripting/EntityScriptingSystem.h"
 #include "api/ecs/ECS.h"
+#include "api/ecs/components/EntityIdComponent.h"
 
 namespace Chimp {
 	void EntityScriptingSystem::OnInit()

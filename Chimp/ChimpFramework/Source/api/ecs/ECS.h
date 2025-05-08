@@ -7,7 +7,6 @@
 #include "transform/TransformManager.h"
 #include "SystemContainerSystem.h"
 #include "scripting/EntityScriptingSystem.h"
-#include "components/EntityIdComponent.h"
 #include "api/utils/TypeInfo.h"
 #include "api/utils/AnyReference.h"
 #include "hierarchy/EntityHierarchy.h"
@@ -15,6 +14,7 @@
 namespace Chimp {
 	class Engine;
 	class ComponentRegistry;
+	struct EntityIdComponent;
 
 #ifdef CHIMP_FLECS
 	class ECS {
@@ -84,7 +84,6 @@ namespace Chimp {
 		EntityId CreateEntity() {
 			m_EntityCount++;
 			auto ent = m_World.entity();
-			ent.set(EntityIdComponent{ ent });
 			m_EntityHierarchy.OnCreateEntity(ent);
 			return ent;
 		}
