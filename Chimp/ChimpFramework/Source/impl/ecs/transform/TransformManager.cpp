@@ -95,7 +95,7 @@ namespace Chimp {
 		if (!transform) {
 			// Return parent transform
 			EntityId parent;
-			return m_ECS.TryGetParent(entity, parent) ? GetMutableTransform(parent) : nullptr;
+			return m_ECS.GetHierarchy().TryGetParent(entity, parent) ? GetMutableTransform(parent) : nullptr;
 		}
 
 		if (!transform->IsDirty()) return transform;
@@ -105,7 +105,7 @@ namespace Chimp {
 
 		// Get the parent matrix
 		EntityId parent;
-		if (m_ECS.TryGetParent(entity, parent)) {
+		if (m_ECS.GetHierarchy().TryGetParent(entity, parent)) {
 
 			// Calculate the world matrix
 			auto parentTransform = GetMutableTransform(parent);
@@ -126,7 +126,7 @@ namespace Chimp {
 			transform->m_IsDirty = true;
 		}
 
-		const auto& children = m_ECS.GetChildren(entity);
+		const auto& children = m_ECS.GetHierarchy().GetChildren(entity);
 		for (auto& child : children) {
 			MarkDirty(entity, m_ECS.GetMutableComponent<TransformComponent>(child));
 		}

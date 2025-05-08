@@ -37,7 +37,7 @@ namespace ChimpEditor {
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
 
 		// Testing
-		m_gameEcs->SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
+		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
 		m_gameEcs->SetComponent<EntityNameComponent>(m_gameEcs->CreateEntity(), { "MyNamedEntity" });
 
 		m_ecs->GetSystems().OnInit();
