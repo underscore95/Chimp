@@ -9,6 +9,11 @@ namespace Chimp {
 		
 	}
 
+	SystemContainerSystem::~SystemContainerSystem()
+	{
+		m_Systems.clear();
+	}
+
 	void SystemContainerSystem::RegisterSystem(std::unique_ptr<ISystem> system)
 	{
 		m_Systems.push_back(std::move(system));

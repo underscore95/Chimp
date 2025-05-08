@@ -25,10 +25,13 @@ namespace Chimp {
 		ECS(Engine& engine)
 			: m_TransformManager(new TransformManager(*this)),
 			m_SystemContainer(engine, *this),
-			m_EntityScripting(engine, *this),
 			m_EntityHierarchy(*this)
 		{
-			m_SystemContainer.RegisterSystem(UNIQUE_PTR_CAST_FROM_RAW_PTR(ISystem, &m_EntityScripting));
+			{
+				auto scriptingSystem = UNIQUE_PTR_CAST_FROM_RAW_PTR(ISystem, new EntityScriptingSystem(engine, *this));
+				m_EntityScripting = static_cast<EntityScriptingSystem*>(scriptingSystem.get());
+				m_SystemContainer.RegisterSystem(std::move(scriptingSystem));
+			}
 		}
 
 	public:
@@ -72,7 +75,7 @@ namespace Chimp {
 
 	public:
 		SystemContainerSystem& GetSystems() { return m_SystemContainer; }
-		EntityScriptingSystem& GetScripts() { return m_EntityScripting; }
+		EntityScriptingSystem& GetScripts() { return m_EntityScripting.Get(); }
 		EntityHierarchy& GetHierarchy() { return m_EntityHierarchy; }
 
 		// Get number of alive entities
@@ -164,11 +167,11 @@ namespace Chimp {
 		size_t m_EntityCount = 0;
 		std::unique_ptr<TransformManager> m_TransformManager;
 		SystemContainerSystem m_SystemContainer;
-		EntityScriptingSystem m_EntityScripting;
-		EntityHierarchy	 m_EntityHierarchy;
+		Reference<EntityScriptingSystem> m_EntityScripting;
+		EntityHierarchy	m_EntityHierarchy;
 		std::unordered_map<flecs::id_t, TypeInfo> m_ComponentIdToTypeInfo;
 #ifndef NDEBUG
-		std::unordered_set< TypeInfo> m_RegisteredComponents;
+		std::unordered_set<TypeInfo> m_RegisteredComponents;
 #endif
 	};
 #endif

@@ -7,6 +7,7 @@ namespace Chimp {
 	class SystemContainerSystem : public ISystem {
 	public:
 		SystemContainerSystem(Engine& engine, ECS& ecs);
+		~SystemContainerSystem() override;
 
 		void RegisterSystem(std::unique_ptr<ISystem> system);
 
