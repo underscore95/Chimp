@@ -7,4 +7,11 @@ namespace Chimp {
 		static ComponentRegistry inst;
 		return inst;
 	}
+
+	void ComponentRegistry::RegisterComponentsInECS(ECS& ecs)
+	{
+		for (auto& func : m_ECSRegisterFunctions) {
+			func(ecs);
+		}
+	}
 }

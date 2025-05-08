@@ -21,6 +21,8 @@
 #include "Loggers.h"
 #include "api/audio/sfx/SoundEffect.h"
 
+#include "api/ecs/components/ComponentRegistry.h"
+
 namespace Chimp {
 	Engine::Engine() :
 		m_ResourceManager(*this),
@@ -165,7 +167,9 @@ namespace Chimp {
 
 	std::unique_ptr<ECS> Engine::CreateECS()
 	{
-		return std::unique_ptr<ECS>(new ECS(*this));
+		auto ecs= std::unique_ptr<ECS>(new ECS(*this));
+		ComponentRegistry::Instance().RegisterComponentsInECS(*ecs);
+		return std::move(ecs);
 	}
 
 	std::unique_ptr<IWindow> Engine::CreateWindow() const

@@ -37,9 +37,14 @@ namespace ChimpEditor {
 		ImGui::Begin("Inspector");
 
 		if (m_sceneHierarchy->HasSelectedEntity()) {
-			auto str = m_sceneHierarchy->GetSelectedEntity().str();
-			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(m_sceneHierarchy->GetSelectedEntity());
+			auto ent = m_sceneHierarchy->GetSelectedEntity();
+			auto str = ent.str();
+			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(ent);
 			ImGui::Text(nameComp ? nameComp->Name.c_str() : str.c_str());
+
+			m_gameEcs.GetComponentsOnEntity(ent, [](Chimp::AnyConstReference component) {
+				ImGui::Text(component.GetType().Name());
+				});
 		}
 
 		ImGui::End();

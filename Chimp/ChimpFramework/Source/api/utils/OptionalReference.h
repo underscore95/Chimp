@@ -49,6 +49,11 @@ namespace Chimp {
 
 		operator bool() const { return HasValue(); }
 
+		bool operator==(const ConstOptionalReference<T>& other) const {
+			return m_Value == other.m_Value;
+		}
+
+
 	private:
 		const T* m_Value;
 	};
@@ -64,4 +69,13 @@ namespace Chimp {
 
 	template <typename T>
 	using ConstReference = ConstOptionalReference<T>;
+}
+
+namespace std {
+	template <typename T>
+	struct hash<Chimp::ConstOptionalReference<T>> {
+		std::size_t operator()(const Chimp::ConstOptionalReference<T>& ref) const noexcept {
+			return std::hash<const T*>{}(ref.operator->());
+		}
+	};
 }

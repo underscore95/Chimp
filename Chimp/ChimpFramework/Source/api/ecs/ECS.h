@@ -9,13 +9,17 @@
 #include "SystemContainerSystem.h"
 #include "scripting/EntityScriptingSystem.h"
 #include "components/EntityIdComponent.h"
+#include "api/utils/TypeInfo.h"
+#include "api/utils/AnyReference.h"
 
 namespace Chimp {
 	class Engine;
+	class ComponentRegistry;
 
 #ifdef CHIMP_FLECS
 	class ECS {
 		friend class Engine;
+		friend class ComponentRegistry;
 	private:
 		ECS(Engine& engine)
 			: m_TransformManager(new TransformManager(*this)),
@@ -114,7 +118,7 @@ namespace Chimp {
 			parentComp->Children.Remove(child);
 		}
 
-		const UnorderedPossiblyUniqueCollection<EntityId, HierarchyComponent::SMALL_CHILDREN_SIZE>& GetChildren(EntityId parent) const {
+		const UnorderedCollection<EntityId, HierarchyComponent::SMALL_CHILDREN_SIZE>& GetChildren(EntityId parent) const {
 			auto hierarchyComp = parent.get<HierarchyComponent>();
 			assert(hierarchyComp);
 			return hierarchyComp->Children;
@@ -176,6 +180,13 @@ namespace Chimp {
 		// component - The value to set the component to
 		template <typename Component>
 		void SetComponent(EntityId entity, const Component& component) {
+#ifndef NDEBUG
+			if (!m_RegisteredComponents.contains(typeid(Component))) {
+				std::string name = typeid(Component).name();
+				Loggers::Main().Error("Component " + name + " not registered.");
+				assert(false);
+			}
+#endif
 			entity.set(component);
 		}
 
@@ -202,6 +213,9 @@ namespace Chimp {
 			return View<Components...>(m_World);
 		}
 
+		// Get all components on an entity
+		void GetComponentsOnEntity(EntityId entity, const std::function<void(AnyConstReference)>& function);
+
 		TransformManager& GetTransformManager() {
 			return *m_TransformManager;
 		}
@@ -220,12 +234,25 @@ namespace Chimp {
 			entity.destruct();
 		}
 
+		template <typename T>
+		void RegisterComponent() {
+			m_World.component<T>();
+			m_ComponentIdToTypeInfo[m_World.id<T>()] = typeid(T);
+#ifndef NDEBUG
+			m_RegisteredComponents.insert(typeid(T));
+#endif
+		}
+
 	private:
 		flecs::world m_World;
 		size_t m_EntityCount = 0;
 		std::unique_ptr<TransformManager> m_TransformManager;
 		SystemContainerSystem m_SystemContainer;
 		EntityScriptingSystem& m_EntityScripting;
+		std::unordered_map<flecs::id_t, TypeInfo> m_ComponentIdToTypeInfo;
+#ifndef NDEBUG
+		std::unordered_set< TypeInfo> m_RegisteredComponents;
+#endif
 	};
 #endif
 }
