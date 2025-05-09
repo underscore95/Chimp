@@ -79,7 +79,7 @@ namespace Chimp {
 		EntityHierarchy& GetHierarchy() { return m_EntityHierarchy; }
 
 		// Get number of alive entities
-		[[nodiscard]] size_t GetEntityCount() {
+		[[nodiscard]] size_t GetEntityCount() const {
 			return m_EntityCount;
 		}
 

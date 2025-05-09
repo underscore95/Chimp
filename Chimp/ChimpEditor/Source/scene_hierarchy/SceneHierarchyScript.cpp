@@ -1,5 +1,6 @@
 #include "SceneHierarchyScript.h"
 #include "EntityNameComponent.h"
+#include "api/ecs/hierarchy/HierarchyComponent.h"
 
 namespace ChimpEditor {
 	SceneHierarchyScript::SceneHierarchyScript(Chimp::EntityId entity,
@@ -11,7 +12,7 @@ namespace ChimpEditor {
 	{
 	}
 
-	Chimp::EntityId SceneHierarchyScript::GetSelectedEntity()
+	Chimp::EntityId SceneHierarchyScript::GetSelectedEntity() const
 	{
 		return m_selectedEntity;
 	}

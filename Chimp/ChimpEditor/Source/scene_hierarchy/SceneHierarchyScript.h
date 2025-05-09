@@ -3,12 +3,14 @@
 #include "Chimp.h"
 
 namespace ChimpEditor {
+	class HierarchyComponent;
+
 	class SceneHierarchyScript : public Chimp::IEntityScript {
 	public:
 		SceneHierarchyScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameECS);
 
 	public:
-		Chimp::EntityId GetSelectedEntity();
+		Chimp::EntityId GetSelectedEntity() const;
 		bool HasSelectedEntity();
 
 	private:

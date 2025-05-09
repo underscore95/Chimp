@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "api/graphics/meshes/Mesh.h"
+#include "api/ecs/components/ComponentRegistry.h"
 
 namespace Chimp {
 	class MeshComponent {
@@ -22,4 +23,9 @@ namespace Chimp {
 
 		Mesh* Mesh;
 	};
+
+
+	namespace Unused {
+		static ComponentRegister<MeshComponent> MeshComponentRegister;
+	}
 }

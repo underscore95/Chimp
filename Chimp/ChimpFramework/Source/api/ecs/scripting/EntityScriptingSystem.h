@@ -1,12 +1,12 @@
 #pragma once
 
-#include "ScriptableComponent.h"
 #include "api/ecs/SystemContainerSystem.h"
 #include "api/ecs/EntityId.h"
 #include "api/ecs/scripting/IEntityScript.h"
 
 namespace Chimp {
 	typedef void* ScriptId;
+	class ScriptableComponent;
 
 	// T is script class
 	template <typename T>
@@ -43,7 +43,7 @@ namespace Chimp {
 		template <typename T>
 		std::unique_ptr<ScriptAndEntity<T>> GetFirstEntityWithScript() {
 			std::unique_ptr<ScriptAndEntity<T>> found = nullptr;
-			ForEachScriptedEntity([&found, this](EntityId entity, ScriptableComponent scripts) {
+			ForEachScriptedEntity([&found, this](EntityId entity, ScriptableComponent& scripts) {
 				if (found) return;
 				OptionalReference<T> script = GetFirstScript<T>(entity);
 				if (script) found = std::make_unique<ScriptAndEntity<T>>(script, entity);

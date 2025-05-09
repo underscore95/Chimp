@@ -3,7 +3,7 @@
 #include "stdafx.h"
 
 namespace Chimp {
-	// Uses an array when not many elements, then switches to a vector. Removing from array swaps with last
+	// Uses an array when not many elements, then switches to a vector. Removing swaps with last element
 	template <typename T, int SmallNumElements = 8>
 	class UnorderedCollection {
 		static_assert(SmallNumElements < 126, "SmallNumElements must be < 126 to fit in signed char");

@@ -16,7 +16,6 @@
 #include "api/ecs/scripting/EntityScriptingSystem.h"
 #include "api/ecs/scripting/IEntityScript.h"
 #include "api/ecs/components/ComponentRegistry.h"
-#include "api/ecs/RegisterComponents.h"
 
 // Misc
 #include "api/networking/PacketTypeRegistry.h"

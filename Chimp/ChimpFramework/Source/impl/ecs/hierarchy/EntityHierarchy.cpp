@@ -93,7 +93,7 @@ namespace Chimp {
 		assert(childComp);
 		if (childComp->HierarchyLevel > 0) {
 			// Let the parent know they don't have this child anymore
-			auto parentComp = childComp->Parent.get_mut< HierarchyComponent>();
+			auto parentComp = childComp->Parent.get_mut<HierarchyComponent>();
 			assert(parentComp);
 			auto& children = parentComp->Children;
 			children.Remove(entity);

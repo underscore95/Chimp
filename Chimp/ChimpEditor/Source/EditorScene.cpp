@@ -48,12 +48,6 @@ namespace ChimpEditor {
 	void EditorScene::OnDeactivate() {}
 
 	void EditorScene::OnUpdate() {
-		auto view = m_gameEcs->GetEntitiesWithComponents<Chimp::EntityIdComponent, Chimp::HierarchyComponent>();
-		for (auto& [id, hi] : view) {
-			long longId = id.Id.id();
-			int i = 3;
-		}
-
 		m_ecs->GetSystems().OnUpdate();
 	}
 
