@@ -35,3 +35,4 @@
 #include "api/utils/waves/WaveManager.h"
 #include "api/threading/ThreadPool.h"
 #include "api/utils/preprocessor/Casting.h"
+#include "api/utils/ByteVisualiser.h"

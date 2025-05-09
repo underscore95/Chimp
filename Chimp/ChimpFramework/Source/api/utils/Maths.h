@@ -642,6 +642,24 @@ namespace Chimp {
 		return std::pow(base, exponent);
 	}
 
+	// Rounding
+	inline float Floor(float value) {
+		return std::floor(value);
+	}
+
+	inline float Ceil(float value) {
+		return std::ceil(value);
+	}
+
+	inline float Round(float value) {
+		return std::round(value);
+	}
+
+	// Log
+	inline float Log(float value, float base) {
+		return log(value) / log(base);
+	}
+
 	// Get squared distance between two points
 	inline float GetSquaredDistanceBetween(float a, float b) {
 		return (a - b) * (a - b);

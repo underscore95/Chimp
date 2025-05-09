@@ -15,6 +15,7 @@
 #include <string>
 #include <queue>
 #include <tuple>
+#include <bitset>
 #include <array>
 
 // STD Multithreading

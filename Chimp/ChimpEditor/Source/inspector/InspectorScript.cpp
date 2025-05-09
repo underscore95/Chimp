@@ -37,20 +37,72 @@ namespace ChimpEditor {
 		ImGui::Begin("Inspector");
 
 		if (m_sceneHierarchy->HasSelectedEntity()) {
+			// Entity name
 			auto ent = m_sceneHierarchy->GetSelectedEntity();
 			auto str = ent.str();
 			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(ent);
 			ImGui::Text(nameComp ? nameComp->Name.c_str() : str.c_str());
 
+			// Options
+			RenderByteVisualisationOption();
+
+			// Components
 			m_gameEcs.GetComponentsOnEntity(ent, [this](Chimp::AnyReference component) {
 				auto name = GetComponentTypeName(component);
 				if (ImGui::CollapsingHeader(name.c_str())) {
+					RenderByteVisualisation(component);
 					Chimp::ComponentRegistry::Instance().RenderEditorUI(component);
 				}
 				});
 		}
 
 		ImGui::End();
+	}
+
+	void InspectorScript::RenderByteVisualisationOption()
+	{
+		const char* visualisationFormats[] = { "None", "Hex", "Binary" };
+		int currentSelection = static_cast<int>(m_byteVisualisationFormat);
+
+		if (ImGui::BeginCombo("Byte Visualisation", visualisationFormats[currentSelection], ImGuiComboFlags_WidthFitPreview))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(visualisationFormats); i++)
+			{
+				bool isSelected = (currentSelection == i);
+				if (ImGui::Selectable(visualisationFormats[i], isSelected))
+				{
+					currentSelection = i;
+					m_byteVisualisationFormat = static_cast<ByteVisualisationFormat>(i);
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+	}
+
+	void InspectorScript::RenderByteVisualisation(Chimp::AnyReference component)
+	{
+		if (m_byteVisualisationFormat == ByteVisualisationFormat::None) return;
+
+		std::string bytes;
+		if (m_byteVisualisationFormat == ByteVisualisationFormat::Hex) {
+			bytes = "Data: " + Chimp::ByteVisualiser::VisualiseBytesHex(
+				(char*)component.GetPtr(),
+				Chimp::ComponentRegistry::Instance().GetSize(component)
+			);
+		}
+		else if (m_byteVisualisationFormat == ByteVisualisationFormat::Binary) {
+			bytes = "Data: " + Chimp::ByteVisualiser::VisualiseBytesBinary(
+				(char*)component.GetPtr(),
+				Chimp::ComponentRegistry::Instance().GetSize(component)
+			);
+		}
+
+		ImGui::PushTextWrapPos();
+		ImGui::TextWrapped("%s", bytes.c_str());
+		ImGui::PopTextWrapPos();
 	}
 
 	std::string InspectorScript::GetComponentTypeName(Chimp::AnyReference component)

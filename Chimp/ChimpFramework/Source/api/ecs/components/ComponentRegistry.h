@@ -61,7 +61,9 @@ namespace Chimp {
 		DISABLE_COPY_AND_MOVE(ComponentRegister);
 	public:
 		virtual void RenderInspectorUI(T& comp) {
+			ImGui::PushTextWrapPos();
 			ImGui::Text("Override RenderInspectorUI in your ComponentRegister<T> to add UI here.");
+			ImGui::PopTextWrapPos();
 		};
 
 	public:
