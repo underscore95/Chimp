@@ -10,12 +10,16 @@ namespace Chimp {
 		TypeInfo(OptionalReference<T> t) : m_TypeInfo(&typeid(T)) {}
 
 		template <typename T>
-		TypeInfo() : m_TypeInfo(&typeid(T)) {}
+		TypeInfo() : TypeInfo(&typeid(T)) {}
 
-		TypeInfo() : m_TypeInfo(nullptr) {}
+		TypeInfo() : TypeInfo(nullptr) {}
 
-		TypeInfo(const type_info& typeInfo) : m_TypeInfo(&typeInfo) {}
-		TypeInfo(const type_info* typeInfo) : m_TypeInfo(typeInfo) {}
+		TypeInfo(const type_info& typeInfo) : TypeInfo(&typeInfo) {}
+		TypeInfo(const type_info* typeInfo) : m_TypeInfo(typeInfo) {
+#ifndef NDEBUG
+			m_NameOfStoredTypeDoNotUse = m_TypeInfo == nullptr ? "Invalid Type" : m_TypeInfo->name();
+#endif
+		}
 
 		inline const char* Name() const {
 			assert(m_TypeInfo);
@@ -33,6 +37,9 @@ namespace Chimp {
 
 	private:
 		const type_info* m_TypeInfo;
+#ifndef NDEBUG
+		std::string m_NameOfStoredTypeDoNotUse;
+#endif
 	};
 }
 

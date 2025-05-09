@@ -20,15 +20,20 @@ namespace Chimp {
 		static ComponentRegistry& Instance();
 
 		// Renders the editor inspector UI for this type
-		template <typename T>
-		void RenderEditorUI(T& value) {
-			size_t hashCode = typeid(value).hash_code();
+		void RenderEditorUI(AnyReference value) {
+			size_t hashCode = value.GetType().Hash();
 			auto it = m_RenderEditorUIFunctions.find(hashCode);
-			if (it != m_RenderEditorUIFunctions.end()) {
-				auto& func = it->second;
-				void* voidValue = &value;
-				func(voidValue);
-			}
+			assert(it != m_RenderEditorUIFunctions.end());
+			auto& func = it->second;
+			void* voidValue = value.GetPtr();
+			func(voidValue);
+		}
+
+		size_t GetSize(AnyReference value) {
+			size_t hashCode = value.GetType().Hash();
+			auto it = m_ComponentSizes.find(hashCode);
+			assert(it != m_ComponentSizes.end());
+			return it->second;
 		}
 
 	private:
@@ -39,12 +44,14 @@ namespace Chimp {
 			size_t hashCode = typeId.hash_code();
 			m_RenderEditorUIFunctions[hashCode] = [function](void* value) { function(*reinterpret_cast<T*>(value)); }; // convert the function into one that takes a void*
 			m_ECSRegisterFunctions.push_back([](ECS& ecs) { ecs.RegisterComponent<T>(); });
+			m_ComponentSizes[hashCode] = sizeof(T);
 		}
 
 		void RegisterComponentsInECS(ECS& ecs);
 
 	private:
-		std::unordered_map<size_t, std::function<void(void*)>> m_RenderEditorUIFunctions;
+		std::unordered_map<size_t, std::function<void(void*)>> m_RenderEditorUIFunctions; // type hash code -> function expecting T* which renders inspector ui
+		std::unordered_map<size_t, size_t> m_ComponentSizes; // type hash code -> sizeof(T)
 		std::vector<std::function<void(ECS&)>> m_ECSRegisterFunctions;
 	};
 
@@ -53,12 +60,21 @@ namespace Chimp {
 	class ComponentRegister {
 		DISABLE_COPY_AND_MOVE(ComponentRegister);
 	public:
-		// Register a component
-		// function - function that should render any editor UI for the inspector
-		ComponentRegister(const std::function<void(T&)>& func) {
-			static bool unused = [func]() { ComponentRegistry::Instance().RegisterComponent(func); return true; }();
-		}
+		virtual void RenderInspectorUI(T& comp) {
+			ImGui::Text("Override RenderInspectorUI in your ComponentRegister<T> to add UI here.");
+		};
 
-		ComponentRegister() : ComponentRegister([](T&) {}) {}
+	public:
+		// Register a component
+		ComponentRegister() {
+			static bool unused = [this]() {
+				const std::function<void(T&)> renderInspectorUiFunction = [this](T& comp) { RenderInspectorUI(comp); };
+				ComponentRegistry::Instance().RegisterComponent(
+					renderInspectorUiFunction
+				);
+
+				return true;
+				}();
+		}
 	};
 }

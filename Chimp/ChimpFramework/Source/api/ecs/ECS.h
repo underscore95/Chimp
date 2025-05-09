@@ -141,7 +141,7 @@ namespace Chimp {
 		}
 
 		// Get all components on an entity
-		void GetComponentsOnEntity(EntityId entity, const std::function<void(AnyConstReference)>& function);
+		void GetComponentsOnEntity(EntityId entity, const std::function<void(AnyReference)>& function);
 
 		TransformManager& GetTransformManager() {
 			return *m_TransformManager;

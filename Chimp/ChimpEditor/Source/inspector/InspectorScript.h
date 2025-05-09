@@ -14,6 +14,7 @@ namespace ChimpEditor {
 		void OnRender() override;
 		void OnRenderUI() override;
 
+		std::string GetComponentTypeName(Chimp::AnyReference component);
 	private:
 		Chimp::ECS& m_gameEcs;
 		Chimp::Reference< SceneHierarchyScript> m_sceneHierarchy;

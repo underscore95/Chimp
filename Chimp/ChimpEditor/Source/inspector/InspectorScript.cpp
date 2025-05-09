@@ -42,11 +42,26 @@ namespace ChimpEditor {
 			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(ent);
 			ImGui::Text(nameComp ? nameComp->Name.c_str() : str.c_str());
 
-			m_gameEcs.GetComponentsOnEntity(ent, [](Chimp::AnyConstReference component) {
-				ImGui::Text(component.GetType().Name());
+			m_gameEcs.GetComponentsOnEntity(ent, [this](Chimp::AnyReference component) {
+				auto name = GetComponentTypeName(component);
+				if (ImGui::CollapsingHeader(name.c_str())) {
+					Chimp::ComponentRegistry::Instance().RenderEditorUI(component);
+				}
 				});
 		}
 
 		ImGui::End();
+	}
+
+	std::string InspectorScript::GetComponentTypeName(Chimp::AnyReference component)
+	{
+		std::string rawName = component.GetType().Name();
+		if (rawName.starts_with("struct ")) {
+			rawName.erase(0, 7);
+		}
+		else if (rawName.starts_with("class ")) {
+			rawName.erase(0, 6);
+		}
+		return rawName;
 	}
 }

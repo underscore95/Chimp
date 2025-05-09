@@ -4,17 +4,28 @@
 #include "OptionalReference.h"
 
 namespace Chimp {
+	class AnyConstReference;
+
 	class AnyOptionalReference {
 	public:
 		template <typename T>
-		AnyOptionalReference(T& t) :
+	explicit	AnyOptionalReference(T& t) :
 			Type(&typeid(T)),
 			Ptr(&t) {
+		static_assert(!std::is_same_v<std::remove_cvref_t<T>, AnyConstReference>,
+			"T must not be AnyConstReference");
+		static_assert(!std::is_same_v<std::remove_cvref_t<T>, AnyOptionalReference>,
+			"T must not be AnyOptionalReference");
 		}
 
 		AnyOptionalReference() :
 			Type(nullptr),
 			Ptr(nullptr) {
+		}
+
+		AnyOptionalReference(TypeInfo typeInfo, void* notNullPtr) :
+			Type(typeInfo),
+			Ptr(notNullPtr) {
 		}
 
 		TypeInfo GetType() const { return Type; };
@@ -28,9 +39,13 @@ namespace Chimp {
 	class AnyConstReference {
 	public:
 		template <typename T>
-		AnyConstReference(const T& t) :
+		explicit AnyConstReference(const T& t) :
 			Type(&typeid(T)),
 			Ptr(&t) {
+			static_assert(!std::is_same_v<std::remove_cvref_t<T>, AnyConstReference>,
+				"T must not be AnyConstReference");
+			static_assert(!std::is_same_v<std::remove_cvref_t<T>, AnyOptionalReference>,
+				"T must not be AnyOptionalReference");
 		}
 
 		AnyConstReference(TypeInfo typeInfo, void* notNullPtr) :
@@ -40,7 +55,7 @@ namespace Chimp {
 		}
 
 		TypeInfo GetType() const { return Type; };
-		void* GetPtr() const { return Ptr; }
+		const void* GetPtr() const { return Ptr; }
 
 		bool operator==(const AnyConstReference& other) const {
 			return Ptr == other.Ptr;
@@ -48,6 +63,8 @@ namespace Chimp {
 
 	private:
 		TypeInfo Type;
-		void* Ptr;
+		const void* Ptr;
 	};
+
+	typedef AnyOptionalReference AnyReference;
 }
