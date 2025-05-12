@@ -21,7 +21,7 @@ namespace Chimp {
 		class Builder {
 			friend class Mesh;
 		public:
-			Builder();
+			Builder(std::string name);
 
 			// Add a section to the mesh
 			Builder& AddSection(
@@ -38,6 +38,7 @@ namespace Chimp {
 		private:
 			std::vector<std::unique_ptr<Section>> m_Sections;
 			bool m_IsBuilt = false;
+			std::string m_Name;
 		};
 		friend class Builder;
 
@@ -66,7 +67,10 @@ namespace Chimp {
 		ConstIterator begin() const; 
 		ConstIterator end() const;
 
+		std::string_view GetName() const { return m_Name; }
+
 	private:
 		std::vector<std::unique_ptr<Section>> m_Sections;
+		std::string m_Name;
 	};
 }

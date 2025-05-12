@@ -13,6 +13,9 @@ namespace Chimp::GL {
 
 		IRenderer& GetRenderer() const override;
 
+		void BeginDebugGroup(const std::string& name) const override;
+		void EndDebugGroup() const override;
+
 		std::unique_ptr<IBuffer> CreateBuffer(
 			const Usage& usage,
 			const BindTarget target

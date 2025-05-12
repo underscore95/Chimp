@@ -9,7 +9,8 @@ namespace Chimp {
 	public:
 		// Don't use this constructor, it's only here for the ECS to use
 		[[deprecated]] MeshComponent() :
-			Mesh(nullptr) {}
+			Mesh(nullptr) {
+		}
 
 		MeshComponent(Mesh* mesh)
 			: Mesh(mesh)
@@ -26,6 +27,16 @@ namespace Chimp {
 
 
 	namespace Unused {
-		static ComponentRegister<MeshComponent> MeshComponentRegister;
+		class MeshComponentRegister : public ComponentRegister<MeshComponent> {
+		public:
+			MeshComponentRegister() : ComponentRegister() {
+			}
+
+			void RenderInspectorUI(EntityId id, MeshComponent& comp) override {
+				auto str = std::format("Mesh: {}", comp.Mesh->GetName());
+				ImGui::TextWrapped(str.c_str());
+			}
+		};
+		COMPONENT_REGISTER(MeshComponentRegister);
 	}
 }

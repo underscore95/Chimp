@@ -35,12 +35,16 @@ namespace Chimp {
 
 	void SceneManager::Render()
 	{
+		m_Engine.GetRenderingManager().BeginDebugGroup("Scene Render");
 		m_CurrentScene->OnRender();
+		m_Engine.GetRenderingManager().EndDebugGroup();
 	}
 
 	void SceneManager::RenderUI()
 	{
+		m_Engine.GetRenderingManager().BeginDebugGroup("Scene UI Render");
 		m_CurrentScene->OnRenderUI();
+		m_Engine.GetRenderingManager().EndDebugGroup();
 	}
 
 	bool SceneManager::CheckForSceneChange()
@@ -57,7 +61,7 @@ namespace Chimp {
 				m_CurrentScene->m_HasInitialized = true;
 			}
 			return true;
-			}
+		}
 		return false;
 	}
 

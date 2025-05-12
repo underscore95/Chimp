@@ -45,6 +45,9 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 	ss << std::endl;
 
 	auto& logger = Chimp::Loggers::Rendering();
+
+	if (type == GL_DEBUG_TYPE_PUSH_GROUP || type == GL_DEBUG_TYPE_POP_GROUP) return; // Don't care about these
+
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_HIGH:         logger.Error(ss); break;
@@ -76,6 +79,20 @@ namespace Chimp::GL {
 	IRenderer& RenderingManager::GetRenderer() const
 	{
 		return *m_Renderer;
+	}
+
+	void RenderingManager::BeginDebugGroup(const std::string& name) const
+	{
+#ifndef NDEBUG
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name.c_str());
+#endif
+	}
+
+	void RenderingManager::EndDebugGroup() const
+	{
+#ifndef NDEBUG
+		glPopDebugGroup();
+#endif
 	}
 
 	std::unique_ptr<IBuffer> RenderingManager::CreateBuffer(

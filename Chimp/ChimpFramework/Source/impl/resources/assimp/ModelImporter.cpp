@@ -28,7 +28,7 @@ namespace Chimp {
 			(settings.IncludeNormals ? 3 : 0) +
 			(settings.IncludeTextureCoordinates ? 2 : 0);
 
-		Mesh::Builder builder;
+		Mesh::Builder builder(path);
 		for (size_t meshIndex = 0; meshIndex < model->mNumMeshes; ++meshIndex) {
 			auto modelMesh = model->mMeshes[meshIndex];
 

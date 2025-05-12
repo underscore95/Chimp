@@ -5,7 +5,7 @@
 namespace ChimpEditor {
 	class SceneViewScript : public Chimp::IEntityScript {
 	public:
-		SceneViewScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs);
+		SceneViewScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs);
 
 	private:
 		void OnInit() override;
@@ -15,5 +15,6 @@ namespace ChimpEditor {
 
 	private:
 		std::shared_ptr<Chimp::IRenderTexture> m_sceneViewTexture;
+		Chimp::ECS& m_gameEcs;
 	};
 }

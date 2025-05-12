@@ -61,7 +61,7 @@ namespace Chimp {
 			std::move(elementLayout)
 		);
 
-		return Mesh::Builder()
+		return Mesh::Builder(texture.GetPath())
 			.AddSection(std::move(elementArray), texture)
 			.Build();
 	}

@@ -39,6 +39,9 @@ namespace Chimp {
 		// Get the renderer
 		[[nodiscard]] virtual IRenderer& GetRenderer() const = 0;
 
+		virtual void BeginDebugGroup(const std::string& message) const = 0;
+		virtual void EndDebugGroup() const = 0;
+
 		// Create a buffer which holds data on the GPU.
 		// size, numElements can be left empty and will be updated once data is set.
 		// size - the size of the buffer in bytes (default 0)
@@ -152,7 +155,7 @@ namespace Chimp {
 		// Set frame buffer
 		virtual void SetFrameBuffer(int id = 0) const = 0;
 
-		// Set the default render target, pass in nullptr to render to the back buffer
+		// Set the default render target, pass in an invalid ptr to render to the back buffer
 		void SetDefaultRenderTarget(std::weak_ptr<IRenderTexture> renderTarget);
 
 		// Set render target to the default

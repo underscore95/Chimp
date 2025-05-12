@@ -22,5 +22,8 @@ namespace ChimpEditor {
 		std::unique_ptr<Chimp::ECS> m_ecs;
 		std::unique_ptr<Chimp::ECS> m_gameEcs;
 		Chimp::EntityId m_sceneView;
+		std::string m_modelPath;
+		Chimp::FreeCameraController m_controller;
+		Chimp::CameraPerspective m_camera;
 	};
 }

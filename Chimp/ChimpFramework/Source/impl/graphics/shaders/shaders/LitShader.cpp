@@ -79,8 +79,8 @@ namespace Chimp {
 		// Setup
 		m_Lighting.IsDepthPass = true;
 
-		m_ShadowMap->BindForReading(1, GetRawShader(), "u_ShadowMap");
-		m_CubeMap->BindForReading(2, GetRawShader(), "u_CubeShadowMap");
+		m_ShadowMap->BindForReading(1, GetRawShader(), "u_ShadowMaps");
+		m_CubeMap->BindForReading(2, GetRawShader(), "u_CubeShadowMaps");
 
 		// Reset depth buffer
 		m_ShadowMap->BindForWriting();
@@ -120,10 +120,7 @@ namespace Chimp {
 		}
 
 		// Reset state
-		m_Engine.GetRenderingManager().SetFrameBuffer();
-		m_Engine.GetRenderingManager().SetViewport({ 0,0 }, m_Engine.GetWindow().GetSize());
-		m_Engine.GetRenderingManager().ClearDepthBuffer();
-		m_Engine.GetRenderingManager().ClearColorBuffer();
+		m_Engine.GetRenderingManager().BindDefaultRenderTarget();
 
 		m_Lighting.IsDepthPass = false;
 		if (usingCameraMatrices) {
