@@ -69,8 +69,7 @@ namespace ChimpEditor {
 		if (hierarchyComp.Children.Size() == 0) {
 			// Leaf node
 			if (ImGui::Selectable(entityName, m_selectedEntity == entity)) {
-				m_selectedEntity = entity;
-				GetLogger().Info("Selected ");
+				SelectEntity(entity);
 			}
 		}
 		else {
@@ -81,8 +80,7 @@ namespace ChimpEditor {
 
 			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, entityName);
 			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
-				m_selectedEntity = entity;
-				GetLogger().Info("Selected ");
+				SelectEntity(entity);
 			}
 
 			if (nodeOpen) {
@@ -96,5 +94,14 @@ namespace ChimpEditor {
 
 		// Reset cursor
 		ImGui::SetCursorPosX(oldCursorPosX);
+	}
+
+	void SceneHierarchyScript::SelectEntity(Chimp::EntityId entity)
+	{
+		m_selectedEntity = entity;
+		auto transformComp = m_gameECS.GetComponent<Chimp::TransformComponent>(m_selectedEntity);
+		if (transformComp && !m_gameECS.GetComponent<Chimp::EulerRotationComponent>(m_selectedEntity)) {
+			m_gameECS.SetComponent<Chimp::EulerRotationComponent>(m_selectedEntity, { Chimp::ToEulerRotation(transformComp->LocalRotation) });
+		}
 	}
 }

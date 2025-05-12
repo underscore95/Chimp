@@ -5,6 +5,7 @@
 #include "api/ecs/components/ComponentRegistry.h"
 #include "api/ecs/transform/TransformManager.h"
 #include "api/ecs/ECS.h"
+#include "api/ecs/transform/EulerRotationComponent.h"
 
 namespace Chimp {
 
@@ -56,10 +57,11 @@ namespace Chimp {
 				isDirty |= ImGui::InputFloat3(translationLabel.c_str(), &copy.LocalTranslation.x);
 
 				// Rotation
-				Chimp::Vector3f rotation = ToEulerRotation(copy.LocalRotation);
-				auto rotationLabel = std::format("Rotation##{}{}", (long)id, rotation.x * rotation.y * rotation.z);
-				if (ImGui::InputFloat3(rotationLabel.c_str(), &rotation.x)) {
-					copy.LocalRotation = ToQuatRotation(rotation);
+				auto eulerRot = GetECS().GetMutableComponent<EulerRotationComponent>(id);
+				assert(eulerRot);
+				auto rotationLabel = std::format("Rotation##{}", (long)id);
+				if (ImGui::InputFloat3(rotationLabel.c_str(), &eulerRot->Rotation.x)) {
+					copy.LocalRotation = ToQuatRotation(eulerRot->Rotation);
 					isDirty = true;
 				}
 

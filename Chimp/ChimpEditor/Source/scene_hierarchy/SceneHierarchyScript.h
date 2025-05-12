@@ -21,6 +21,8 @@ namespace ChimpEditor {
 
 		void RenderUI(Chimp::EntityId entity, Chimp::HierarchyComponent& hierarchyComp, float cursorPosX);
 
+		void SelectEntity(Chimp::EntityId entity);
+
 	private:
 		std::shared_ptr<Chimp::IRenderTexture> m_sceneViewTexture;
 		Chimp::ECS& m_gameECS;
