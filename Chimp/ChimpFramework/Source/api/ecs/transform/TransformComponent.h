@@ -57,8 +57,11 @@ namespace Chimp {
 
 				// Rotation
 				Chimp::Vector3f rotation = ToEulerRotation(copy.LocalRotation);
-				auto rotationLabel = std::format("Rotation##{}", (long)id);
-				isDirty |= ImGui::InputFloat3(rotationLabel.c_str(), &rotation.x);
+				auto rotationLabel = std::format("Rotation##{}{}", (long)id, rotation.x * rotation.y * rotation.z);
+				if (ImGui::InputFloat3(rotationLabel.c_str(), &rotation.x)) {
+					copy.LocalRotation = ToQuatRotation(rotation);
+					isDirty = true;
+				}
 
 				// Scale
 				auto scaleLabel = std::format("Scale##{}", (long)id);
