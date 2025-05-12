@@ -80,6 +80,16 @@ namespace Chimp {
 		MarkDirty(entity, transform);
 	}
 
+	void TransformManager::SetTranslationRotationScale(EntityId entity, Vector3f translation, Quaternion rotation, Vector3f scale)
+	{
+		auto transform = GetMutableTransform(entity);
+		assert(transform);
+		transform->LocalTranslation = translation;
+		transform->LocalRotation = rotation;
+		transform->LocalScale = scale;
+		MarkDirty(entity, transform);
+	}
+
 	void TransformManager::UpdateAllMatrices()
 	{
 		auto view = m_ECS.GetEntitiesWithComponents <EntityIdComponent, TransformComponent>();

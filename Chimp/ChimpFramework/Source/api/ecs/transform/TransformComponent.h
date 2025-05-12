@@ -2,22 +2,23 @@
 
 #include "stdafx.h"
 #include "api/utils/Maths.h"
+#include "api/ecs/components/ComponentRegistry.h"
+#include "api/ecs/transform/TransformManager.h"
+#include "api/ecs/ECS.h"
 
 namespace Chimp {
-
-	class ECS;
-	class TransformManager;
 
 	struct TransformComponent {
 		friend class ECS;
 		friend class TransformManager;
 	public:
-		TransformComponent() : TransformComponent({}, CreateIdentityQuaternion(), {}) {}
+		TransformComponent() : TransformComponent({}, CreateIdentityQuaternion(), { 1,1,1 }) {}
 
 		TransformComponent(const Vector3f& translation,
 			const Vector3f& eulerRotationDegrees,
 			const Vector3f& scale) : TransformComponent(translation, ToQuatRotation(eulerRotationDegrees), scale)
-		{ }
+		{
+		}
 
 		TransformComponent(const Vector3f& translation,
 			const Quaternion& rotation,
@@ -42,4 +43,31 @@ namespace Chimp {
 	private:
 		bool m_IsDirty;
 	};
+
+	namespace Unused {
+		class TransformComponentRegister : ComponentRegister<TransformComponent> {
+		public:
+			void RenderInspectorUI(EntityId id, TransformComponent& comp) override {
+				TransformComponent copy = comp;
+				bool isDirty = copy.IsDirty();
+
+				// Translation
+				auto translationLabel = std::format("Translation##{}", (long)id);
+				isDirty |= ImGui::InputFloat3(translationLabel.c_str(), &copy.LocalTranslation.x);
+
+				// Rotation
+				Chimp::Vector3f rotation = ToEulerRotation(copy.LocalRotation);
+				auto rotationLabel = std::format("Rotation##{}", (long)id);
+				isDirty |= ImGui::InputFloat3(rotationLabel.c_str(), &rotation.x);
+
+				// Scale
+				auto scaleLabel = std::format("Scale##{}", (long)id);
+				isDirty |= ImGui::InputFloat3(scaleLabel.c_str(), &copy.LocalScale.x);
+
+				GetECS().GetTransformManager().SetTranslationRotationScale(id, copy.LocalTranslation, copy.LocalRotation, copy.LocalScale);
+			}
+		};
+
+		static TransformComponentRegister RegisterTransformComponent;
+	}
 }

@@ -40,6 +40,7 @@ namespace ChimpEditor {
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
 		auto testEnt = m_gameEcs->CreateEntity();
 		m_gameEcs->SetComponent<EntityNameComponent>(testEnt, { "MyNamedEntity" });
+		m_gameEcs->SetComponent<Chimp::TransformComponent>(testEnt, {});
 		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f });
 
 		m_ecs->GetSystems().OnInit();
