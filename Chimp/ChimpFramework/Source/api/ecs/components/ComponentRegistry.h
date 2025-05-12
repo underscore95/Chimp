@@ -29,6 +29,10 @@ namespace Chimp {
 			func(id, voidValue);
 		}
 
+		bool ShouldHideInInspectorUI(TypeInfo typeInfo) {
+			return m_ShouldHideInInspectorUI.contains(typeInfo.Hash());
+		}
+
 		size_t GetSize(AnyReference value) {
 			size_t hashCode = value.GetType().Hash();
 			auto it = m_ComponentSizes.find(hashCode);
@@ -45,13 +49,16 @@ namespace Chimp {
 
 		// Register a component, this can only be called from ComponentRegister which ensures it is impossible to register a component twice
 		template <typename T>
-		void RegisterComponent(const std::function<void(EntityId, T&)>& renderInspectorUi, const std::function<void(ECS&)>& setActiveEcsFunction) {
+		void RegisterComponent(bool shouldHideInInspectorUI, const std::function<void(EntityId, T&)>& renderInspectorUi, const std::function<void(ECS&)>& setActiveEcsFunction) {
 			const auto& typeId = typeid(T);
 			size_t hashCode = typeId.hash_code();
 			m_RenderEditorUIFunctions[hashCode] = [renderInspectorUi](EntityId id, void* value) { renderInspectorUi(id, *reinterpret_cast<T*>(value)); }; // convert the function into one that takes a void*
 			m_ECSRegisterFunctions.push_back([](ECS& ecs) { ecs.RegisterComponent<T>(); });
 			m_SetActiveECSFunctions[hashCode] = setActiveEcsFunction;
 			m_ComponentSizes[hashCode] = sizeof(T);
+			if (shouldHideInInspectorUI) {
+				m_ShouldHideInInspectorUI.insert(hashCode);
+			}
 		}
 
 		void RegisterComponentsInECS(ECS& ecs);
@@ -60,6 +67,7 @@ namespace Chimp {
 		std::unordered_map<size_t, std::function<void(EntityId, void*)>> m_RenderEditorUIFunctions; // type hash code -> function expecting T* which renders inspector ui
 		std::unordered_map<size_t, std::function<void(ECS&)>> m_SetActiveECSFunctions; // type hash code -> function which sets active ecs
 		std::unordered_map<size_t, size_t> m_ComponentSizes; // type hash code -> sizeof(T)
+		std::unordered_set<size_t> m_ShouldHideInInspectorUI; // type hash code
 		std::vector<std::function<void(ECS&)>> m_ECSRegisterFunctions;
 	};
 
@@ -76,11 +84,14 @@ namespace Chimp {
 
 	public:
 		// Register a component
-		ComponentRegister() {
-			static bool unused = [this]() {
+		ComponentRegister(
+			bool shouldHideInInspectorUI = false
+		) {
+			static bool unused = [this, shouldHideInInspectorUI]() {
 				const std::function<void(EntityId, T&)> renderInspectorUiFunction = [this](EntityId id, T& comp) { RenderInspectorUI(id, comp); };
 				const std::function<void(ECS&)> setEcsFunction = [this](ECS& ecs) { m_ECS = ecs; };
 				ComponentRegistry::Instance().RegisterComponent(
+					shouldHideInInspectorUI,
 					renderInspectorUiFunction,
 					setEcsFunction
 				);
@@ -95,4 +106,7 @@ namespace Chimp {
 	private:
 		Reference<ECS> m_ECS; // Works like a state machine
 	};
+
+#define COMPONENT_REGISTER(Register) \
+		static Register ComponentRegister_##Register
 }

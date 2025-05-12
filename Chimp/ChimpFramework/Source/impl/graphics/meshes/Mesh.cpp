@@ -2,7 +2,8 @@
 
 namespace Chimp {
 	// Mesh::Builder
-	Mesh::Builder::Builder()
+	Mesh::Builder::Builder(std::string name) :
+		m_Name(name)
 	{
 	}
 
@@ -50,6 +51,7 @@ namespace Chimp {
 	// Mesh
 	Mesh::Mesh(Builder& builder)
 	{
+		m_Name = std::move(builder.m_Name);
 		m_Sections = std::move(builder.m_Sections);
 		m_Sections.shrink_to_fit();
 	}

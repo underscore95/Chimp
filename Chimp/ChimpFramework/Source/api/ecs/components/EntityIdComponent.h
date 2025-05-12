@@ -9,6 +9,10 @@ namespace Chimp {
 	};
 
 	namespace Unused {
-		static ComponentRegister<EntityIdComponent> RegisterEntityIdComponent;
+		class EntityIdComponentRegister : public ComponentRegister<EntityIdComponent> {
+		public:
+			EntityIdComponentRegister() : ComponentRegister(true) {}
+		};
+		COMPONENT_REGISTER(EntityIdComponentRegister);
 	}
 }

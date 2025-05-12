@@ -45,7 +45,7 @@ namespace Chimp {
 	};
 
 	namespace Unused {
-		class TransformComponentRegister : ComponentRegister<TransformComponent> {
+		class TransformComponentRegister : public ComponentRegister<TransformComponent> {
 		public:
 			void RenderInspectorUI(EntityId id, TransformComponent& comp) override {
 				TransformComponent copy = comp;
@@ -67,7 +67,6 @@ namespace Chimp {
 				GetECS().GetTransformManager().SetTranslationRotationScale(id, copy.LocalTranslation, copy.LocalRotation, copy.LocalScale);
 			}
 		};
-
-		static TransformComponentRegister RegisterTransformComponent;
+		COMPONENT_REGISTER(TransformComponentRegister);
 	}
 }

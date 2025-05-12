@@ -7,5 +7,11 @@ namespace ChimpEditor {
 		std::string Name;
 	};
 
-	static Chimp::ComponentRegister<EntityNameComponent> Register;
+	namespace Unused {
+		class EntityNameComponentRegister : public Chimp::ComponentRegister<EntityNameComponent> {
+		public:
+			EntityNameComponentRegister() : ComponentRegister(true) {}
+		};
+		COMPONENT_REGISTER(EntityNameComponentRegister);
+	}
 }

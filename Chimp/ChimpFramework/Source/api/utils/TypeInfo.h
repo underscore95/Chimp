@@ -35,6 +35,14 @@ namespace Chimp {
 			return Hash() == other.Hash();
 		}
 
+		bool operator==(const type_info* other) const {
+			return Hash() == other->hash_code();
+		}
+
+		bool operator==(const type_info& other) const {
+			return *this == &other;
+		}
+
 	private:
 		const type_info* m_TypeInfo;
 #ifndef NDEBUG

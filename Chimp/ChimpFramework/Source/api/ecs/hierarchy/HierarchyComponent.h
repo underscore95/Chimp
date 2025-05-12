@@ -13,6 +13,10 @@ namespace Chimp {
 	};
 
 	namespace Unused {
-		static ComponentRegister<HierarchyComponent> RegisterHierarchyComponent;
+		class HierarchyComponentRegister : public ComponentRegister<HierarchyComponent> {
+		public:
+			HierarchyComponentRegister() : ComponentRegister(true) {}
+		};
+		COMPONENT_REGISTER(HierarchyComponentRegister);
 	}
 }

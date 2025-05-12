@@ -8,14 +8,13 @@ namespace Chimp {
 	};
 
 	namespace Unused {
-		class HealthComponentRegister : ComponentRegister<HealthComponent> {
+		class HealthComponentRegister : public ComponentRegister<HealthComponent> {
 		public:
 			void RenderInspectorUI(EntityId id, HealthComponent& comp) override {
 				auto healthLabel = std::format("Health##{}", (long)id);
 				ImGui::InputFloat(healthLabel.c_str(), &comp.Health, 1, 10);
 			}
 		};
-
-		static HealthComponentRegister RegisterHealthComponent;
+		COMPONENT_REGISTER(HealthComponentRegister);
 	}
 }
