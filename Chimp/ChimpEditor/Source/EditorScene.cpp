@@ -3,6 +3,7 @@
 #include "scene_hierarchy/SceneHierarchyScript.h"
 #include "scene_hierarchy/EntityNameComponent.h"
 #include "inspector/InspectorScript.h"
+#include "asset_manager/AssetManagerScript.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -35,6 +36,9 @@ namespace ChimpEditor {
 
 		// Inspector
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+
+		// Asset manager
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetManagerScript(m_sceneView, m_engine, *m_ecs)));
 
 		// Testing
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());

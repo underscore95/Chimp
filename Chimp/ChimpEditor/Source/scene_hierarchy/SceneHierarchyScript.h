@@ -24,7 +24,6 @@ namespace ChimpEditor {
 		void SelectEntity(Chimp::EntityId entity);
 
 	private:
-		std::shared_ptr<Chimp::IRenderTexture> m_sceneViewTexture;
 		Chimp::ECS& m_gameECS;
 		Chimp::EntityId m_selectedEntity;
 	};
