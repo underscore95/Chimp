@@ -61,14 +61,14 @@ namespace ChimpEditor {
 		// Get entity name
 		auto nameComp = m_gameECS.GetComponent<EntityNameComponent>(entity);
 		auto entityIdString = entity.str();
-		auto entityName = nameComp ? nameComp->Name.c_str() : entityIdString.c_str();
+		std::string entityName = nameComp ? nameComp->Name : std::format("Entity {}", entityIdString.c_str());
 
 		// Draw UI
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		if (hierarchyComp.Children.Size() == 0) {
 			// Leaf node
-			if (ImGui::Selectable(entityName, m_selectedEntity == entity)) {
+			if (ImGui::Selectable(entityName.c_str(), m_selectedEntity == entity)) {
 				SelectEntity(entity);
 			}
 		}
@@ -78,7 +78,7 @@ namespace ChimpEditor {
 			if (isSelected)
 				nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
-			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, entityName);
+			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entity, nodeFlags, entityName.c_str());
 			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
 				SelectEntity(entity);
 			}
