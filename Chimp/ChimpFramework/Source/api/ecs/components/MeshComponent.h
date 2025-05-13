@@ -3,16 +3,17 @@
 #include "stdafx.h"
 #include "api/graphics/meshes/Mesh.h"
 #include "api/ecs/components/ComponentRegistry.h"
+#include "api/resources/ResourceReference.h"
 
 namespace Chimp {
 	class MeshComponent {
 	public:
 		// Don't use this constructor, it's only here for the ECS to use
 		[[deprecated]] MeshComponent() :
-			Mesh(nullptr) {
+			Mesh() {
 		}
 
-		MeshComponent(Mesh* mesh)
+		MeshComponent(ResourceReference<Mesh> mesh)
 			: Mesh(mesh)
 		{
 		}
@@ -22,9 +23,8 @@ namespace Chimp {
 		{
 		}
 
-		Mesh* Mesh;
+		ResourceReference<Mesh> Mesh;
 	};
-
 
 	namespace Unused {
 		class MeshComponentRegister : public ComponentRegister<MeshComponent> {
@@ -33,7 +33,7 @@ namespace Chimp {
 			}
 
 			void RenderInspectorUI(EntityId id, MeshComponent& comp) override {
-				auto str = std::format("Mesh: {}", comp.Mesh->GetName());
+				auto str = std::format("Mesh: {}", comp.Mesh ? comp.Mesh.Get()->GetName() : "Resource Not Imported");
 				ImGui::TextWrapped(str.c_str());
 			}
 		};

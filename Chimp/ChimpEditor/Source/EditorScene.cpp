@@ -50,7 +50,7 @@ namespace ChimpEditor {
 		auto testEnt = m_gameEcs->CreateEntity();
 		m_gameEcs->SetComponent<EntityNameComponent>(testEnt, { "MyNamedEntity" });
 		m_gameEcs->SetComponent<Chimp::TransformComponent>(testEnt, {});
-		m_gameEcs->SetComponent<Chimp::MeshComponent>(testEnt, { &m_engine.GetResourceManager().GetModels().Get(m_modelPath) });
+		m_gameEcs->SetComponent<Chimp::MeshComponent>(testEnt, { { &m_engine.GetResourceManager().GetModels().Get(m_modelPath), m_modelPath } });
 		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f });
 
 		m_ecs->GetSystems().OnInit();

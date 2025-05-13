@@ -14,12 +14,12 @@ namespace Chimp {
 	private:
 		// Special constructor for resource manager since it is a special bad coded class that doesn't have an importer before it needs a container.
 		ModelResourceContainer(Engine& engine) :
-			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& paths) { return LoadResource(engine, paths); }) {
+			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& path) { return LoadResource(engine, path); }) {
 		}
 
 	public:
 		ModelResourceContainer(Engine& engine, IModelImporter& modelImporter) :
-			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& paths) { return LoadResource(engine, paths); })
+			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& path) { return LoadResource(engine, path); })
 		{
 			m_ModelImporter = modelImporter;
 		}
@@ -32,6 +32,9 @@ namespace Chimp {
 
 	private:
 		Resource<Mesh> LoadResource(Engine& engine, const ModelResourcePath& paths);
+		void OnUnload(const ImageResourcePath& path);
+
+	private:
 		Chimp::Reference<IModelImporter> m_ModelImporter;
 	};
 }

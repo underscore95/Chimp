@@ -8,7 +8,10 @@ namespace Chimp {
 	template <typename K, typename T>
 	class ResourceContainer {
 	public:
-		ResourceContainer(std::function<Resource<T>(const K&)> loadResourceFunc) : m_LoadResourceFunc(loadResourceFunc) {}
+		ResourceContainer(std::function<Resource<T>(const K&)> loadResourceFunc) :
+			m_LoadResourceFunc(loadResourceFunc)
+		{
+		}
 		virtual ~ResourceContainer() = default;
 
 		// Depend on a resource, but its not required right now
@@ -30,7 +33,7 @@ namespace Chimp {
 			if (iter == m_Resources.end()) {
 				auto resource = m_LoadResourceFunc(path);
 				assert(resource.RefCount == 0);
-				iter = m_Resources.emplace(path, std::move(resource)).first; 
+				iter = m_Resources.emplace(path, std::move(resource)).first;
 			}
 
 			iter->second.RefCount++;
@@ -63,6 +66,7 @@ namespace Chimp {
 		void UnloadUnused() {
 			for (auto it = m_Resources.begin(); it != m_Resources.end();) {
 				if (it->second.RefCount <= 0) {
+					OnUnload(it->first);
 					it = m_Resources.erase(it);
 				}
 				else {
@@ -83,6 +87,13 @@ namespace Chimp {
 		[[nodiscard]] size_t Size() const {
 			return m_Resources.size();
 		}
+
+		// Get loaded resources
+		const std::unordered_map<K, Resource<T>>& GetLoadedResources() { return m_Resources; }
+
+	protected:
+		virtual void OnUnload(const K& path) {};
+
 	protected:
 		std::unordered_map<K, Resource<T>> m_Resources;
 

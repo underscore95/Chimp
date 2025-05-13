@@ -65,7 +65,10 @@ namespace Chimp {
 			}
 
 			assert(!transform.IsDirty());
-			Render(*mesh.Mesh, { transform.WorldTransformMatrix, ToNormalMatrix(transform.WorldTransformMatrix) });
+			auto optionalMesh = mesh.Mesh.Get();
+			if (optionalMesh) {
+				Render(*optionalMesh, { transform.WorldTransformMatrix, ToNormalMatrix(transform.WorldTransformMatrix) });
+			}
 		}
 	}
 
@@ -156,7 +159,10 @@ namespace Chimp {
 				continue;
 			}
 
-			GetShadowShader().Render(*mesh.Mesh, { transform.WorldTransformMatrix, CreateIdentityMatrix() });
+			auto optionalMesh = mesh.Mesh.Get();
+			if (optionalMesh) {
+				GetShadowShader().Render(*optionalMesh, { transform.WorldTransformMatrix, CreateIdentityMatrix() });
+			}
 		}
 	}
 
@@ -175,7 +181,10 @@ namespace Chimp {
 				continue;
 			}
 
-			GetPointShadowShader().Render(*mesh.Mesh, { transform.WorldTransformMatrix, CreateIdentityMatrix() });
+			auto optionalMesh = mesh.Mesh.Get();
+			if (optionalMesh) {
+				GetPointShadowShader().Render(*optionalMesh, { transform.WorldTransformMatrix, CreateIdentityMatrix() });
+			}
 		}
 	}
 }

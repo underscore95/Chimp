@@ -54,10 +54,10 @@ namespace ChimpEditor {
 	void AssetImporterScript::RenderImportAssetButton(Chimp::AssetImportState state, Chimp::AssetType& assetType)
 	{
 		if (state == Chimp::AssetImportState::Imported) {
-			ImGui::BeginDisabled();
-			ImGui::Button("Asset Imported");
-			ImGui::EndDisabled();
-			return; 
+			if (ImGui::Button("Unimport Asset")) {
+				assetType.UnimportAsset(m_assetManager.GetSelectedFile());
+			}
+			return;
 		}
 
 		if (!ImGui::Button(state == Chimp::AssetImportState::NeedsReimporting ? "Reimport Asset" : "Import Asset")) return;

@@ -1,16 +1,12 @@
 #include "ModelAssetType.h"
 #include "Engine.h"
+#include "api/resources/ResourceReference.h"
 
 namespace Chimp {
 	ModelAssetType::ModelAssetType(Engine& engine) :
 		AssetType("Model"),
 		m_Engine(engine)
 	{
-	}
-
-	ModelAssetType::~ModelAssetType()
-	{
-		UnimportAllAssets();
 	}
 
 	bool ModelAssetType::IsThisAssetType(const std::string& fileExtension)
@@ -23,7 +19,7 @@ namespace Chimp {
 		bool b;
 		ImGui::Checkbox("Useless check box <3", &b);
 
-		if (m_Engine.GetResourceManager().GetModels().IsLoaded(assetPath.string())) {
+		if (IsImported(assetPath)) {
 			return AssetImportState::Imported;
 		}
 		return AssetImportState::NotImported;
@@ -35,8 +31,6 @@ namespace Chimp {
 
 		auto& models = m_Engine.GetResourceManager().GetModels();
 		models.ImmediateDepend(assetPath.string());
-
-		m_ImportedAssets.push_back(assetPath);
 	}
 
 	void ModelAssetType::UnimportAsset(const std::filesystem::path& assetPath)
@@ -45,7 +39,22 @@ namespace Chimp {
 
 		auto& models = m_Engine.GetResourceManager().GetModels();
 		models.Release(assetPath.string());
+		models.UnloadUnused();
+	}
 
-		m_ImportedAssets.erase(std::find(m_ImportedAssets.begin(), m_ImportedAssets.end(), assetPath));
+	const std::vector<std::filesystem::path>& ModelAssetType::GetImportedAssets() const
+	{
+		auto& models = m_Engine.GetResourceManager().GetModels();
+		std::vector<std::filesystem::path> paths;
+		paths.reserve(models.GetLoadedResources().size());
+		for (const auto& [path, _] : models.GetLoadedResources()) {
+			paths.push_back(path);
+		}
+		return paths;
+	}
+
+	bool ModelAssetType::IsImported(const std::filesystem::path& assetPath) const
+	{
+		return m_Engine.GetResourceManager().GetModels().IsLoaded(assetPath.string());
 	}
 }

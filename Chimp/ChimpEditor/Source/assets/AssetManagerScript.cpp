@@ -73,6 +73,7 @@ void ChimpEditor::AssetManagerScript::RenderFileUI(const std::filesystem::path& 
 	auto label = std::format("{}", path.string());
 	if (ImGui::InvisibleButton(label.c_str(), ImGui::CalcTextSize(fileName.c_str()))) {
 		m_selectedFile = isCurrentlySelected ? "" : path;
+		Chimp::NormaliseSlashesInPath(m_selectedFile);
 	}
 	ImGui::SetCursorPos(cursorPos);
 	ImGui::TextColored(isCurrentlySelected ? ImVec4{ 0.7f, 0.7f, 1.0f, 1.0f } : ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f }, fileName.c_str());

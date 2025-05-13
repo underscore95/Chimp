@@ -7,7 +7,6 @@ namespace Chimp {
 	class ModelAssetType : public AssetType {
 	public:
 		ModelAssetType(Engine& engine);
-		~ModelAssetType() override;
 
 		bool IsThisAssetType(const std::string& fileExtension) override;
 
@@ -16,6 +15,10 @@ namespace Chimp {
 		void ImportAsset(const std::filesystem::path& assetPath) override;
 
 		void UnimportAsset(const std::filesystem::path& assetPath) override;
+
+		const std::vector<std::filesystem::path>& GetImportedAssets() const override;
+
+		bool IsImported(const std::filesystem::path& assetPath) const override;
 
 	private:
 		Engine& m_Engine;

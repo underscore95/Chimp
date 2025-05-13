@@ -14,4 +14,7 @@ namespace Chimp {
 	[[nodiscard]] std::string GetPathRelativeToFile(const std::string& path, std::string_view pathToFile);
 
 	[[nodiscard]] std::string GetFileExtension(const std::filesystem::path& path);
+
+	// Replaces all '\\' with '/'
+	[[nodiscard]] void NormaliseSlashesInPath(std::filesystem::path& path);
 }

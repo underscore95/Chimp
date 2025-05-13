@@ -25,4 +25,15 @@ namespace Chimp {
 	{
 		return	path.has_extension() ? path.extension().string() : "";
 	}
+
+	void NormaliseSlashesInPath(std::filesystem::path& path)
+	{
+		std::string pathStr = path.string();
+		for (char& ch : pathStr) {
+			if (ch == '\\') {
+				ch = '/';
+			}
+		}
+		path = std::filesystem::path(pathStr);
+	}
 }
