@@ -4,6 +4,9 @@
 #include "api/graphics/meshes/Mesh.h"
 #include "api/ecs/components/ComponentRegistry.h"
 #include "api/resources/ResourceReference.h"
+#include "api/resources/asset_types/AssetTypeManager.h"
+#include "api/Engine.h"
+#include "api/utils/StringUtils.h"
 
 namespace Chimp {
 	class MeshComponent {
@@ -33,10 +36,35 @@ namespace Chimp {
 			}
 
 			void RenderInspectorUI(EntityId id, MeshComponent& comp) override {
-				auto str = std::format("Mesh: {}", comp.Mesh ? comp.Mesh.Get()->GetName() : "Resource Not Imported");
-				ImGui::TextWrapped(str.c_str());
+				auto assetType = Engine::GetEngine().GetResourceManager().GetAssetTypeManager().GetType(AssetTypeId::Model);
+				std::vector<std::filesystem::path> assets = assetType->GetImportedAssets();
+
+#ifndef NDEBUG
+				std::string currentlySelectedResource = comp.Mesh ? comp.Mesh.GetPath().string() : "None"; 
+				RemoveUntilAndIncluding("Data/", currentlySelectedResource);
+
+				if (ImGui::BeginCombo("Mesh", currentlySelectedResource.c_str())) {
+					if (ImGui::Selectable("None", !comp.Mesh)) {
+						// Select none
+						comp.Mesh.Set(nullptr, "");
+					}
+
+					// List of resources
+					for (const auto& path : assets) {
+						auto shortenedPathString = path.string();
+						RemoveUntilAndIncluding("Data/", shortenedPathString);
+						if (ImGui::Selectable(shortenedPathString.c_str(), comp.Mesh.IsEqual(shortenedPathString))) {
+							int assetIndex = ImportedAssetsList::Instance().GetAssetIndex(path);
+							comp.Mesh.Set(ImportedAssetsList::Instance().GetAsset<Mesh>(assetIndex), path);
+						}
+					}
+					ImGui::EndCombo();
+				}
+#else
+				ImGui::Text("Resource selection dropdown cannot render in release builds.");
+#endif
 			}
 		};
-		COMPONENT_REGISTER(MeshComponentRegister);
+	COMPONENT_REGISTER(MeshComponentRegister);
 	}
 }

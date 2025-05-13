@@ -19,9 +19,11 @@ namespace Chimp {
 		void NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref);
 		void NotifyAssetUnloaded(const std::filesystem::path& path);
 
+#ifndef NDEBUG
 		int GetAssetIndex(const std::filesystem::path& path);
 		bool IsAssetImported(int index);
 		std::filesystem::path GetPath(int index);
+#endif
 
 		template <typename T>
 		Reference<T> GetAsset(int index) {
@@ -55,16 +57,14 @@ namespace Chimp {
 #endif
 		{
 		}
-		ResourceReference(Reference<T> ref, const std::filesystem::path& path) :
-			Ref(ref)
-#ifndef NDEBUG
-			, AssetIndex(ImportedAssetsList::Instance().GetAssetIndex(path))
-#endif
+		ResourceReference(OptionalReference<T> ref, const std::filesystem::path& path)
 		{
+			Set(ref, path);
 		}
 
 		OptionalReference<T> Get() {
 #ifndef NDEBUG
+			if (AssetIndex < 0) return nullptr;
 			if (!ImportedAssetsList::Instance().IsAssetImported(AssetIndex)) {
 				if (CachedAssetValid) {
 					// Our asset was unloaded and we don't know about it yet
@@ -86,10 +86,15 @@ namespace Chimp {
 #endif
 		}
 
-		void Set(Reference<T> ref, const std::filesystem::path& path) {
+		void Set(OptionalReference<T> ref, const std::filesystem::path& path) {
+
+			assert(!(!ref && path != ""));
+			assert(!(ref && path == ""));
+
 			Ref = ref;
 #ifndef NDEBUG
-			AssetIndex = ImportedAssetsList::Instance().GetAssetIndex(path);
+			AssetIndex = Ref ? ImportedAssetsList::Instance().GetAssetIndex(path) : -4;
+			CachedAssetValid = false;
 #endif
 		}
 
@@ -101,11 +106,21 @@ namespace Chimp {
 				;
 		}
 
+#ifndef NDEBUG
+		bool IsEqual(const std::filesystem::path& assetPath) {
+			return  ImportedAssetsList::Instance().GetAssetIndex(assetPath) == AssetIndex && static_cast<bool>(*this);
+		}
+
+		std::filesystem::path GetPath() {
+			return ImportedAssetsList::Instance().GetPath(AssetIndex);
+		}
+#endif
+
 	private:
-		Reference<T> Ref;
+		OptionalReference<T> Ref;
 #ifndef NDEBUG
 		int AssetIndex;
-		bool CachedAssetValid = true;
+		bool CachedAssetValid;
 #endif
 	};
 }

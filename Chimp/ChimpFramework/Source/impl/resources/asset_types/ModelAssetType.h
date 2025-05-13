@@ -16,7 +16,7 @@ namespace Chimp {
 
 		void UnimportAsset(const std::filesystem::path& assetPath) override;
 
-		const std::vector<std::filesystem::path>& GetImportedAssets() const override;
+		std::vector<std::filesystem::path> GetImportedAssets() const override;
 
 		bool IsImported(const std::filesystem::path& assetPath) const override;
 

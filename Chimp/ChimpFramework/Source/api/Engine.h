@@ -35,6 +35,8 @@ namespace Chimp {
 	public:
 		~Engine();
 
+		[[nodiscard]] static Engine& GetEngine(); // Prefer passing engine rather than using this function
+
 		[[nodiscard]] TimeManager& GetTimeManager();
 		[[nodiscard]] IWindow& GetWindow();
 		[[nodiscard]] IRenderingManager& GetRenderingManager();

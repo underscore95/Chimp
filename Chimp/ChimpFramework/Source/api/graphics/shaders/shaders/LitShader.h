@@ -9,6 +9,7 @@ namespace Chimp {
 	class LitPointShadowShader;
 	class LitShadowShader;
 	class IRenderTexture;
+	class MeshComponent;
 
 	class LitShader : public GameShader {
 		friend class ChimpShaders;

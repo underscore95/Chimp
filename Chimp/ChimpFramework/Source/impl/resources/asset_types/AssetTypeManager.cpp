@@ -15,9 +15,14 @@ namespace Chimp {
 		return nullptr;
 	}
 
+	Reference<AssetType> AssetTypeManager::GetType(AssetTypeId id)
+	{
+		return m_AssetTypes[id].get();
+	}
+
 	void AssetTypeManager::RegisterAssetType(std::unique_ptr<AssetType> assetType)
 	{
 		assert(assetType);
-		m_AssetTypes[std::string(assetType->GetName())] = std::move(assetType);
+		m_AssetTypes[assetType->GetId()] = std::move(assetType);
 	}
 }

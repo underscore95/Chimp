@@ -12,11 +12,12 @@ namespace Chimp {
 		AssetTypeManager(Engine& engine);
 
 		OptionalReference<AssetType> GetType(const std::string& fileExtension);
+		Reference<AssetType> GetType(AssetTypeId id);
 
 	private:
 		void RegisterAssetType(std::unique_ptr<AssetType> assetType);
 
 	private:
-		std::unordered_map<std::string, std::unique_ptr<AssetType>> m_AssetTypes;
+		std::unordered_map<AssetTypeId, std::unique_ptr<AssetType>> m_AssetTypes;
 	};
 }

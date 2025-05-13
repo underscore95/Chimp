@@ -24,6 +24,9 @@
 #include "api/ecs/components/ComponentRegistry.h"
 
 namespace Chimp {
+
+	static Reference<Engine> g_Engine;
+
 	Engine::Engine() :
 		m_ResourceManager(*this),
 		m_Window(CreateWindow()),
@@ -33,6 +36,8 @@ namespace Chimp {
 		m_AudioManager(std::make_unique<AudioManager>()),
 		m_MusicPlayer(*this)
 	{
+		assert(!g_Engine);
+		g_Engine = this;
 		m_ResourceManager.InitModelImporter();
 
 		PacketTypeRegistry::RegisterChimpPacketTypes();
@@ -54,6 +59,13 @@ namespace Chimp {
 	Engine::~Engine()
 	{
 		m_RenderingManager->DestroyChimpShaders();
+		g_Engine = nullptr;
+	}
+
+	Engine& Engine::GetEngine()
+	{
+		assert(g_Engine);
+		return g_Engine;
 	}
 
 	TimeManager& Engine::GetTimeManager()

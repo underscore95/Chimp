@@ -7,9 +7,16 @@ namespace Chimp {
 		Imported, NeedsReimporting, NotImported
 	};
 
+	enum class AssetTypeId {
+		Model
+	};
+
 	class AssetType {
 	protected:
-		AssetType(const std::string& name) : m_Name(name) {}
+		AssetType(const std::string& name, AssetTypeId id) : 
+			m_Name(name),
+			m_Id(id)
+		{}
 
 	public:
 		virtual ~AssetType() = default;
@@ -28,14 +35,17 @@ namespace Chimp {
 		virtual	void UnimportAsset(const std::filesystem::path& assetPath) = 0;
 
 		// Get all imported assets
-		virtual const std::vector<std::filesystem::path>& GetImportedAssets() const = 0;
+		virtual std::vector<std::filesystem::path> GetImportedAssets() const = 0; // TODO return an iterator or something rather than a vector
 
 		// Is asset imported
 		virtual	bool IsImported(const std::filesystem::path& assetPath) const = 0;
 
-		std::string_view GetName() { return m_Name; }
+		std::string_view GetName() const { return m_Name; }
+
+		AssetTypeId GetId() const { return m_Id; }
 
 	private:
 		std::string m_Name;
+		AssetTypeId m_Id;
 	};
 }

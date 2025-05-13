@@ -16,6 +16,7 @@
 #include "api/ecs/scripting/EntityScriptingSystem.h"
 #include "api/ecs/scripting/IEntityScript.h"
 #include "api/ecs/components/ComponentRegistry.h"
+#include "api/ecs/components/MeshComponent.h"
 
 // Misc
 #include "api/networking/PacketTypeRegistry.h"
@@ -38,3 +39,4 @@
 #include "api/utils/preprocessor/Casting.h"
 #include "api/utils/ByteVisualiser.h"
 #include "api/utils/FilePath.h"
+#include "api/utils/StringUtils.h"

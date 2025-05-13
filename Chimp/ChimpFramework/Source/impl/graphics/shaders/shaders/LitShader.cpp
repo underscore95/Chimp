@@ -4,6 +4,7 @@
 #include "Loggers.h"
 #include "Engine.h"
 #include "api/graphics/utils/IRenderTexture.h"
+#include "api/ecs/components/MeshComponent.h"
 
 namespace Chimp {
 	LitShader::LitShader(Engine& engine) : GameShader(

@@ -4,7 +4,7 @@
 
 namespace Chimp {
 	ModelAssetType::ModelAssetType(Engine& engine) :
-		AssetType("Model"),
+		AssetType("Model", AssetTypeId::Model),
 		m_Engine(engine)
 	{
 	}
@@ -42,7 +42,7 @@ namespace Chimp {
 		models.UnloadUnused();
 	}
 
-	const std::vector<std::filesystem::path>& ModelAssetType::GetImportedAssets() const
+	std::vector<std::filesystem::path> ModelAssetType::GetImportedAssets() const
 	{
 		auto& models = m_Engine.GetResourceManager().GetModels();
 		std::vector<std::filesystem::path> paths;

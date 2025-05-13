@@ -9,9 +9,9 @@ namespace Chimp {
 
 	void ImportedAssetsList::NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref)
 	{
+#ifndef NDEBUG
 		assert(path != "");
 		assert(ref.GetPtr() != nullptr);
-#ifndef NDEBUG
 		auto it = m_AssetIndices.find(path);
 		if (it != m_AssetIndices.end()) {
 			m_AssetStillImported[it->second] = true;
@@ -26,33 +26,28 @@ namespace Chimp {
 
 	void ImportedAssetsList::NotifyAssetUnloaded(const std::filesystem::path& path)
 	{
-		assert(path != "");
 #ifndef NDEBUG
+		assert(path != "");
 		m_AssetStillImported[m_AssetIndices[path]] = false;
 		m_AssetLocations.erase(path);
 #endif
 	}
 
+#ifndef NDEBUG
 	int ImportedAssetsList::GetAssetIndex(const std::filesystem::path& path)
 	{
-#ifndef NDEBUG
 		auto it = m_AssetIndices.find(path);
 		if (it != m_AssetIndices.end()) { 
 			return it->second;
 		}
 		return -3;
-#else
-		return -2;
-#endif
+
 	}
 
 	bool ImportedAssetsList::IsAssetImported(int index)
 	{
-#ifndef NDEBUG
+		assert(index >= 0);
 		return m_AssetStillImported[index];
-#else
-		return true;
-#endif
 	}
 
 	std::filesystem::path ImportedAssetsList::GetPath(int index)
@@ -62,4 +57,6 @@ namespace Chimp {
 		}
 		return "";
 	}
+
+#endif
 }
