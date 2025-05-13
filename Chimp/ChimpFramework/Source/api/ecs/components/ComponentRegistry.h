@@ -1,0 +1,112 @@
+#pragma once
+
+#include "stdafx.h"
+#include "api/ecs/ECS.h"
+
+namespace Chimp {
+
+	template <typename T>
+	class ComponentRegister;
+	class Engine;
+
+	class ComponentRegistry {
+		template <typename T>
+		friend class ComponentRegister;
+		friend class Engine;
+		DISABLE_COPY_AND_MOVE(ComponentRegistry);
+	private:
+		ComponentRegistry() = default;
+	public:
+		static ComponentRegistry& Instance();
+
+		// Renders the editor inspector UI for this type
+		void RenderEditorUI(EntityId id, AnyReference value) {
+			size_t hashCode = value.GetType().Hash();
+			auto it = m_RenderEditorUIFunctions.find(hashCode);
+			assert(it != m_RenderEditorUIFunctions.end());
+			auto& func = it->second;
+			void* voidValue = value.GetPtr();
+			func(id, voidValue);
+		}
+
+		bool ShouldHideInInspectorUI(TypeInfo typeInfo) {
+			return m_ShouldHideInInspectorUI.contains(typeInfo.Hash());
+		}
+
+		size_t GetSize(AnyReference value) {
+			size_t hashCode = value.GetType().Hash();
+			auto it = m_ComponentSizes.find(hashCode);
+			assert(it != m_ComponentSizes.end());
+			return it->second;
+		}
+
+	public:
+		void SetActiveECS(ECS& ecs) {
+			for (auto& [hashCode, function] : m_SetActiveECSFunctions) {
+				function(ecs);
+			}
+		}
+
+		// Register a component, this can only be called from ComponentRegister which ensures it is impossible to register a component twice
+		template <typename T>
+		void RegisterComponent(bool shouldHideInInspectorUI, const std::function<void(EntityId, T&)>& renderInspectorUi, const std::function<void(ECS&)>& setActiveEcsFunction) {
+			const auto& typeId = typeid(T);
+			size_t hashCode = typeId.hash_code();
+			m_RenderEditorUIFunctions[hashCode] = [renderInspectorUi](EntityId id, void* value) { renderInspectorUi(id, *reinterpret_cast<T*>(value)); }; // convert the function into one that takes a void*
+			m_ECSRegisterFunctions.push_back([](ECS& ecs) { ecs.RegisterComponent<T>(); });
+			m_SetActiveECSFunctions[hashCode] = setActiveEcsFunction;
+			m_ComponentSizes[hashCode] = sizeof(T);
+			if (shouldHideInInspectorUI) {
+				m_ShouldHideInInspectorUI.insert(hashCode);
+			}
+		}
+
+		void RegisterComponentsInECS(ECS& ecs);
+
+	private:
+		std::unordered_map<size_t, std::function<void(EntityId, void*)>> m_RenderEditorUIFunctions; // type hash code -> function expecting T* which renders inspector ui
+		std::unordered_map<size_t, std::function<void(ECS&)>> m_SetActiveECSFunctions; // type hash code -> function which sets active ecs
+		std::unordered_map<size_t, size_t> m_ComponentSizes; // type hash code -> sizeof(T)
+		std::unordered_set<size_t> m_ShouldHideInInspectorUI; // type hash code
+		std::vector<std::function<void(ECS&)>> m_ECSRegisterFunctions;
+	};
+
+	// Registers the component
+	template <typename T>
+	class ComponentRegister {
+		DISABLE_COPY_AND_MOVE(ComponentRegister);
+	public:
+		virtual void RenderInspectorUI(EntityId id, T& comp) {
+			ImGui::PushTextWrapPos();
+			ImGui::Text("Override RenderInspectorUI in your ComponentRegister<T> to add UI here.");
+			ImGui::PopTextWrapPos();
+		};
+
+	public:
+		// Register a component
+		ComponentRegister(
+			bool shouldHideInInspectorUI = false
+		) {
+			static bool unused = [this, shouldHideInInspectorUI]() {
+				const std::function<void(EntityId, T&)> renderInspectorUiFunction = [this](EntityId id, T& comp) { RenderInspectorUI(id, comp); };
+				const std::function<void(ECS&)> setEcsFunction = [this](ECS& ecs) { m_ECS = ecs; };
+				ComponentRegistry::Instance().RegisterComponent(
+					shouldHideInInspectorUI,
+					renderInspectorUiFunction,
+					setEcsFunction
+				);
+
+				return true;
+				}();
+		}
+
+	protected:
+		ECS& GetECS() { return m_ECS.Get(); }
+
+	private:
+		Reference<ECS> m_ECS; // Works like a state machine
+	};
+
+#define COMPONENT_REGISTER(Register) \
+		static Register ComponentRegister_##Register
+}

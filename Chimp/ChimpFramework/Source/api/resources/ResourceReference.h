@@ -1,0 +1,126 @@
+#pragma once
+
+#include "stdafx.h"
+#include "api/utils/OptionalReference.h"
+#include "Loggers.h"
+#include "api/utils/AnyReference.h"
+
+namespace Chimp {
+
+	class IShader;
+	class GameShader;
+
+	class ImportedAssetsList {
+	private:
+		ImportedAssetsList() = default;
+	public:
+		static ImportedAssetsList& Instance();
+
+		void NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref);
+		void NotifyAssetUnloaded(const std::filesystem::path& path);
+
+#ifndef NDEBUG
+		int GetAssetIndex(const std::filesystem::path& path);
+		bool IsAssetImported(int index);
+		std::filesystem::path GetPath(int index);
+#endif
+
+		template <typename T>
+		Reference<T> GetAsset(int index) {
+#ifndef NDEBUG
+			auto it = m_AssetLocations.find(GetPath(index));
+			if (it == m_AssetLocations.end()) return nullptr;
+			void* data = it->second.GetPtr();
+			assert(it->second.GetType() == typeid(T));
+			return static_cast<T*>(data);
+#else
+			return nullptr;
+#endif
+		}
+	private:
+		std::vector<bool> m_AssetStillImported;
+		std::unordered_map<std::filesystem::path, int> m_AssetIndices;
+		std::unordered_map<std::filesystem::path, AnyReference> m_AssetLocations;
+	};
+
+	template <typename T>
+	class ResourceReference {
+		static_assert(
+			!std::is_same_v<T, IShader> && !std::is_same_v<T, GameShader>,
+			"T must not be IShader or GameShader"
+			);
+	public:
+
+		ResourceReference() : Ref(nullptr)
+#ifndef NDEBUG
+			, AssetIndex(-1)
+#endif
+		{
+		}
+		ResourceReference(OptionalReference<T> ref, const std::filesystem::path& path)
+		{
+			Set(ref, path);
+		}
+
+		OptionalReference<T> Get() {
+#ifndef NDEBUG
+			if (AssetIndex < 0) return nullptr;
+			if (!ImportedAssetsList::Instance().IsAssetImported(AssetIndex)) {
+				if (CachedAssetValid) {
+					// Our asset was unloaded and we don't know about it yet
+					Loggers::Resources().Warning(std::format(
+						"Reference to asset with index {} at address {} with path {} no longer exists.",
+						AssetIndex, static_cast<void*>(Ref.GetNullablePtr()), ImportedAssetsList::Instance().GetPath(AssetIndex).string()
+					));
+					CachedAssetValid = false;
+				}
+			}
+			else if (!CachedAssetValid) {
+				// Our asset was unloaded but then reloaded and we don't know about it yet
+				CachedAssetValid = true;
+				Ref = ImportedAssetsList::Instance().GetAsset<T>(AssetIndex);
+			}
+			return CachedAssetValid ? Ref : nullptr;
+#else
+			return Ref;
+#endif
+		}
+
+		void Set(OptionalReference<T> ref, const std::filesystem::path& path) {
+
+			assert(!(!ref && path != ""));
+			assert(!(ref && path == ""));
+
+			Ref = ref;
+#ifndef NDEBUG
+			AssetIndex = Ref ? ImportedAssetsList::Instance().GetAssetIndex(path) : -4;
+			CachedAssetValid = false;
+#endif
+		}
+
+		operator bool() const {
+			return Ref
+#ifndef NDEBUG
+				&& ImportedAssetsList::Instance().IsAssetImported(AssetIndex)
+#endif
+				;
+		}
+
+#ifndef NDEBUG
+		bool IsEqual(const std::filesystem::path& assetPath) {
+			return  ImportedAssetsList::Instance().GetAssetIndex(assetPath) == AssetIndex && static_cast<bool>(*this);
+		}
+
+		std::filesystem::path GetPath() {
+			return ImportedAssetsList::Instance().GetPath(AssetIndex);
+		}
+#endif
+
+	private:
+		OptionalReference<T> Ref;
+#ifndef NDEBUG
+		int AssetIndex;
+		bool CachedAssetValid;
+#endif
+	};
+}

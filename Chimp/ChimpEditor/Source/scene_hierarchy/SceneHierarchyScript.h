@@ -1,0 +1,30 @@
+#pragma once
+
+#include "Chimp.h"
+
+namespace ChimpEditor {
+	class HierarchyComponent;
+
+	class SceneHierarchyScript : public Chimp::IEntityScript {
+	public:
+		SceneHierarchyScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameECS);
+
+	public:
+		Chimp::EntityId GetSelectedEntity() const;
+		bool HasSelectedEntity();
+
+	private:
+		void OnInit() override;
+		void OnUpdate() override;
+		void OnRender() override;
+		void OnRenderUI() override;
+
+		void RenderUI(Chimp::EntityId entity, Chimp::HierarchyComponent& hierarchyComp, float cursorPosX);
+
+		void SelectEntity(Chimp::EntityId entity);
+
+	private:
+		Chimp::ECS& m_gameECS;
+		Chimp::EntityId m_selectedEntity;
+	};
+}
