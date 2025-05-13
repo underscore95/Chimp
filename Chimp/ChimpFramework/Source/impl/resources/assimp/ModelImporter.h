@@ -19,6 +19,7 @@ namespace Chimp {
 		virtual ~ModelImporter() = default;
 
 		std::unique_ptr<Mesh> LoadModel(const std::string& path, const Settings& settings = {}) override;
+		bool IsSupportedFileExtension(const std::string& fileExtension) const override;
 
 	private:
 		Assimp::Importer m_Importer;

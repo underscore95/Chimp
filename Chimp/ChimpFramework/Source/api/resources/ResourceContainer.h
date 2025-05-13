@@ -40,8 +40,13 @@ namespace Chimp {
 
 		// Get a resource, does bad stuff if it doesn't exist, only call this if you are 100% sure it exists
 		[[nodiscard]] T& Get(const K& path) {
-			assert(m_Resources.find(path) != m_Resources.end());
+			assert(IsLoaded(path));
 			return *m_Resources[path].Data;
+		}
+
+		// Is a resource loaded?
+		[[nodiscard]] bool IsLoaded(const K& path) {
+			return m_Resources.find(path) != m_Resources.end();
 		}
 
 		// Release a resource, this decrements the reference count

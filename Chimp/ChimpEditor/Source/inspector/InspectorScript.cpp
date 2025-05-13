@@ -30,8 +30,7 @@ namespace ChimpEditor {
 	void InspectorScript::OnRenderUI()
 	{
 		ImGui::SetNextWindowPos({ GetEngine().GetWindow().GetSize().x * 0.75f + 8, 0 });
-		ImGui::SetNextWindowSizeConstraints(
-			{ 16, 16 },
+		ImGui::SetNextWindowSize(
 			Chimp::ComponentMultiply(GetEngine().GetWindow().GetSize(), { 0.25f, 1.0f }) - Chimp::Vector2f{ 8,0 }
 		);
 		ImGui::Begin("Inspector");

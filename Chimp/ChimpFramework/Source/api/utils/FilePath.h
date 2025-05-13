@@ -12,4 +12,6 @@ namespace Chimp {
 	// if path is absolute, returns path
 	// always returns an absolute path
 	[[nodiscard]] std::string GetPathRelativeToFile(const std::string& path, std::string_view pathToFile);
+
+	[[nodiscard]] std::string GetFileExtension(const std::filesystem::path& path);
 }

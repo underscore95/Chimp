@@ -5,6 +5,7 @@
 #ifdef CHIMP_ASSIMP
 #include "impl/resources/assimp/ModelImporter.h"
 #endif
+#include "api/resources/asset_types/AssetTypeManager.h"
 
 namespace Chimp {
 	ResourceManager::ResourceManager(Engine& engine)
@@ -18,6 +19,17 @@ namespace Chimp {
 		m_Sounds(engine)
 	{
 		InitModelImporter();
+
+		m_AssetTypeManager = std::make_unique<AssetTypeManager>(engine);
+	}
+
+	ResourceManager::~ResourceManager()
+	{
+	}
+
+	AssetTypeManager& ResourceManager::GetAssetTypeManager()
+	{
+		return *m_AssetTypeManager;
 	}
 
 	ResourceContainer<ShaderFilePaths, IShader>& ResourceManager::GetShaders()

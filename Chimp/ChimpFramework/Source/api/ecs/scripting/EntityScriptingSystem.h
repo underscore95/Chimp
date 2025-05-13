@@ -25,6 +25,7 @@ namespace Chimp {
 	public:
 		ScriptId AttachScript(EntityId entity, std::unique_ptr<IEntityScript> script);
 		void DetachScript(EntityId entity, ScriptId script);
+		OptionalReference<IEntityScript> GetScript(EntityId entity, ScriptId id);
 
 		// returns the first script on the entity which matches the predicate
 		OptionalReference<IEntityScript> GetFirstScript(EntityId entity, std::function<bool(IEntityScript*)> predicate);

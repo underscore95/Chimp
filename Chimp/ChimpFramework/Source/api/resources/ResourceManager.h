@@ -17,6 +17,7 @@
 namespace Chimp {
 	class Engine;
 	class MainLoop;
+	class AssetTypeManager;
 	class IShader;
 
 	class ResourceManager {
@@ -24,8 +25,12 @@ namespace Chimp {
 		friend class MainLoop;
 	private:
 		ResourceManager(Engine& engine);
+		~ResourceManager();
 
 	public:
+		// Asset type manager imports assets, used by editor
+		[[nodiscard]] AssetTypeManager& GetAssetTypeManager();
+
 		// Stores IShader, this is wrapper classes around shaders in the rendering API
 		[[nodiscard]] ResourceContainer<ShaderFilePaths, IShader>& GetShaders();
 
@@ -62,6 +67,7 @@ namespace Chimp {
 		Engine& m_Engine;
 		std::unique_ptr<IModelImporter> m_ModelImporter;
 		MeshStorage m_MeshStorage;
+		std::unique_ptr<AssetTypeManager> m_AssetTypeManager;
 
 		ShaderResourceContainer m_Shaders;
 		TextureResourceContainer m_Textures;

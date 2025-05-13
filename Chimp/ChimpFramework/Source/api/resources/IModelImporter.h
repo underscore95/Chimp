@@ -30,6 +30,10 @@ namespace Chimp {
 		// Only support 1 texture per mesh section (one model (mesh in chimp) can have multiple mesh sections!)
 		virtual std::unique_ptr<Mesh> LoadModel(const std::string& path, const Settings& settings = {}) = 0;
 
+		// Check if we can import this file extension
+		// fileExtension - the file extension, case insensitive, can start with a . or not, some valid values are .Png, png, PNG, .png
+		virtual bool IsSupportedFileExtension(const std::string& fileExtension) const = 0;
+
 	protected:
 		IRenderingManager& m_RenderingManager;
 	};

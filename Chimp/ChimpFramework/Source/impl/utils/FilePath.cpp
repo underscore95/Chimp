@@ -20,4 +20,9 @@ namespace Chimp {
 		pathToFilePath /= path;
 		return pathToFilePath.string();
 	}
+
+	std::string GetFileExtension(const std::filesystem::path& path)
+	{
+		return	path.has_extension() ? path.extension().string() : "";
+	}
 }

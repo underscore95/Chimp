@@ -19,7 +19,7 @@ namespace Chimp {
 
 	public:
 		ModelResourceContainer(Engine& engine, IModelImporter& modelImporter) :
-			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& paths) { return LoadResource(engine, paths); }) 
+			ResourceContainer<ModelResourcePath, Mesh>([&](const ModelResourcePath& paths) { return LoadResource(engine, paths); })
 		{
 			m_ModelImporter = modelImporter;
 		}
@@ -27,6 +27,8 @@ namespace Chimp {
 		~ModelResourceContainer() = default;
 
 		IModelImporter::Settings ImportSettings; // Will be used whenever we load a model
+
+		const IModelImporter& GetModelImporter() const { return m_ModelImporter; }
 
 	private:
 		Resource<Mesh> LoadResource(Engine& engine, const ModelResourcePath& paths);

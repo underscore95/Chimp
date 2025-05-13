@@ -26,6 +26,8 @@ namespace Chimp {
 
 		operator bool() const { return HasValue(); }
 
+		operator T& () const { return Get(); }
+
 	private:
 		T* m_Value;
 	};

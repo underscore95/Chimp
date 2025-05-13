@@ -247,7 +247,7 @@ namespace Chimp {
 
 	void MakeUpVectorValid(Reference<Vector3f> up, Vector3f forward)
 	{
-		assert(IsNormalised(up));
+		assert(IsNormalised(up.Get()));
 
 		// Fix forward and up vectors being collinear which means we can't make a right vector
 		if (IsCollinear(*up, forward)) {

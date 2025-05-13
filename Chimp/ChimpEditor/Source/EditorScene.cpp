@@ -3,7 +3,8 @@
 #include "scene_hierarchy/SceneHierarchyScript.h"
 #include "scene_hierarchy/EntityNameComponent.h"
 #include "inspector/InspectorScript.h"
-#include "asset_manager/AssetManagerScript.h"
+#include "assets/AssetManagerScript.h"
+#include "assets/AssetImporterScript.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -38,7 +39,11 @@ namespace ChimpEditor {
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
 
 		// Asset manager
-		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetManagerScript(m_sceneView, m_engine, *m_ecs)));
+		Chimp::Reference<AssetManagerScript> assetManager = { new AssetManagerScript(m_sceneView, m_engine, *m_ecs) };
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, assetManager.GetNotNullPtr()));
+
+		// Asset importer
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetImporterScript(m_sceneView, m_engine, *m_ecs, assetManager.Get())));
 
 		// Testing
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
@@ -85,14 +90,7 @@ namespace ChimpEditor {
 	}
 
 	void EditorScene::OnRenderUI() {
-
-		ImGui::SetNextWindowPos({ 0,0 });
-		ImGui::SetNextWindowSize(m_engine.GetWindow().GetSize());
-		ImGui::Begin("Chimp Editor", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-
 		m_ecs->GetSystems().OnRenderUI();
-
-		ImGui::End();
 	}
 
 	void EditorScene::LoadResources() {

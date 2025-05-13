@@ -21,6 +21,7 @@
 #include "api/networking/PacketTypeRegistry.h"
 #include "api/graphics/GameShader.h"
 #include "api/audio/IPlayingAudio.h"
+#include "api/resources/asset_types/AssetTypeManager.h"
 
 // Utils
 #include "api/utils/FileReader.h"
@@ -36,3 +37,4 @@
 #include "api/threading/ThreadPool.h"
 #include "api/utils/preprocessor/Casting.h"
 #include "api/utils/ByteVisualiser.h"
+#include "api/utils/FilePath.h"
