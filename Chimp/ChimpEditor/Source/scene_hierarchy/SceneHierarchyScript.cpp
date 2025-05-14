@@ -37,8 +37,7 @@ namespace ChimpEditor {
 	void SceneHierarchyScript::OnRenderUI()
 	{
 		ImGui::SetNextWindowPos({ 0, 0 });
-		ImGui::SetNextWindowSizeConstraints(
-			{ 16, 16 },
+		ImGui::SetNextWindowSize(
 			Chimp::ComponentMultiply(GetEngine().GetWindow().GetSize(), { 0.25f, 1.0f }) - Chimp::Vector2f{ 8,0 }
 		);
 		ImGui::Begin("Scene Hierarchy");
