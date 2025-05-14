@@ -17,7 +17,7 @@ Chimp (the engine) and ChimpGame (the game) are separate projects.
 - `vcpkg install imgui[opengl3-binding,glfw-binding] assimp opengl openal glfw enet flecs stb libsndfile glm`
 - Set cacheVariables.CMAKE_TOOLCHAIN_FILE in CMakePresets.json to package manager path.
 - Set VCPKG_ROOT in environment variables
-- Reload the ChimpGame CMakeLists, in visual studio you can do this by saving it
-- First build will fail because of missing dlls, don't panic. After it fails, reload the CMakeLists.txt again and it should compile.
+- Reload the ChimpFramework CMakeLists.txt, you can do this in visual studio by saving it (ctrl s)
+- Build ChimpEditor.exe
 
 Simply use visual studio to run the "ChimpGame.exe" target.

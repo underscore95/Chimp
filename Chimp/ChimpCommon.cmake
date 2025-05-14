@@ -1,4 +1,6 @@
 function(setup_chimp_executable target_name)
+    set(CHIMP_EXE_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "Chimp executable output directory")
+
     # Define GAME_DATA_FOLDER
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
         target_compile_definitions(${target_name} PUBLIC GAME_DATA_FOLDER="Data")
@@ -8,9 +10,10 @@ function(setup_chimp_executable target_name)
 
     # Copy data folder only in release
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
+        file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/Data)
         add_custom_command(TARGET ${target_name} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_CURRENT_SOURCE_DIR}/Data ${CMAKE_BINARY_DIR}/Data
+                ${CMAKE_CURRENT_SOURCE_DIR}/Data ${CMAKE_CURRENT_BINARY_DIR}/Data
         )
     endif()
 endfunction()
