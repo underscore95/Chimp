@@ -110,6 +110,11 @@ namespace Chimp {
 			const ShaderFilePaths& shaderFilePaths
 		) const = 0;
 
+		// Can we load this image file format
+		[[nodiscard]] virtual bool SupportsImageFileExtension(
+			const std::string& fileExtension
+		) const;
+
 		// Load an image from a file
 		[[nodiscard]] virtual std::unique_ptr<IImageLoader::LoadedImage> LoadImage(
 			const std::string& filePath

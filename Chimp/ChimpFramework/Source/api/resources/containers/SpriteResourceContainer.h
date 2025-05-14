@@ -18,6 +18,9 @@ namespace Chimp {
 
 	private:
 		Resource<Mesh> LoadResource(Engine& engine, const TextureResourcePath& paths);
+		void OnUnload(const TextureResourcePath& path);
+
+	private:
 		ResourceContainer<TextureResourcePath, ITexture>& m_Textures;
 	};
 }

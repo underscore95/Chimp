@@ -36,4 +36,17 @@ namespace Chimp {
 		}
 		path = std::filesystem::path(pathStr);
 	}
+
+	std::string NormaliseFileExtension(const std::string& fileExtension)
+	{
+		std::string ext = fileExtension;
+		// Remove leading dot if present
+		if (!ext.empty() && ext[0] == '.')
+			ext = ext.substr(1);
+
+		// Convert to lower case
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+		return ext;
+	}
 }

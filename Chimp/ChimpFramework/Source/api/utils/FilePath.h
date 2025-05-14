@@ -17,4 +17,7 @@ namespace Chimp {
 
 	// Replaces all '\\' with '/'
 	[[nodiscard]] void NormaliseSlashesInPath(std::filesystem::path& path);
+
+	// Sets to lower case and removes leading dot if present, undefined behaviour if a non-file extension is passed in
+	[[nodiscard]] std::string NormaliseFileExtension(const std::string& fileExtension);
 }

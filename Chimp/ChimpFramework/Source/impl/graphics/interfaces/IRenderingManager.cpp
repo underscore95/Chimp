@@ -24,6 +24,11 @@ namespace Chimp {
 		return std::move(buffer);
 	}
 
+	bool IRenderingManager::SupportsImageFileExtension(const std::string& fileExtension) const
+	{
+		return m_ImageLoader.SupportsImageFileExtension(fileExtension);
+	}
+
 	std::unique_ptr<IImageLoader::LoadedImage> IRenderingManager::LoadImage(const std::string& filePath) const
 	{
 		return m_ImageLoader.LoadImage(filePath);

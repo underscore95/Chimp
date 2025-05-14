@@ -32,7 +32,7 @@ namespace Chimp {
 
 	private:
 		Resource<Mesh> LoadResource(Engine& engine, const ModelResourcePath& paths);
-		void OnUnload(const ImageResourcePath& path);
+		void OnUnload(const ModelResourcePath& path);
 
 	private:
 		Chimp::Reference<IModelImporter> m_ModelImporter;

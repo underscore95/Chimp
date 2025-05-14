@@ -11,5 +11,9 @@ namespace Chimp::STB {
 
 	public:
 		std::unique_ptr<IImageLoader::LoadedImage> LoadImage(const std::string& path, const Options& options) override;
+
+		[[nodiscard]] bool SupportsImageFileExtension(
+			const std::string& fileExtension
+		) const override;
 	};
 }

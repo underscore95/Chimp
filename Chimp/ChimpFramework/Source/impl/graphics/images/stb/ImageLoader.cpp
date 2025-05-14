@@ -1,4 +1,5 @@
 #include "ImageLoader.h"
+#include "api/utils/FilePath.h"
 #include "Loggers.h"
 
 namespace Chimp::STB {
@@ -32,5 +33,14 @@ namespace Chimp::STB {
 #endif
 
 		return image;
+	}
+
+	bool ImageLoader::SupportsImageFileExtension(const std::string& fileExtension) const
+	{
+		static const std::unordered_set<std::string> supportedExtensions = {
+			"png"
+		};
+
+		return supportedExtensions.find(NormaliseFileExtension(fileExtension)) != supportedExtensions.end();
 	}
 }

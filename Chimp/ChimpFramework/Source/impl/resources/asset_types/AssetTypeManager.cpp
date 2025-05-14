@@ -1,10 +1,12 @@
 #include "api/resources/asset_types/AssetTypeManager.h"
 #include "ModelAssetType.h"
+#include "TextureAssetType.h"
 
 namespace Chimp {
 	AssetTypeManager::AssetTypeManager(Engine& engine)
 	{
 		RegisterAssetType(UNIQUE_PTR_CAST_FROM_RAW_PTR(AssetType, new ModelAssetType(engine)));
+		RegisterAssetType(UNIQUE_PTR_CAST_FROM_RAW_PTR(AssetType, new TextureAssetType(engine)));
 	}
 
 	OptionalReference<AssetType> AssetTypeManager::GetType(const std::string& fileExtension)

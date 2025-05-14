@@ -41,5 +41,9 @@ namespace Chimp {
 			const std::string& path,
 			const Options& options = {}
 		) = 0;
+
+		[[nodiscard]] virtual bool SupportsImageFileExtension(
+			const std::string& fileExtension
+		) const = 0;
 	};
 }

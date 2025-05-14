@@ -168,13 +168,7 @@ namespace Chimp {
 	{
 		size_t numFormats = m_Importer.GetImporterCount();
 
-		std::string ext = fileExtension;
-		// Remove leading dot if present
-		if (!ext.empty() && ext[0] == '.')
-			ext = ext.substr(1);
-
-		// Convert to lower case
-		std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+		std::string ext = NormaliseFileExtension(fileExtension);
 
 		for (size_t i = 0; i < numFormats; ++i) {
 			const aiImporterDesc* desc = m_Importer.GetImporterInfo(i);

@@ -10,6 +10,7 @@ namespace Chimp {
 	class IShader;
 	class GameShader;
 
+	// TODO: What if something is imported as two different asset types? e.g a texture and a sprite
 	class ImportedAssetsList {
 	private:
 		ImportedAssetsList() = default;

@@ -9,7 +9,7 @@ namespace Chimp {
 		return std::move(model);
 	}
 
-	void ModelResourceContainer::OnUnload(const ImageResourcePath& path)
+	void ModelResourceContainer::OnUnload(const ModelResourcePath& path)
 	{
 		ImportedAssetsList::Instance().NotifyAssetUnloaded(path);
 	}

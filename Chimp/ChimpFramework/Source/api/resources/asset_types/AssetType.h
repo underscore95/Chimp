@@ -8,7 +8,7 @@ namespace Chimp {
 	};
 
 	enum class AssetTypeId {
-		Model
+		Model, Texture
 	};
 
 	class AssetType {

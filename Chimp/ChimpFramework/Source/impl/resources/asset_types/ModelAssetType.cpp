@@ -45,9 +45,14 @@ namespace Chimp {
 	std::vector<std::filesystem::path> ModelAssetType::GetImportedAssets() const
 	{
 		auto& models = m_Engine.GetResourceManager().GetModels();
+		auto& sprites = m_Engine.GetResourceManager().GetSprites();
+
 		std::vector<std::filesystem::path> paths;
-		paths.reserve(models.GetLoadedResources().size());
+		paths.reserve(models.GetLoadedResources().size() + sprites.GetLoadedResources().size());
 		for (const auto& [path, _] : models.GetLoadedResources()) {
+			paths.push_back(path);
+		}
+		for (const auto& [path, _] : sprites.GetLoadedResources()) {
 			paths.push_back(path);
 		}
 		return paths;

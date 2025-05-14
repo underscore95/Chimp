@@ -1,9 +1,6 @@
 # Compiling
 
-## How is the engine linked to the game?
-
-The engine is an executable and the game is a statically linked library.
-Chimp (the engine) and ChimpGame (the game) are separate projects.
+Make sure none of the parent folders of the repository are called "Data"
 
 ## PC Requirements
 
