@@ -12,6 +12,16 @@ namespace Chimp {
 		class EntityIdComponentRegister : public ComponentRegister<EntityIdComponent> {
 		public:
 			EntityIdComponentRegister() : ComponentRegister(true) {}
+
+			EntityIdComponent Deserialise(const Json& json) override {
+				return {
+				.Id = SizeTToEntityId(json["Id"], nullptr)
+				};
+			}
+
+			void Serialise(Json& json, const EntityIdComponent& comp) override {
+				json["Id"] = comp.Id.id();
+			}
 		};
 		COMPONENT_REGISTER(EntityIdComponentRegister);
 	}

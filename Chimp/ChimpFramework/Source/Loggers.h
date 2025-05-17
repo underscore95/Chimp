@@ -50,4 +50,10 @@ namespace Chimp::Loggers {
 		static Logger logger("ChimpAudio", LogLevel::INFO);
 		return logger;
 	}
+
+	static Logger& ECS()
+	{
+		static Logger logger("ChimpECS", LogLevel::INFO);
+		return logger;
+	}
 }

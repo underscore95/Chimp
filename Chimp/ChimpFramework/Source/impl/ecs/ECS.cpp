@@ -1,7 +1,72 @@
 #include "api/ecs/ECS.h"
 #include "api/ecs/components/ComponentRegistry.h"
+#include "api/ecs/components/EntityIdComponent.h"
+#include "api/utils/StringUtils.h"
+#include "api/utils/preprocessor/Casting.h"
+#include "api/Engine.h"
 
 namespace Chimp {
+
+	std::string ECS::Serialise()
+	{
+		auto view = GetEntitiesWithComponents<EntityIdComponent>();
+		Json json;
+
+		// Store each entity json in json[entityId]
+		for (auto& [entId] : view) {
+			auto newId = flecs::entity(m_World, entId.Id);
+			Json entityJson;
+			// Store each component in json[entityId][componentTypeName]
+			GetComponentsOnEntity(newId, [&entityJson](AnyReference comp) {
+				ComponentRegistry::Instance().Serialise(entityJson, comp);
+				});
+
+			size_t id = newId.id();
+			json[std::to_string(id)] = entityJson; // fun fact originally i just did json[id] but id is just a random uint64_t so it allocated a 71gb array
+		}
+
+		return json.dump();
+	}
+
+	std::unique_ptr<ECS> ECS::Deserialise(Engine& engine, std::string_view json)
+	{
+		std::unique_ptr<ECS> ecs = engine.CreateECS();
+
+		Json parsed = Json::parse(json); // Parse json
+
+		std::vector<DeserialisedEntity> entities;
+
+		// Create all the entities
+		for (const auto& pair : parsed.items()) {
+			const auto& key = pair.key();
+
+			// Get the entity id
+			size_t entId;
+			if (!StringToSizeT(key, &entId)) {
+				Loggers::ECS().Error(std::format("Failed to convert entity id {} into a size_t", key));
+				continue;
+			}
+			EntityId id = SizeTToEntityId(entId, ecs->m_World.c_ptr());
+			ecs->CreateEntityWithoutComponents(id);
+
+			// Push entity info
+			entities.push_back(DeserialisedEntity{
+				.Id=id,
+				.Json = parsed[key]
+				});
+		}
+
+		// Loop all components
+		for (const auto& ent : entities) {
+			// Add all components
+			for (const auto& pair : ent.Json.items()) {
+				ComponentRegistry::Instance().Deserialise(*ecs, ent.Id, pair.key(), ent.Json);
+			}
+		}
+
+		return std::move(ecs);
+	}
+
 	void ECS::GetComponentsOnEntity(EntityId entity, const std::function<void(AnyReference)>& function)
 	{
 		entity.each([this, entity, &function](flecs::id id) {
@@ -12,5 +77,10 @@ namespace Chimp {
 			assert(componentPtr);
 			function(AnyReference{ typeInfo,componentPtr });
 			});
+	}
+
+	void ECS::CreateEntityWithoutComponents(EntityId idToUse)
+	{
+		m_World.make_alive(idToUse);
 	}
 }

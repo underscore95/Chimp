@@ -12,6 +12,11 @@
 #include "hierarchy/EntityHierarchy.h"
 
 namespace Chimp {
+	struct DeserialisedEntity {
+		EntityId Id;
+		Json Json;
+	};
+
 	class Engine;
 	class ComponentRegistry;
 	struct EntityIdComponent;
@@ -35,6 +40,13 @@ namespace Chimp {
 		}
 
 	public:
+		// Serialisation
+		// Serialise to json
+		std::string Serialise();
+
+		// Deserialise from json
+		static std::unique_ptr<ECS> Deserialise(Engine& engine, std::string_view json);
+
 		// A view represents a set of entities each with the same common set of components
 		template <typename... Components>
 		class View {
@@ -148,10 +160,15 @@ namespace Chimp {
 		}
 
 	private:
+
 		void DestroySingleEntity(EntityId entity) {
 			m_EntityCount--;
 			entity.destruct();
 		}
+
+
+		// Used for ECS deserialisation only
+		void CreateEntityWithoutComponents(EntityId idToUse);
 
 		template <typename T>
 		void RegisterComponent() {

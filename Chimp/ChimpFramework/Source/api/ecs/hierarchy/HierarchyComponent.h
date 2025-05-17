@@ -15,7 +15,23 @@ namespace Chimp {
 	namespace Unused {
 		class HierarchyComponentRegister : public ComponentRegister<HierarchyComponent> {
 		public:
-			HierarchyComponentRegister() : ComponentRegister(true) {}
+			HierarchyComponentRegister() : ComponentRegister(true) {
+
+			}
+
+			HierarchyComponent Deserialise(const Json& json) override {
+				return {
+				.Parent = SizeTToEntityId(json["Parent"], nullptr),
+				.HierarchyLevel = json["HierarchyLevel"],
+				.Children = json["Children"]
+				};
+			}
+
+			void Serialise(Json& json, const HierarchyComponent& comp) override {
+				json["Parent"] = comp.Parent.id();
+				json["HierarchyLevel"] = comp.HierarchyLevel;
+				json["Children"] = comp.Children;
+			}
 		};
 		COMPONENT_REGISTER(HierarchyComponentRegister);
 	}

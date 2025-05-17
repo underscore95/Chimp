@@ -14,6 +14,16 @@ namespace Chimp {
 				auto healthLabel = std::format("Health##{}", (long)id);
 				ImGui::InputFloat(healthLabel.c_str(), &comp.Health, 1, 10);
 			}
+
+			HealthComponent Deserialise(const Json& json) override {
+				return {
+				.Health = json["Health"]
+				};
+			}
+
+			void Serialise(Json& json, const HealthComponent& comp) override {
+				json["Health"] = comp.Health;
+			}
 		};
 		COMPONENT_REGISTER(HealthComponentRegister);
 	}

@@ -54,6 +54,23 @@ namespace ChimpEditor {
 		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f });
 
 		m_ecs->GetSystems().OnInit();
+
+		// Test ecs serialisation
+		auto ecs = m_engine.CreateECS();
+		ecs->CreateEntity();
+		ecs->RemoveEntity(ecs->CreateEntity());
+		ecs->CreateEntity();
+
+		auto json = ecs->Serialise();
+		GetLogger().Info("ecs1:");
+		GetLogger().Info(json);
+
+		auto ecs2 = Chimp::ECS::Deserialise(m_engine, json);
+		auto view = ecs2->GetEntitiesWithComponents<Chimp::EntityIdComponent>();
+		std::cout << "number entities in second ecs: " << view.Size() << "\n";
+
+		GetLogger().Info("ecs2:");
+		GetLogger().Info(ecs2->Serialise());
 	}
 
 	void EditorScene::OnActivate(std::unique_ptr<Scene> previousScene) {

@@ -18,4 +18,11 @@ namespace Chimp {
 			str.erase(0, pos + phrase.length());
 		}
 	}
+
+	bool StringToSizeT(const std::string& str, size_t* out)
+	{
+		std::istringstream iss(str);
+		iss >> *out;
+		return !iss.fail();
+	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "api/ecs/EntityId.h" // Hacky fix because somewhere includes this before entity id and uses serialisation
 
 namespace Chimp {
 	// Uses an array when not many elements, then switches to a vector. Removing swaps with last element
@@ -11,6 +12,12 @@ namespace Chimp {
 	public:
 		UnorderedCollection() : m_ActiveIndex(0) {
 			new (&m_Array) std::array<T, SmallNumElements>();
+		}
+
+		UnorderedCollection(const std::vector<T> vec) : UnorderedCollection() {
+			for (const auto& v : vec) {
+				Insert(v);
+			}
 		}
 
 		UnorderedCollection(const UnorderedCollection& other) : m_ActiveIndex(other.m_ActiveIndex) {
@@ -44,7 +51,7 @@ namespace Chimp {
 			}
 		}
 
-		size_t Size() {
+		size_t Size() const {
 			size_t size = IsUsingVector() ? GetVector().size() : m_ActiveIndex;
 			return size;
 		}
@@ -195,6 +202,15 @@ namespace Chimp {
 		}
 		const_iterator cbegin() const { return begin(); }
 		const_iterator cend() const { return end(); }
+
+		std::vector<T> CopyToVector() const {
+			std::vector<T> copy;
+			copy.reserve(Size());
+			for (const auto& v : *this) {
+				copy.push_back(v);
+			}
+			return copy;
+		}
 #pragma endregion
 
 	private:
@@ -213,5 +229,31 @@ namespace Chimp {
 		const std::vector<T>& GetVector() const { return *reinterpret_cast<const std::vector<T>*>(&m_Vector); }
 	};
 
+	/*
+	If you get compile errors here, the issue is your T isn't serialisable or deserialisable.
+	Probably you need to include the file that defines T and defines the to_json and from_json overloads for T before including this file.
 
+	T must also have a default and copy constructor.
+
+	The above constraints are only in effect if you wish to serialise and deserialise.
+	*/
+	template <typename T, int SmallNumElements>
+	inline void to_json(Json& j, const UnorderedCollection<T, SmallNumElements>& e) {
+		j = Json::array();
+		for (const T& t : e) {
+			Json json;
+			to_json(json, e);
+			j.push_back(json);
+		}
+	}
+
+	template <typename T, int SmallNumElements>
+	inline void from_json(const Json& j, UnorderedCollection<T, SmallNumElements>& e) {
+		for (const auto& pair : j.items()) {
+			T t;
+			const Json& itemJson = pair.value();
+			from_json(itemJson, t);
+			e.Insert(t);
+		}
+	}
 }

@@ -82,6 +82,9 @@
 #include <AL/alc.h>
 #endif
 
+// json
+#include "api/utils/Json.h"
+
 // PREPROCESSOR
 #include "api/utils/preprocessor/CopyAndMove.h"
 #include "api/utils/preprocessor/Casting.h"
