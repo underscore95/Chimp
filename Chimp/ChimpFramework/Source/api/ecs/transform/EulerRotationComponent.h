@@ -15,6 +15,16 @@ namespace Chimp {
 		class EulerRotationComponentRegister : public ComponentRegister<EulerRotationComponent> {
 		public:
 			EulerRotationComponentRegister() : ComponentRegister(true) {}
+
+			EulerRotationComponent Deserialise(const Json& json) override {
+				return {
+				.Rotation = json["Rotation"]
+				};
+			}
+
+			void Serialise(Json& json, const EulerRotationComponent& comp) override {
+				json["Rotation"] = comp.Rotation;
+			}
 		};
 		COMPONENT_REGISTER(EulerRotationComponentRegister);
 	}

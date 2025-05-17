@@ -40,7 +40,7 @@ namespace Chimp {
 				std::vector<std::filesystem::path> assets = assetType->GetImportedAssets();
 
 #ifndef NDEBUG
-				std::string currentlySelectedResource = comp.Mesh ? comp.Mesh.GetPath().string() : "None"; 
+				std::string currentlySelectedResource = comp.Mesh ? comp.Mesh.GetPath().string() : "None";
 				RemoveUntilAndIncluding("Data/", currentlySelectedResource);
 
 				if (ImGui::BeginCombo("Mesh", currentlySelectedResource.c_str())) {
@@ -64,7 +64,25 @@ namespace Chimp {
 				ImGui::Text("Resource selection dropdown cannot render in release builds.");
 #endif
 			}
+
+			MeshComponent Deserialise(const Json& json) override {
+#ifndef NDEBUG
+				std::string path = json["Path"];
+				return { {	Engine::GetEngine().GetResourceManager().GetModels().Get(path), path} };
+#else
+				Loggers::ECS().Warn("Cannot deserialise MeshComponent in release builds.");
+#endif
+				return {};
+			}
+
+			void Serialise(Json& json, const MeshComponent& comp) override {
+#ifndef NDEBUG
+				json["Path"] = comp.Mesh.GetPath();
+#else
+				Loggers::ECS().Warn("Cannot serialise MeshComponent in release builds.");
+#endif
+			}
 		};
-	COMPONENT_REGISTER(MeshComponentRegister);
+		COMPONENT_REGISTER(MeshComponentRegister);
 	}
 }

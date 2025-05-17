@@ -19,7 +19,6 @@ namespace Chimp {
 		j = e;
 	}
 
-	// Warning! Output entity will not be associated with any world
 	inline void from_json(const Json& j, EntityId& e) {
 		e = j.get<std::size_t>();
 	}

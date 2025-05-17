@@ -13,11 +13,10 @@
 #include "api/utils/preprocessor/Casting.h"
 #include <memory>
 #include "OptionalReference.h"
+#include "api/utils/Json.h"
 #include <string>
 
 namespace Chimp {
-	class YAMLSerialiser;
-
 	struct Vector2f;
 	struct Vector3f;
 	struct Vector4f;
@@ -566,6 +565,76 @@ namespace Chimp {
 		}
 	};
 
+	// Serialisation
+	// Vector2f
+	inline void to_json(Json& j, const Vector2f& e) {
+		j = Json::object();
+		j["x"] = e.x;
+		j["y"] = e.y;
+	}
+
+	inline void from_json(const Json& j, Vector2f& e) {
+		e = {
+			j.at("x").get<float>(),
+			j.at("y").get<float>()
+		};
+	}
+
+	// Vector3f
+	inline void to_json(Json& j, const Vector3f& e) {
+		j = Json::object();
+		j["x"] = e.x;
+		j["y"] = e.y;
+		j["z"] = e.z;
+	}
+
+	inline void from_json(const Json& j, Vector3f& e) {
+		e = {
+			j.at("x").get<float>(),
+			j.at("y").get<float>(),
+			j.at("z").get<float>()
+		};
+	}
+
+	// Vector4f
+	inline void to_json(Json& j, const Vector4f& e) {
+		j = Json::object();
+		j["x"] = e.x;
+		j["y"] = e.y;
+		j["z"] = e.z;
+		j["w"] = e.w;
+	}
+
+	inline void from_json(const Json& j, Vector4f& e) {
+		e = {
+			j.at("x").get<float>(),
+			j.at("y").get<float>(),
+			j.at("z").get<float>(),
+			j.at("w").get<float>()
+		};
+	}
+}
+namespace glm {
+	// Quaternion
+	inline void to_json(Chimp::Json& j, const glm::quat& q) {
+		j = Chimp::Json::object();
+		j["x"] = q.x;
+		j["y"] = q.y;
+		j["z"] = q.z;
+		j["w"] = q.w;
+	}
+
+	inline void from_json(const Chimp::Json& j, glm::quat& q) {
+		q = glm::quat{
+			j.at("x").get<float>(),
+			j.at("y").get<float>(),
+			j.at("z").get<float>(),
+			j.at("w").get<float>()
+		};
+	}
+}
+
+namespace Chimp {
 	// Vector to string
 	[[nodiscard]] std::string ToString(float v);
 	[[nodiscard]] std::string ToString(Vector2f v);

@@ -52,9 +52,9 @@ namespace Chimp {
 			);
 	public:
 
-		ResourceReference() : Ref(nullptr)
+		ResourceReference() : m_Ref(nullptr)
 #ifndef NDEBUG
-			, AssetIndex(-1)
+			, m_AssetIndex(-1)
 #endif
 		{
 		}
@@ -65,25 +65,25 @@ namespace Chimp {
 
 		OptionalReference<T> Get() {
 #ifndef NDEBUG
-			if (AssetIndex < 0) return nullptr;
-			if (!ImportedAssetsList::Instance().IsAssetImported(AssetIndex)) {
-				if (CachedAssetValid) {
+			if (m_AssetIndex < 0) return nullptr;
+			if (!ImportedAssetsList::Instance().IsAssetImported(m_AssetIndex)) {
+				if (m_CachedAssetValid) {
 					// Our asset was unloaded and we don't know about it yet
 					Loggers::Resources().Warning(std::format(
 						"Reference to asset with index {} at address {} with path {} no longer exists.",
-						AssetIndex, static_cast<void*>(Ref.GetNullablePtr()), ImportedAssetsList::Instance().GetPath(AssetIndex).string()
+						m_AssetIndex, static_cast<void*>(m_Ref.GetNullablePtr()), ImportedAssetsList::Instance().GetPath(m_AssetIndex).string()
 					));
-					CachedAssetValid = false;
+					m_CachedAssetValid = false;
 				}
 			}
-			else if (!CachedAssetValid) {
+			else if (!m_CachedAssetValid) {
 				// Our asset was unloaded but then reloaded and we don't know about it yet
-				CachedAssetValid = true;
-				Ref = ImportedAssetsList::Instance().GetAsset<T>(AssetIndex);
+				m_CachedAssetValid = true;
+				m_Ref = ImportedAssetsList::Instance().GetAsset<T>(m_AssetIndex);
 			}
-			return CachedAssetValid ? Ref : nullptr;
+			return m_CachedAssetValid ? m_Ref : nullptr;
 #else
-			return Ref;
+			return m_Ref;
 #endif
 		}
 
@@ -92,36 +92,40 @@ namespace Chimp {
 			assert(!(!ref && path != ""));
 			assert(!(ref && path == ""));
 
-			Ref = ref;
+			m_Ref = ref;
 #ifndef NDEBUG
-			AssetIndex = Ref ? ImportedAssetsList::Instance().GetAssetIndex(path) : -4;
-			CachedAssetValid = false;
+			m_AssetIndex = m_Ref ? ImportedAssetsList::Instance().GetAssetIndex(path) : -4;
+			m_CachedAssetValid = false;
 #endif
 		}
 
 		operator bool() const {
-			return Ref
+			return m_Ref
 #ifndef NDEBUG
-				&& ImportedAssetsList::Instance().IsAssetImported(AssetIndex)
+				&& ImportedAssetsList::Instance().IsAssetImported(m_AssetIndex)
 #endif
 				;
 		}
 
 #ifndef NDEBUG
-		bool IsEqual(const std::filesystem::path& assetPath) {
-			return  ImportedAssetsList::Instance().GetAssetIndex(assetPath) == AssetIndex && static_cast<bool>(*this);
+		bool IsEqual(const std::filesystem::path& assetPath) const  {
+			return  ImportedAssetsList::Instance().GetAssetIndex(assetPath) == m_AssetIndex && static_cast<bool>(*this);
 		}
 
-		std::filesystem::path GetPath() {
-			return ImportedAssetsList::Instance().GetPath(AssetIndex);
+		std::filesystem::path GetPath() const  {
+			return ImportedAssetsList::Instance().GetPath(m_AssetIndex);
+		}
+
+		int GetAssetIndex() const {
+			return m_AssetIndex;
 		}
 #endif
 
 	private:
-		OptionalReference<T> Ref;
+		OptionalReference<T> m_Ref;
 #ifndef NDEBUG
-		int AssetIndex;
-		bool CachedAssetValid;
+		int m_AssetIndex;
+		bool m_CachedAssetValid;
 #endif
 	};
 }

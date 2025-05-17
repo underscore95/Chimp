@@ -71,6 +71,23 @@ namespace Chimp {
 
 				GetECS().GetTransformManager().SetTranslationRotationScale(id, copy.LocalTranslation, copy.LocalRotation, copy.LocalScale);
 			}
+
+			TransformComponent Deserialise(const Json& json) override {
+				Quaternion rot;
+				json["Rotation"].get_to(rot);
+				return {
+					json["Translation"],
+					rot,
+					json["Scale"]
+				};
+			}
+
+
+			void Serialise(Json& json, const TransformComponent& comp) override {
+				json["Translation"] = comp.LocalTranslation;
+				json["Rotation"] = comp.LocalRotation;
+				json["Scale"] = comp.LocalScale;
+			}
 		};
 		COMPONENT_REGISTER(TransformComponentRegister);
 	}
