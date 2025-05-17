@@ -11,18 +11,18 @@ namespace Chimp {
 	void Chimp::EntityHierarchy::SetParent(EntityId child, EntityId parent)
 	{
 		if (child == parent) {
-			Loggers::Main().Error(std::format("Attempted to make {} a parent of itself.", child.id()));
+			Loggers::Main().Error(std::format("Attempted to make {} a parent of itself.", child));
 			assert(false);
 			return;
 		}
 
 		// Check if we have a parent
-		auto hierarchyComp = child.get_mut<HierarchyComponent>();
+		auto hierarchyComp = m_ECS.GetMutableComponent<HierarchyComponent>(child);
 		assert(hierarchyComp);
 		if (hierarchyComp->HierarchyLevel > 0) {
 			// TODO: Do nothing if the parent is the same?
 			// We have a parent, let them know their child is leaving if they track children
-			auto oldParentsComp = hierarchyComp->Parent.get_mut<HierarchyComponent>();
+			auto oldParentsComp = m_ECS.GetMutableComponent<HierarchyComponent>(hierarchyComp->Parent);
 			assert(oldParentsComp);
 			auto& children = oldParentsComp->Children;
 			children.Remove(child);
@@ -31,7 +31,7 @@ namespace Chimp {
 		// Set the new parent
 		hierarchyComp->Parent = parent;
 
-		auto parentComp = parent.get_mut<HierarchyComponent>();
+		auto parentComp = m_ECS.GetMutableComponent<HierarchyComponent>(parent);
 		assert(parentComp);
 		auto& children = parentComp->Children;
 		children.Insert(child);
@@ -41,7 +41,7 @@ namespace Chimp {
 
 	bool EntityHierarchy::IsChildOf(EntityId parent, EntityId possibleChild) const
 	{
-		auto trackChildrenComp = parent.get<HierarchyComponent>();
+		auto trackChildrenComp = m_ECS.GetMutableComponent<HierarchyComponent>(parent);
 		assert(trackChildrenComp);
 		auto& children = trackChildrenComp->Children;
 		return children.Contains(possibleChild);
@@ -49,31 +49,31 @@ namespace Chimp {
 
 	void EntityHierarchy::OrphanChild(EntityId child) const
 	{
-		auto childComp = child.get_mut<HierarchyComponent>();
+		auto childComp = m_ECS.GetMutableComponent<HierarchyComponent>(child);
 		assert(childComp);
 		if (childComp->HierarchyLevel <= 0) return;
-		auto parentComp = childComp->Parent.get_mut<HierarchyComponent>();
+		auto parentComp = m_ECS.GetMutableComponent<HierarchyComponent>(childComp->Parent);
 		childComp->HierarchyLevel = 0;
 		parentComp->Children.Remove(child);
 	}
 
 	const UnorderedCollection<EntityId, EntityHierarchy::SMALL_CHILDREN_SIZE>& EntityHierarchy::GetChildren(EntityId parent) const
 	{
-		auto hierarchyComp = parent.get<HierarchyComponent>();
+		auto hierarchyComp = m_ECS.GetComponent<HierarchyComponent>(parent);
 		assert(hierarchyComp);
 		return hierarchyComp->Children;
 	}
 
 	EntityId EntityHierarchy::GetParent(EntityId child)
 	{
-		auto hierarchy = child.get<HierarchyComponent>();
+		auto hierarchy = m_ECS.GetComponent<HierarchyComponent>(child);
 		assert(hierarchy);
 		return hierarchy->Parent;
 	}
 
 	bool EntityHierarchy::TryGetParent(EntityId child, EntityId& outParent)
 	{
-		auto hierarchy = child.get<HierarchyComponent>();
+		auto hierarchy = m_ECS.GetComponent<HierarchyComponent>(child);
 		assert(hierarchy);
 		if (hierarchy->HierarchyLevel > 0) {
 			outParent = hierarchy->Parent;
@@ -89,11 +89,11 @@ namespace Chimp {
 	}
 	void EntityHierarchy::RemoveEntityAndChildren(EntityId entity)
 	{
-		auto childComp = entity.get<HierarchyComponent>();
+		auto childComp = m_ECS.GetComponent<HierarchyComponent>(entity);
 		assert(childComp);
 		if (childComp->HierarchyLevel > 0) {
 			// Let the parent know they don't have this child anymore
-			auto parentComp = childComp->Parent.get_mut<HierarchyComponent>();
+			auto parentComp = m_ECS.GetMutableComponent<HierarchyComponent>(childComp->Parent);
 			assert(parentComp);
 			auto& children = parentComp->Children;
 			children.Remove(entity);
@@ -106,7 +106,7 @@ namespace Chimp {
 	{
 		{
 			// Remove any children
-			auto trackChildrenComp = entity.get<HierarchyComponent>();
+			auto trackChildrenComp = m_ECS.GetComponent<HierarchyComponent>(entity);
 			assert(trackChildrenComp);
 			auto& children = trackChildrenComp->Children;
 			for (auto& child : children) {

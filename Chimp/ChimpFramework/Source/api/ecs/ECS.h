@@ -96,7 +96,7 @@ namespace Chimp {
 		}
 
 		// Create an entity with minimal components
-		EntityId CreateEntity() {
+		Entity CreateEntity() {
 			m_EntityCount++;
 			auto ent = m_World.entity();
 			m_EntityHierarchy.OnCreateEntity(ent);
@@ -108,9 +108,14 @@ namespace Chimp {
 			m_EntityHierarchy.RemoveEntityAndChildren(entity);
 		}
 
+		// Convert id to entity
+		Entity ToEntity(EntityId entity) const {
+			return IdToEntity(entity, m_World);
+		}
+
 		// Is entity alive
 		bool IsEntityAlive(EntityId entity) {
-			return entity.is_alive();
+			return ToEntity(entity).is_alive();
 		}
 
 		// Set a component on an entity, creating it if it doesn't exist
@@ -126,20 +131,21 @@ namespace Chimp {
 				assert(false);
 			}
 #endif
-			entity.set(component);
+			ToEntity(entity).set(component);
 		}
 
 		// Get a component from an entity
 		// entity - The entity to get the component from
 		template <typename Component>
-		ConstOptionalReference<Component> GetComponent(EntityId entity) const {
+		ConstOptionalReference<Component> GetComponent(EntityId entityId) const {
+			auto entity = ToEntity(entityId);
 			return ConstOptionalReference<Component>(entity.get<Component>());
 		}
 
 		// Get a component from an entity
 		template <typename Component>
 		OptionalReference<Component> GetMutableComponent(EntityId entity) {
-			return OptionalReference<Component>(entity.get_mut<Component>());
+			return OptionalReference<Component>(ToEntity(entity).get_mut<Component>());
 		}
 
 		// Get all entities with all of a set of components
@@ -163,7 +169,7 @@ namespace Chimp {
 
 		void DestroySingleEntity(EntityId entity) {
 			m_EntityCount--;
-			entity.destruct();
+			ToEntity(entity).destruct();
 		}
 
 

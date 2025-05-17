@@ -21,14 +21,14 @@ namespace Chimp {
 
 			HierarchyComponent Deserialise(const Json& json) override {
 				return {
-				.Parent = SizeTToEntityId(json["Parent"], nullptr),
+				.Parent = json["Parent"],
 				.HierarchyLevel = json["HierarchyLevel"],
 				.Children = json["Children"]
 				};
 			}
 
 			void Serialise(Json& json, const HierarchyComponent& comp) override {
-				json["Parent"] = comp.Parent.id();
+				json["Parent"] = comp.Parent;
 				json["HierarchyLevel"] = comp.HierarchyLevel;
 				json["Children"] = comp.Children;
 			}

@@ -15,12 +15,12 @@ namespace Chimp {
 
 			EntityIdComponent Deserialise(const Json& json) override {
 				return {
-				.Id = SizeTToEntityId(json["Id"], nullptr)
+				.Id = json["Id"]
 				};
 			}
 
 			void Serialise(Json& json, const EntityIdComponent& comp) override {
-				json["Id"] = comp.Id.id();
+				json["Id"] = comp.Id;
 			}
 		};
 		COMPONENT_REGISTER(EntityIdComponentRegister);

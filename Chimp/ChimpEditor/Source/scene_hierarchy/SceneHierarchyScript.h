@@ -26,5 +26,6 @@ namespace ChimpEditor {
 	private:
 		Chimp::ECS& m_gameECS;
 		Chimp::EntityId m_selectedEntity;
+		bool m_hasSelectedEntity = false;
 	};
 }

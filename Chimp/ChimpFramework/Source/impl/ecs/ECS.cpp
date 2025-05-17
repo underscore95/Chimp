@@ -41,17 +41,16 @@ namespace Chimp {
 			const auto& key = pair.key();
 
 			// Get the entity id
-			size_t entId;
+			EntityId entId;
 			if (!StringToSizeT(key, &entId)) {
 				Loggers::ECS().Error(std::format("Failed to convert entity id {} into a size_t", key));
 				continue;
 			}
-			EntityId id = SizeTToEntityId(entId, ecs->m_World.c_ptr());
-			ecs->CreateEntityWithoutComponents(id);
+			ecs->CreateEntityWithoutComponents(entId);
 
 			// Push entity info
 			entities.push_back(DeserialisedEntity{
-				.Id=id,
+				.Id=entId,
 				.Json = parsed[key]
 				});
 		}
@@ -69,11 +68,11 @@ namespace Chimp {
 
 	void ECS::GetComponentsOnEntity(EntityId entity, const std::function<void(AnyReference)>& function)
 	{
-		entity.each([this, entity, &function](flecs::id id) {
+		ToEntity(entity).each([this, entity, &function](flecs::id id) {
 			auto it = m_ComponentIdToTypeInfo.find(id.raw_id());
 			assert(it != m_ComponentIdToTypeInfo.end());
 			TypeInfo typeInfo = it->second;
-			void* componentPtr = entity.get_mut(id);
+			void* componentPtr = ToEntity(entity).get_mut(id);
 			assert(componentPtr);
 			function(AnyReference{ typeInfo,componentPtr });
 			});

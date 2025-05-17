@@ -38,7 +38,7 @@ namespace ChimpEditor {
 		if (m_sceneHierarchy->HasSelectedEntity()) {
 			// Entity name
 			auto ent = m_sceneHierarchy->GetSelectedEntity();
-			auto str = ent.str();
+			std::string str = std::to_string(ent);
 			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(ent);
 			ImGui::Text(nameComp ? nameComp->Name.c_str() : str.c_str());
 

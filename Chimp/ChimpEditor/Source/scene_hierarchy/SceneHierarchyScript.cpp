@@ -19,7 +19,7 @@ namespace ChimpEditor {
 
 	bool SceneHierarchyScript::HasSelectedEntity()
 	{
-		return m_selectedEntity != Chimp::EntityId{};
+		return m_hasSelectedEntity;
 	}
 
 	void SceneHierarchyScript::OnInit()
@@ -59,8 +59,7 @@ namespace ChimpEditor {
 
 		// Get entity name
 		auto nameComp = m_gameECS.GetComponent<EntityNameComponent>(entity);
-		auto entityIdString = entity.str();
-		std::string entityName = nameComp ? nameComp->Name : std::format("Entity {}", entityIdString.c_str());
+		std::string entityName = nameComp ? nameComp->Name : std::format("Entity {}", entity);
 
 		// Draw UI
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -97,6 +96,7 @@ namespace ChimpEditor {
 
 	void SceneHierarchyScript::SelectEntity(Chimp::EntityId entity)
 	{
+		m_hasSelectedEntity = true;
 		m_selectedEntity = entity;
 		auto transformComp = m_gameECS.GetComponent<Chimp::TransformComponent>(m_selectedEntity);
 		if (transformComp && !m_gameECS.GetComponent<Chimp::EulerRotationComponent>(m_selectedEntity)) {
