@@ -100,7 +100,7 @@ endif()
 # only copy in release
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
 file(REMOVE_RECURSE ${CHIMP_EXE_OUT_DIR}/ChimpData)
-add_custom_command(TARGET Chimp POST_BUILD
+add_custom_command(TARGET ChimpFramework POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 	${CMAKE_CURRENT_SOURCE_DIR}/ChimpData ${CHIMP_EXE_OUT_DIR}/ChimpData
 )

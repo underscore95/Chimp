@@ -7,6 +7,7 @@
 #include "api/resources/asset_types/AssetTypeManager.h"
 #include "api/Engine.h"
 #include "api/utils/StringUtils.h"
+#include "Loggers.h"
 
 namespace Chimp {
 	class MeshComponent {
@@ -39,7 +40,7 @@ namespace Chimp {
 				auto assetType = Engine::GetEngine().GetResourceManager().GetAssetTypeManager().GetType(AssetTypeId::Model);
 				std::vector<std::filesystem::path> assets = assetType->GetImportedAssets();
 
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 				std::string currentlySelectedResource = comp.Mesh ? comp.Mesh.GetPath().string() : "None";
 				RemoveUntilAndIncluding("Data/", currentlySelectedResource);
 
@@ -66,20 +67,20 @@ namespace Chimp {
 			}
 
 			MeshComponent Deserialise(const Json& json) override {
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 				std::string path = json["Path"];
 				return { {	Engine::GetEngine().GetResourceManager().GetModels().Get(path), path} };
 #else
-				Loggers::ECS().Warn("Cannot deserialise MeshComponent in release builds.");
+				Loggers::ECS().Warning("Cannot deserialise MeshComponent unless CHIMP_rESOURCE_SERIALISATION is defined.");
 #endif
 				return {};
 			}
 
 			void Serialise(Json& json, const MeshComponent& comp) override {
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 				json["Path"] = comp.Mesh.GetPath();
 #else
-				Loggers::ECS().Warn("Cannot serialise MeshComponent in release builds.");
+				Loggers::ECS().Warning("Cannot serialise MeshComponent unless CHIMP_rESOURCE_SERIALISATION is defined.");
 #endif
 			}
 		};

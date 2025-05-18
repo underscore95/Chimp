@@ -31,3 +31,8 @@ target_compile_definitions(ChimpEditor PRIVATE
 )
 
 copy_chimp_dlls(ChimpEditor)
+
+# Chimp options
+target_compile_definitions(ChimpFramework PUBLIC 
+       CHIMP_RESOURCE_SERIALISATION=1 # Tracks resources on mesh component etc so ECS can be serialised
+)

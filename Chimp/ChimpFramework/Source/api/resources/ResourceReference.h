@@ -20,7 +20,7 @@ namespace Chimp {
 		void NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref);
 		void NotifyAssetUnloaded(const std::filesystem::path& path);
 
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 		int GetAssetIndex(const std::filesystem::path& path);
 		bool IsAssetImported(int index);
 		std::filesystem::path GetPath(int index);
@@ -28,7 +28,7 @@ namespace Chimp {
 
 		template <typename T>
 		Reference<T> GetAsset(int index) {
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 			auto it = m_AssetLocations.find(GetPath(index));
 			if (it == m_AssetLocations.end()) return nullptr;
 			void* data = it->second.GetPtr();
@@ -53,7 +53,7 @@ namespace Chimp {
 	public:
 
 		ResourceReference() : m_Ref(nullptr)
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 			, m_AssetIndex(-1)
 #endif
 		{
@@ -64,7 +64,7 @@ namespace Chimp {
 		}
 
 		OptionalReference<T> Get() {
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 			if (m_AssetIndex < 0) return nullptr;
 			if (!ImportedAssetsList::Instance().IsAssetImported(m_AssetIndex)) {
 				if (m_CachedAssetValid) {
@@ -93,7 +93,7 @@ namespace Chimp {
 			assert(!(ref && path == ""));
 
 			m_Ref = ref;
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 			m_AssetIndex = m_Ref ? ImportedAssetsList::Instance().GetAssetIndex(path) : -4;
 			m_CachedAssetValid = false;
 #endif
@@ -101,13 +101,13 @@ namespace Chimp {
 
 		operator bool() const {
 			return m_Ref
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 				&& ImportedAssetsList::Instance().IsAssetImported(m_AssetIndex)
 #endif
 				;
 		}
 
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 		bool IsEqual(const std::filesystem::path& assetPath) const  {
 			return  ImportedAssetsList::Instance().GetAssetIndex(assetPath) == m_AssetIndex && static_cast<bool>(*this);
 		}
@@ -123,7 +123,7 @@ namespace Chimp {
 
 	private:
 		OptionalReference<T> m_Ref;
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 		int m_AssetIndex;
 		bool m_CachedAssetValid;
 #endif

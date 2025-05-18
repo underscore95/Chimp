@@ -9,7 +9,7 @@ namespace Chimp {
 
 	void ImportedAssetsList::NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref)
 	{
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 		assert(path != "");
 		assert(ref.GetPtr() != nullptr);
 		auto it = m_AssetIndices.find(path);
@@ -26,14 +26,14 @@ namespace Chimp {
 
 	void ImportedAssetsList::NotifyAssetUnloaded(const std::filesystem::path& path)
 	{
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 		assert(path != "");
 		m_AssetStillImported[m_AssetIndices[path]] = false;
 		m_AssetLocations.erase(path);
 #endif
 	}
 
-#ifndef NDEBUG
+#ifdef CHIMP_RESOURCE_SERIALISATION
 	int ImportedAssetsList::GetAssetIndex(const std::filesystem::path& path)
 	{
 		auto it = m_AssetIndices.find(path);
