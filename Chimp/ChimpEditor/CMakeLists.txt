@@ -1,9 +1,32 @@
-﻿include(${CMAKE_SOURCE_DIR}/ChimpCommon.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/GameDataMacro.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/CopyChimpDlls.cmake)
 
-add_executable(ChimpEditor "Source/Main.cpp" "Source/Logger.h" "Source/stdafx.h" "Source/EditorScene.h" "Source/EditorScene.cpp" "Source/scene_view/SceneViewScript.h" "Source/scene_view/SceneViewScript.cpp" "Source/scene_hierarchy/SceneHierarchyScript.h" "Source/scene_hierarchy/SceneHierarchyScript.cpp" "Source/scene_hierarchy/EntityNameComponent.h" "Source/inspector/InspectorScript.h" "Source/inspector/InspectorScript.cpp"  "Source/assets/AssetManagerScript.h" "Source/assets/AssetManagerScript.cpp" "Source/assets/AssetImporterScript.h" "Source/assets/AssetImporterScript.cpp")
+# ChimpEditor
+include(ChimpEditorSources.cmake)
+set_property(TARGET ChimpEditor PROPERTY CXX_STANDARD 20)
 
-setup_chimp_target(ChimpEditor)
-setup_chimp_executable(ChimpEditor)
+# Link to chimp
+set_game_data_macro(ChimpEditor)
 
+target_include_directories(ChimpEditor PRIVATE "Source/")
+target_include_directories(ChimpEditor PRIVATE "${CMAKE_SOURCE_DIR}/ChimpFramework/Source/")
+
+target_link_libraries(ChimpEditor PRIVATE Chimp)
+
+target_compile_definitions(ChimpEditor PRIVATE
+        CHIMP_GLM=1
+        CHIMP_LIBSNDFILE=1
+        CHIMP_STB=1
+        CHIMP_FLECS=1
+        CHIMP_ENET=1
+        CHIMP_GLFW=1
+        CHIMP_OPENAL=1
+        CHIMP_OPENGL=1
+        CHIMP_ASSIMP=1
+        CHIMP_IMGUI=1
+)
+
+copy_chimp_dlls(ChimpEditor)
+
+# Link to chimp game
 target_link_libraries(ChimpEditor PRIVATE ChimpGame)
-target_include_directories(ChimpEditor PRIVATE ../ChimpGame/Source)
