@@ -4,11 +4,15 @@ include(${CMAKE_SOURCE_DIR}/cmake/CopyChimpDlls.cmake)
 # ChimpEditor
 include(ChimpEditorSources.cmake)
 set_property(TARGET ChimpEditor PROPERTY CXX_STANDARD 20)
+target_include_directories(ChimpEditor PRIVATE "Source/")
+
+# Link to chimp game
+target_include_directories(ChimpEditor PRIVATE "${CMAKE_SOURCE_DIR}/ChimpGame/Source/")
+target_link_libraries(ChimpEditor PRIVATE ChimpGame)
 
 # Link to chimp
 set_game_data_macro(ChimpEditor)
 
-target_include_directories(ChimpEditor PRIVATE "Source/")
 target_include_directories(ChimpEditor PRIVATE "${CMAKE_SOURCE_DIR}/ChimpFramework/Source/")
 
 target_link_libraries(ChimpEditor PRIVATE ChimpFramework)
@@ -27,6 +31,3 @@ target_compile_definitions(ChimpEditor PRIVATE
 )
 
 copy_chimp_dlls(ChimpEditor)
-
-# Link to chimp game
-target_link_libraries(ChimpEditor PRIVATE ChimpGame)

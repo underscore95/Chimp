@@ -5,6 +5,7 @@
 #include "inspector/InspectorScript.h"
 #include "assets/AssetManagerScript.h"
 #include "assets/AssetImporterScript.h"
+#include "Game.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -15,6 +16,7 @@ namespace ChimpEditor {
 		m_controller(m_camera, engine.GetWindow().GetInputManager())
 	{
 		LoadResources();
+		Chimp::ChimpGame->Setup(engine);
 	}
 
 	EditorScene::~EditorScene()
