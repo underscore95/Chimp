@@ -7,7 +7,7 @@ namespace ChimpEditor {
 
 	class SceneHierarchyScript : public Chimp::IEntityScript {
 	public:
-		SceneHierarchyScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameECS);
+		SceneHierarchyScript(Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameECS);
 
 	public:
 		Chimp::EntityId GetSelectedEntity() const;

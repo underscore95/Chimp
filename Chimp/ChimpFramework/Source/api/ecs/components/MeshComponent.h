@@ -67,13 +67,8 @@ namespace Chimp {
 			}
 
 			MeshComponent Deserialise(const Json& json) override {
-#ifdef CHIMP_RESOURCE_SERIALISATION
 				std::string path = json["Path"];
 				return { {	Engine::GetEngine().GetResourceManager().GetModels().Get(path), path} };
-#else
-				Loggers::ECS().Warning("Cannot deserialise MeshComponent unless CHIMP_rESOURCE_SERIALISATION is defined.");
-#endif
-				return {};
 			}
 
 			void Serialise(Json& json, const MeshComponent& comp) override {

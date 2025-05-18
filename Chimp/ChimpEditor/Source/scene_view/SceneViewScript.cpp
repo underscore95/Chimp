@@ -1,9 +1,9 @@
 #include "SceneViewScript.h"
 
 namespace ChimpEditor {
-	SceneViewScript::SceneViewScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs)
+	SceneViewScript::SceneViewScript(Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs)
 		:
-		IEntityScript(entity, engine, ecs),
+		IEntityScript(typeid(this).name(), engine, ecs),
 		m_sceneViewTexture(engine.GetRenderingManager().CreateRenderTexture(1920, 1080)),
 		m_gameEcs(gameEcs)
 	{

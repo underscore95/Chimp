@@ -7,6 +7,7 @@
 namespace Chimp {
 	typedef void* ScriptId;
 	class ScriptableComponent;
+	class ECS;
 
 	// T is script class
 	template <typename T>
@@ -17,6 +18,7 @@ namespace Chimp {
 	};
 
 	class EntityScriptingSystem : public ISystem {
+		friend class ECS;
 	public:
 		EntityScriptingSystem(Engine& engine, ECS& ecs)
 			: ISystem(engine, ecs) {
@@ -57,6 +59,8 @@ namespace Chimp {
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnRenderUI() override;
+
+		void OnDeserialise();
 
 		ScriptableComponent& GetScriptsOn(EntityId entity);
 		void ForEachScriptedEntity(const std::function<void(EntityId entity, ScriptableComponent&)>& func);

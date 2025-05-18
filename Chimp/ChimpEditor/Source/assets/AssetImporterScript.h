@@ -7,7 +7,7 @@ namespace ChimpEditor {
 
 	class AssetImporterScript : public Chimp::IEntityScript {
 	public:
-		AssetImporterScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, AssetManagerScript& assetManager);
+		AssetImporterScript(Chimp::Engine& engine, Chimp::ECS& ecs, AssetManagerScript& assetManager);
 
 	public:
 

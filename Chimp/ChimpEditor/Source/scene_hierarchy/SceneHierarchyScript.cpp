@@ -3,11 +3,10 @@
 #include "api/ecs/hierarchy/HierarchyComponent.h"
 
 namespace ChimpEditor {
-	SceneHierarchyScript::SceneHierarchyScript(Chimp::EntityId entity,
-		Chimp::Engine& engine,
+	SceneHierarchyScript::SceneHierarchyScript(Chimp::Engine& engine,
 		Chimp::ECS& ecs,
 		Chimp::ECS& gameECS) :
-		IEntityScript(entity, engine, ecs),
+		IEntityScript(typeid(this).name(), engine, ecs),
 		m_gameECS(gameECS)
 	{
 	}

@@ -5,7 +5,8 @@
 #include "inspector/InspectorScript.h"
 #include "assets/AssetManagerScript.h"
 #include "assets/AssetImporterScript.h"
-#include "Game.h"
+#include "api/IGame.h"
+#include "Game.h" // This is necessary or IGame::Instance won't be set
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -16,7 +17,7 @@ namespace ChimpEditor {
 		m_controller(m_camera, engine.GetWindow().GetInputManager())
 	{
 		LoadResources();
-		Chimp::ChimpGame->Setup(engine);
+		Chimp::IGame::Instance().Setup(engine);
 	}
 
 	EditorScene::~EditorScene()
@@ -32,20 +33,20 @@ namespace ChimpEditor {
 
 		// Scene view
 		m_sceneView = m_ecs->CreateEntity();
-		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_engine, *m_ecs, *m_gameEcs)));
 
 		// Scene hierarchy
-		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneHierarchyScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneHierarchyScript(m_engine, *m_ecs, *m_gameEcs)));
 
 		// Inspector
-		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_sceneView, m_engine, *m_ecs, *m_gameEcs)));
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new InspectorScript(m_engine, *m_ecs, *m_gameEcs)));
 
 		// Asset manager
-		Chimp::Reference<AssetManagerScript> assetManager = { new AssetManagerScript(m_sceneView, m_engine, *m_ecs) };
+		Chimp::Reference<AssetManagerScript> assetManager = { new AssetManagerScript(m_engine, *m_ecs) };
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, assetManager.GetNotNullPtr()));
 
 		// Asset importer
-		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetImporterScript(m_sceneView, m_engine, *m_ecs, assetManager.Get())));
+		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetImporterScript(m_engine, *m_ecs, assetManager.Get())));
 
 		// Testing
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());

@@ -5,7 +5,7 @@
 namespace ChimpEditor {
 	class SceneViewScript : public Chimp::IEntityScript {
 	public:
-		SceneViewScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs);
+		SceneViewScript(Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs);
 
 	private:
 		void OnInit() override;

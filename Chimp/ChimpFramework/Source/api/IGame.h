@@ -9,23 +9,30 @@ namespace Chimp {
 	class IEntityScript;
 
 	class IGame {
-		typedef std::function<std::unique_ptr<IEntityScript>(Engine&, ECS&, Entity)> CreateScriptFunc;
+		typedef std::function<std::unique_ptr<IEntityScript>(Engine&, ECS&)> CreateScriptFunc;
+	protected:
+		IGame();
+
 	public:
+		static IGame& Instance();
+
+		virtual ~IGame() = default;
+
 		virtual void Setup(Engine& engine) = 0;
 
 		const std::unordered_map<std::string, CreateScriptFunc>& GetScripts() const;
+		std::unique_ptr<IEntityScript> CreateScript(const std::string& name, Engine& engine, ECS& ecs); // Create script
 
 	protected:
 		void RegisterScript(const std::string& name, const CreateScriptFunc& func);
 
 	private:
 		std::unordered_map<std::string, CreateScriptFunc> m_Scripts;
+		static IGame* g_Instance;
 	};
-
-	extern std::unique_ptr<IGame> ChimpGame; // ChimpGame.dll implements this using CHIMP_SET_GAME macro
 }
 
-#define CHIMP_SET_GAME(type)\
-	namespace Chimp {\
-		std::unique_ptr<IGame> ChimpGame = UNIQUE_PTR_CAST_FROM_RAW_PTR(type, new type());\
+#define CHIMP_SET_GAME(type) \
+	namespace Unused { \
+		const static type UnusedChimpGame;\
 	}

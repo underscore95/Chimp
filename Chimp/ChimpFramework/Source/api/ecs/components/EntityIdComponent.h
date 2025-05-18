@@ -6,6 +6,8 @@
 namespace Chimp {
 	struct EntityIdComponent {
 		EntityId Id;
+
+		operator EntityId() const noexcept { return Id; }
 	};
 
 	namespace Unused {

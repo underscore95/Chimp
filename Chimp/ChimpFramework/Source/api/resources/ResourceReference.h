@@ -54,7 +54,7 @@ namespace Chimp {
 
 		ResourceReference() : m_Ref(nullptr)
 #ifdef CHIMP_RESOURCE_SERIALISATION
-			, m_AssetIndex(-1)
+			, m_AssetIndex(-1), m_CachedAssetValid(false)
 #endif
 		{
 		}

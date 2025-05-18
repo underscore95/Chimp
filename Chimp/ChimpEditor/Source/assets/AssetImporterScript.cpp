@@ -2,11 +2,11 @@
 #include "AssetManagerScript.h"
 
 namespace ChimpEditor {
-	AssetImporterScript::AssetImporterScript(Chimp::EntityId entity,
+	AssetImporterScript::AssetImporterScript(
 		Chimp::Engine& engine,
 		Chimp::ECS& ecs,
 		AssetManagerScript& assetManager) :
-		IEntityScript(entity, engine, ecs),
+		IEntityScript(typeid(this).name(), engine, ecs),
 		m_assetManager(assetManager)
 	{
 	}

@@ -10,7 +10,7 @@ namespace ChimpEditor {
 			None = 0, Hex, Binary
 		};
 	public:
-		InspectorScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs);
+		InspectorScript(Chimp::Engine& engine, Chimp::ECS& ecs, Chimp::ECS& gameEcs);
 
 	private:
 		void OnInit() override;

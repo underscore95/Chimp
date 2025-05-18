@@ -1,9 +1,8 @@
 #include "AssetManagerScript.h"
 
-ChimpEditor::AssetManagerScript::AssetManagerScript(Chimp::EntityId entity,
-	Chimp::Engine& engine,
+ChimpEditor::AssetManagerScript::AssetManagerScript(Chimp::Engine& engine,
 	Chimp::ECS& ecs) :
-	IEntityScript(entity, engine, ecs),
+	IEntityScript(typeid(this).name(), engine, ecs),
 	m_currentPath(GAME_DATA_FOLDER),
 	m_selectedFile("")
 {

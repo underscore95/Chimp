@@ -63,6 +63,9 @@ namespace Chimp {
 			}
 		}
 
+		// Notify systems
+		ecs->GetScripts().OnDeserialise();
+
 		return std::move(ecs);
 	}
 

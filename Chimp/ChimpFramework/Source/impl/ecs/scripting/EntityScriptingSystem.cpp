@@ -64,6 +64,7 @@ namespace Chimp {
 	ScriptId EntityScriptingSystem::AttachScript(EntityId entity, std::unique_ptr<IEntityScript> script)
 	{
 		auto& scripts = GetScriptsOn(entity);
+		script->SetEntityId(entity);
 		scripts.Scripts.push_back(std::move(script));
 		return (ScriptId)scripts.Scripts.back().get();
 	}
@@ -100,5 +101,15 @@ namespace Chimp {
 			}
 		}
 		return nullptr;
+	}
+
+	void EntityScriptingSystem::OnDeserialise()
+	{
+		auto view = GetECS().GetEntitiesWithComponents<ScriptableComponent, EntityIdComponent>();
+		for (auto& [scripts, id] : view) {
+			for (auto& script : scripts.Scripts) {
+				script->SetEntityId(id);
+			}
+		}
 	}
 }

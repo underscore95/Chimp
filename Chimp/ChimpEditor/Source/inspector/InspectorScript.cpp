@@ -3,11 +3,10 @@
 #include "scene_hierarchy\EntityNameComponent.h"
 
 namespace ChimpEditor {
-	InspectorScript::InspectorScript(Chimp::EntityId entity,
-		Chimp::Engine& engine,
+	InspectorScript::InspectorScript(Chimp::Engine& engine,
 		Chimp::ECS& ecs,
 		Chimp::ECS& gameEcs) :
-		IEntityScript(entity, engine, ecs),
+		IEntityScript(typeid(this).name(), engine, ecs),
 		m_gameEcs(gameEcs)
 	{
 	}

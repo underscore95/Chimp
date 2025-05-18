@@ -5,7 +5,7 @@
 namespace ChimpEditor {
 	class AssetManagerScript : public Chimp::IEntityScript {
 	public:
-		AssetManagerScript(Chimp::EntityId entity, Chimp::Engine& engine, Chimp::ECS& ecs);
+		AssetManagerScript(Chimp::Engine& engine, Chimp::ECS& ecs);
 
 	public:
 		bool HasFileSelected() const;

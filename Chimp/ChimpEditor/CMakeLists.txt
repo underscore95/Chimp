@@ -34,5 +34,6 @@ copy_chimp_dlls(ChimpEditor)
 
 # Chimp options
 target_compile_definitions(ChimpFramework PUBLIC 
+        CHIMP_EDITOR=1 # We're using the editor, a bunch of minor changes like script components store the last text entered into the new script input box
        CHIMP_RESOURCE_SERIALISATION=1 # Tracks resources on mesh component etc so ECS can be serialised
 )
