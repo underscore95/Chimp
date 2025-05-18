@@ -11,7 +11,7 @@ set_game_data_macro(ChimpEditor)
 target_include_directories(ChimpEditor PRIVATE "Source/")
 target_include_directories(ChimpEditor PRIVATE "${CMAKE_SOURCE_DIR}/ChimpFramework/Source/")
 
-target_link_libraries(ChimpEditor PRIVATE Chimp)
+target_link_libraries(ChimpEditor PRIVATE ChimpFramework)
 
 target_compile_definitions(ChimpEditor PRIVATE
         CHIMP_GLM=1

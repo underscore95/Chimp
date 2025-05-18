@@ -16,7 +16,7 @@ set_game_data_macro(ChimpGame)
 target_include_directories(ChimpGame PRIVATE "Source/")
 target_include_directories(ChimpGame PRIVATE "${CMAKE_SOURCE_DIR}/ChimpFramework/Source/")
 
-target_link_libraries(ChimpGame PRIVATE Chimp)
+target_link_libraries(ChimpGame PRIVATE ChimpFramework)
 
 target_compile_definitions(ChimpGame PRIVATE
         CHIMP_GLM=1
