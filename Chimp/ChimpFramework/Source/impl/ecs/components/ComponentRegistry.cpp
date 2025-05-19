@@ -8,8 +8,9 @@ namespace Chimp {
 		return inst;
 	}
 
-	void ComponentRegistry::RenderEditorUI(EntityId id, AnyReference value)
+	void ComponentRegistry::RenderEditorUI(ECS& ecs, EntityId id, AnyReference value)
 	{
+		SetActiveECS(ecs);
 		size_t hashCode = value.GetType().Hash();
 		auto it = m_RenderEditorUIFunctions.find(hashCode);
 		assert(it != m_RenderEditorUIFunctions.end());
@@ -18,8 +19,9 @@ namespace Chimp {
 		func(id, voidValue);
 	}
 
-	void ComponentRegistry::Serialise(Json& json, AnyReference component)
+	void ComponentRegistry::Serialise(ECS& ecs, Json& json, AnyReference component)
 	{
+		SetActiveECS(ecs);
 		auto it = m_SerialiseFunctions.find(component.GetType().Hash());
 		assert(it != m_SerialiseFunctions.end());
 		Json compJson;
@@ -30,6 +32,7 @@ namespace Chimp {
 
 	void ComponentRegistry::Deserialise(ECS& ecs, EntityId entity, const std::string& typeName, const Json& json)
 	{
+		SetActiveECS(ecs);
 		auto it = m_DeserialiseFunctions.find(typeName);
 		assert(it != m_DeserialiseFunctions.end());
 

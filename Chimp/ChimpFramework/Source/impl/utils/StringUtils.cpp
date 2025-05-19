@@ -25,4 +25,10 @@ namespace Chimp {
 		iss >> *out;
 		return !iss.fail();
 	}
+
+	bool StringContains(std::string_view str, std::string_view phrase)
+	{
+		return str.find(phrase) != std::string_view::npos;
+	}
+
 }

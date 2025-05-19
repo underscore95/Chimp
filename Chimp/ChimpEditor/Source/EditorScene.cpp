@@ -7,6 +7,7 @@
 #include "assets/AssetImporterScript.h"
 #include "api/IGame.h"
 #include "Game.h" // This is necessary or IGame::Instance won't be set
+#include "TestScript.h"
 
 namespace ChimpEditor {
 	EditorScene::EditorScene(Chimp::Engine& engine) :
@@ -49,12 +50,14 @@ namespace ChimpEditor {
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetImporterScript(m_engine, *m_ecs, assetManager.Get())));
 
 		// Testing
+		m_gameEcs->GetScripts().DisableProcessing();
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
 		auto testEnt = m_gameEcs->CreateEntity();
 		m_gameEcs->SetComponent<EntityNameComponent>(testEnt, { "MyNamedEntity" });
 		m_gameEcs->SetComponent<Chimp::TransformComponent>(testEnt, {});
 		m_gameEcs->SetComponent<Chimp::MeshComponent>(testEnt, { { &m_engine.GetResourceManager().GetModels().Get(m_modelPath), m_modelPath } });
-		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f });
+		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f }); 
+		m_gameEcs->GetScripts().AttachScript(testEnt, "Test");
 
 		m_ecs->GetSystems().OnInit();
 
@@ -62,13 +65,13 @@ namespace ChimpEditor {
 		auto ecs = m_engine.CreateECS();
 		ecs->CreateEntity();
 		ecs->RemoveEntity(ecs->CreateEntity());
-		ecs->CreateEntity();
+		ecs->GetScripts().AttachScript(ecs->CreateEntity(), "Test");
 
 		auto json = ecs->Serialise();
 		GetLogger().Info("ecs1:");
 		GetLogger().Info(json);
 
-		auto ecs2 = Chimp::ECS::Deserialise(m_engine, json);
+		auto ecs2 = Chimp::ECS::Deserialise(m_engine, json, false);
 		auto view = ecs2->GetEntitiesWithComponents<Chimp::EntityIdComponent>();
 		std::cout << "number entities in second ecs: " << view.Size() << "\n";
 

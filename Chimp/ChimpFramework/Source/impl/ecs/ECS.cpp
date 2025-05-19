@@ -17,8 +17,8 @@ namespace Chimp {
 			auto newId = flecs::entity(m_World, entId.Id);
 			Json entityJson;
 			// Store each component in json[entityId][componentTypeName]
-			GetComponentsOnEntity(newId, [&entityJson](AnyReference comp) {
-				ComponentRegistry::Instance().Serialise(entityJson, comp);
+			GetComponentsOnEntity(newId, [&entityJson, this](AnyReference comp) {
+				ComponentRegistry::Instance().Serialise(*this, entityJson, comp);
 				});
 
 			size_t id = newId.id();
@@ -28,9 +28,10 @@ namespace Chimp {
 		return json.dump();
 	}
 
-	std::unique_ptr<ECS> ECS::Deserialise(Engine& engine, std::string_view json)
+	std::unique_ptr<ECS> ECS::Deserialise(Engine& engine, std::string_view json, bool disableScriptProcessing)
 	{
 		std::unique_ptr<ECS> ecs = engine.CreateECS();
+		if (disableScriptProcessing) ecs->GetScripts().DisableProcessing();
 
 		Json parsed = Json::parse(json); // Parse json
 

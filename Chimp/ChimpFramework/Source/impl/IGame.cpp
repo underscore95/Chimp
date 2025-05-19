@@ -4,6 +4,7 @@
 #include "api/ecs/scripting/ScriptableComponent.h"
 #include "api/ecs/ECS.h"
 #include "api/Engine.h"
+#include "api/utils/StringUtils.h"
 
 namespace Chimp {
 	IGame* IGame::g_Instance = nullptr;
@@ -21,6 +22,10 @@ namespace Chimp {
 
 	void IGame::RegisterScript(const std::string& name, const CreateScriptFunc& func)
 	{
+		if (StringContains(name, "\"")) {
+			Loggers::ECS().Warning(std::format("Script name '{}' contains a double quote, was this intentional?", name));
+		}
+
 		if (name.size() <= ScriptableComponent::MAX_SCRIPT_NAME_LENGTH) {
 			m_Scripts[name] = func;
 		}
@@ -35,11 +40,11 @@ namespace Chimp {
 		return m_Scripts;
 	}
 
-	std::unique_ptr<IEntityScript> IGame::CreateScript(const std::string& name, Engine& engine, ECS& ecs)
+	std::unique_ptr<IEntityScript> IGame::CreateScript(const std::string& name, ECS& ecs)
 	{
 		auto it = m_Scripts.find(name);
 		if (it != m_Scripts.end()) {
-			return (it->second)(engine, ecs);
+			return (it->second)(ecs);
 		}
 
 		Loggers::ECS().Error(std::format("Failed to find script {}, have you registered it?", name));

@@ -10,10 +10,7 @@ namespace Chimp {
 		DISABLE_COPY(IEntityScript);
 		friend class EntityScriptingSystem;
 	public:
-		IEntityScript(std::string_view name, Engine& engine, ECS& ecs) :
-			ISystem(engine, ecs),
-			m_EntityId(0) {
-		}
+		IEntityScript(std::string_view name, Engine& engine, ECS& ecs);
 
 		virtual ~IEntityScript() {};
 

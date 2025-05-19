@@ -45,14 +45,13 @@ namespace ChimpEditor {
 			RenderByteVisualisationOption();
 
 			// Components
-			Chimp::ComponentRegistry::Instance().SetActiveECS(m_gameEcs);
 			m_gameEcs.GetComponentsOnEntity(ent, [this, ent](Chimp::AnyReference component) {
 				if (Chimp::ComponentRegistry::Instance().ShouldHideInInspectorUI(component.GetType())) return;
 
 				auto name = GetComponentTypeName(component);
 				if (ImGui::CollapsingHeader(name.c_str())) {
 					RenderByteVisualisation(component);
-					Chimp::ComponentRegistry::Instance().RenderEditorUI(ent, component);
+					Chimp::ComponentRegistry::Instance().RenderEditorUI(m_gameEcs, ent, component);
 				}
 				});
 		}

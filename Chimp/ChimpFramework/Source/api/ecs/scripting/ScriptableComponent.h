@@ -24,15 +24,21 @@ namespace Chimp {
 				void RenderInspectorUI(EntityId id, ScriptableComponent& comp) override {
 #ifdef CHIMP_EDITOR
 					// List scripts
-					for (const auto& script : comp.Scripts) {
+					ImGui::Text("Scripts:");
+					for (auto it = comp.Scripts.begin(); it != comp.Scripts.end(); ) {
+						const auto& script = *it;
 						ImGui::Text(script->GetName().c_str());
 						ImGui::SameLine();
 						if (ImGui::Button("-")) {
-							comp.Scripts.remove(script);
+							it = comp.Scripts.erase(it);
+						}
+						else {
+							++it;
 						}
 					}
 
 					// New script
+					ImGui::Text("Add Script:");
 					if (IGame::Instance().GetScripts().empty()) {
 						ImGui::Text("No registered scripts!");
 					}
@@ -50,7 +56,7 @@ namespace Chimp {
 
 							// Dropdown option
 							if (ImGui::Selectable(name.c_str(), false)) {
-								auto script = IGame::Instance().CreateScript(name, Engine::GetEngine(), GetECS());
+								auto script = IGame::Instance().CreateScript(name, GetECS());
 								assert(script);
 								GetECS().GetScripts().AttachScript(id, std::move(script));
 							}
@@ -63,7 +69,7 @@ namespace Chimp {
 				ScriptableComponent Deserialise(const Json& json) override {
 					ScriptableComponent comp;
 					for (const std::string& script : json["Scripts"]) {
-						comp.Scripts.push_back(IGame::Instance().CreateScript(script, Engine::GetEngine(), GetECS()));
+						comp.Scripts.push_back(IGame::Instance().CreateScript(script, GetECS()));
 					}
 					return comp;
 				}

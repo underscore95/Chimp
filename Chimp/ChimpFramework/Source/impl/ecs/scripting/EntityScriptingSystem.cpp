@@ -4,18 +4,9 @@
 #include "api/ecs/scripting/ScriptableComponent.h"
 
 namespace Chimp {
-	void EntityScriptingSystem::OnInit()
-	{
-		auto view = GetECS().GetEntitiesWithComponents<ScriptableComponent>();
-		for (auto& [scripts] : view) {
-			for (auto& script : scripts.Scripts) {
-				script->OnInit();
-			}
-		}
-	}
-
 	void EntityScriptingSystem::OnUpdate()
 	{
+		if (m_processingDisabled) return;
 		auto view = GetECS().GetEntitiesWithComponents<ScriptableComponent>();
 		for (auto& [scripts] : view) {
 			for (auto& script : scripts.Scripts) {
@@ -26,6 +17,7 @@ namespace Chimp {
 
 	void EntityScriptingSystem::OnRender()
 	{
+		if (m_processingDisabled) return;
 		auto view = GetECS().GetEntitiesWithComponents<ScriptableComponent>();
 		for (auto& [scripts] : view) {
 			for (auto& script : scripts.Scripts) {
@@ -35,6 +27,7 @@ namespace Chimp {
 	}
 	void EntityScriptingSystem::OnRenderUI()
 	{
+		if (m_processingDisabled) return;
 		auto view = GetECS().GetEntitiesWithComponents<ScriptableComponent>();
 		for (auto& [scripts] : view) {
 			for (auto& script : scripts.Scripts) {
@@ -66,7 +59,16 @@ namespace Chimp {
 		auto& scripts = GetScriptsOn(entity);
 		script->SetEntityId(entity);
 		scripts.Scripts.push_back(std::move(script));
+		if (!m_processingDisabled) {
+			scripts.Scripts.back()->OnInit();
+		}
 		return (ScriptId)scripts.Scripts.back().get();
+	}
+
+	ScriptId EntityScriptingSystem::AttachScript(EntityId entity, std::string_view scriptName)
+	{
+		auto script = IGame::Instance().CreateScript(std::string(scriptName), GetECS());
+		return AttachScript(entity, std::move(script));
 	}
 
 	void EntityScriptingSystem::DetachScript(EntityId entity, ScriptId script)
@@ -109,6 +111,13 @@ namespace Chimp {
 		for (auto& [scripts, id] : view) {
 			for (auto& script : scripts.Scripts) {
 				script->SetEntityId(id);
+			}
+		}
+
+		if (m_processingDisabled) return;
+		for (auto& [scripts, id] : view) {
+			for (auto& script : scripts.Scripts) {
+				script->OnInit();
 			}
 		}
 	}

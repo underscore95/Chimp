@@ -25,7 +25,12 @@ namespace Chimp {
 		}
 
 	public:
+		// Main use case is for the editor, since we don't want game scripts running in editor mode
+		// Re enabling it is probably a bad idea since script inits won't be called, you could make a vector of lambdas to call if you want to add enable processing function
+		void DisableProcessing() { m_processingDisabled = true; } 
+
 		ScriptId AttachScript(EntityId entity, std::unique_ptr<IEntityScript> script);
+		ScriptId AttachScript(EntityId entity, std::string_view scriptName);
 		void DetachScript(EntityId entity, ScriptId script);
 		OptionalReference<IEntityScript> GetScript(EntityId entity, ScriptId id);
 
@@ -55,7 +60,6 @@ namespace Chimp {
 		}
 
 	private:
-		void OnInit() override;
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnRenderUI() override;
@@ -64,5 +68,8 @@ namespace Chimp {
 
 		ScriptableComponent& GetScriptsOn(EntityId entity);
 		void ForEachScriptedEntity(const std::function<void(EntityId entity, ScriptableComponent&)>& func);
+
+	private:
+		bool m_processingDisabled = false;
 	};
 }

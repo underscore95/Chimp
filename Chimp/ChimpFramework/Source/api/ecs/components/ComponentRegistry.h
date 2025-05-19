@@ -22,10 +22,10 @@ namespace Chimp {
 		static ComponentRegistry& Instance();
 
 		// Renders the editor inspector UI for this type
-		void RenderEditorUI(EntityId id, AnyReference value);
+		void RenderEditorUI(ECS& ecs, EntityId id, AnyReference value);
 
 		// Serialises component and stores in json[typename]
-		void Serialise(Json& json, AnyReference component);
+		void Serialise(ECS& ecs, Json& json, AnyReference component);
 
 		// Deserialises the component stored in json[typeName] and add it to entity
 		void Deserialise(ECS&, EntityId entity, const std::string& typeName, const Json& json);
@@ -42,11 +42,6 @@ namespace Chimp {
 		}
 
 	public:
-		void SetActiveECS(ECS& ecs) {
-			for (auto& [hashCode, function] : m_SetActiveECSFunctions) {
-				function(ecs);
-			}
-		}
 
 		// Register a component, this can only be called from ComponentRegister which ensures it is impossible to register a component twice
 		template <typename T>
@@ -73,6 +68,12 @@ namespace Chimp {
 		}
 
 		void RegisterComponentsInECS(ECS& ecs);
+
+		void SetActiveECS(ECS& ecs) {
+			for (auto& [hashCode, function] : m_SetActiveECSFunctions) {
+				function(ecs);
+			}
+		}
 
 	private:
 		std::unordered_map<size_t, std::function<void(EntityId, void*)>> m_RenderEditorUIFunctions; // type hash code -> function expecting T* which renders inspector ui
@@ -130,7 +131,7 @@ namespace Chimp {
 		}
 
 	protected:
-		ECS& GetECS() { return m_ECS.Get(); }
+		ECS& GetECS() { assert(m_ECS.HasValue()); return m_ECS.Get(); } // Need to set m_ECS before using, call SetActiveECS in ComponentRegistry
 
 	private:
 		Reference<ECS> m_ECS; // Works like a state machine
