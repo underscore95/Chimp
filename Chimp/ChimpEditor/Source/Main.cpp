@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 			if (p == p.parent_path()) break;
 		}
 
-		ImGui::SetCurrentContext(engine.GetWindow().GetImGuiHandler().GetImGuiContext());
+		CHIMP_SET_IMGUI_CONTEXT_IN_DOMAIN();
 		return std::make_unique<ChimpEditor::EditorScene>(engine);
 		}, argc, argv);
 }

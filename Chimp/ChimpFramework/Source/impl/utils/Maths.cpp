@@ -374,6 +374,13 @@ namespace Chimp {
 		return Transpose(Inverse(To3x3(m)));
 	}
 
+	Vector3f MatrixTransform(Vector3f v, const Matrix3x3& m)
+	{
+		Vector4f transformed = Vector4f(v, 1) * m;
+		assert(transformed.w != 0.0f);
+		return Vector3f(transformed) / transformed.w;
+	}
+
 	Vector3f MatrixTransform(Vector3f v, const Matrix& m)
 	{
 		Vector4f transformed = Vector4f(v, 1) * m;

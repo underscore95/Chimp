@@ -20,6 +20,7 @@ namespace Chimp {
 		virtual ~LitShader();
 
 		SceneLighting& GetLighting() { return m_Lighting; }
+		void SetLighting(const SceneLighting& lighting) { m_Lighting = lighting; }
 		void BeginFrame() override;
 		void Render(const Mesh& mesh, const TransformMatrices& transform) override;
 

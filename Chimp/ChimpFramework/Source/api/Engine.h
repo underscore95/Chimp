@@ -16,7 +16,7 @@
 #include "scenes/SceneManager.h"
 #include "api/threading/ThreadPool.h"
 #include "api/utils/TaskScheduler.h"
-#include "api/utils/ImGuiHelper.h"
+#include "api/imgui/ImGuiHelper.h"
 #include "api/utils/Random.h"
 #include "api/audio/AudioManager.h"
 #include "api/audio/music/MusicPlayer.h"

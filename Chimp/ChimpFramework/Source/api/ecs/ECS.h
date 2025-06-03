@@ -9,6 +9,7 @@
 #include "scripting/EntityScriptingSystem.h"
 #include "api/utils/TypeInfo.h"
 #include "api/utils/AnyReference.h"
+#include "api/graphics/shaders/shaders/lighting/LightManager.h"
 #include "hierarchy/EntityHierarchy.h"
 
 namespace Chimp {
@@ -30,7 +31,8 @@ namespace Chimp {
 		ECS(Engine& engine)
 			: m_TransformManager(new TransformManager(*this)),
 			m_SystemContainer(engine, *this),
-			m_EntityHierarchy(*this)
+			m_EntityHierarchy(*this),
+			m_LightManager(*this)
 		{
 			{
 				auto scriptingSystem = UNIQUE_PTR_CAST_FROM_RAW_PTR(ISystem, new EntityScriptingSystem(engine, *this));
@@ -89,6 +91,7 @@ namespace Chimp {
 		SystemContainerSystem& GetSystems() { return m_SystemContainer; }
 		EntityScriptingSystem& GetScripts() { return m_EntityScripting.Get(); }
 		EntityHierarchy& GetHierarchy() { return m_EntityHierarchy; }
+		LightManager& GetLightManager() { return m_LightManager; }
 
 		// Get number of alive entities
 		[[nodiscard]] size_t GetEntityCount() const {
@@ -114,7 +117,7 @@ namespace Chimp {
 		}
 
 		// Is entity alive
-		bool IsEntityAlive(EntityId entity) {
+		bool IsEntityAlive(EntityId entity) const {
 			return ToEntity(entity).is_alive();
 		}
 
@@ -127,9 +130,11 @@ namespace Chimp {
 #ifndef NDEBUG
 			if (!m_RegisteredComponents.contains(typeid(Component))) {
 				std::string name = typeid(Component).name();
-				Loggers::Main().Error("Component " + name + " not registered.");
+				Loggers::Main().Error("Component " + name + " not registered. Perhaps you didn't include the header with the ComponentRegister?");
 				assert(false);
 			}
+
+			assert(IsEntityAlive(entity));
 #endif
 			ToEntity(entity).set(component);
 		}
@@ -193,6 +198,7 @@ namespace Chimp {
 		Reference<EntityScriptingSystem> m_EntityScripting;
 		EntityHierarchy	m_EntityHierarchy;
 		std::unordered_map<flecs::id_t, TypeInfo> m_ComponentIdToTypeInfo;
+		LightManager m_LightManager;
 #ifndef NDEBUG
 		std::unordered_set<TypeInfo> m_RegisteredComponents;
 #endif

@@ -94,7 +94,7 @@ namespace Chimp {
 		for (int i = 0; i < m_Lighting.NumSpotlights; ++i) {
 			auto& spotlight = m_Lighting.Spotlights[i];
 
-			auto matrices = spotlight.CalculateMatrices(35, m_ShadowMap->GetAspectRatio());
+			auto matrices = spotlight.CalculateMatrices(m_ShadowMap->GetAspectRatio());
 			auto lightMatrix = matrices.GetProjectionMatrix() * matrices.GetViewMatrix();
 
 			SetSpotlightMatrix(i, lightMatrix);

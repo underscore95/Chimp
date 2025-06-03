@@ -186,6 +186,10 @@ namespace Chimp {
 			(*this) = (*this) * m;
 		}
 
+		float* Data() {
+			return &x;
+		}
+
 		float x;
 		float y;
 		float z;
@@ -1019,6 +1023,7 @@ namespace Chimp {
 	// Chimp uses world space (so only passing in model matrix) in shaders
 	[[nodiscard]] Matrix3x3 ToNormalMatrix(const Matrix& m);
 
+	[[nodiscard]] Vector3f MatrixTransform(Vector3f v, const Matrix3x3& m);
 	[[nodiscard]] Vector3f MatrixTransform(Vector3f v, const Matrix& m);
 
 	[[nodiscard]] bool IsIdentityMatrix(const Matrix& m);

@@ -39,6 +39,8 @@ namespace ChimpEditor {
 
 	void SceneViewScript::OnRenderUI()
 	{
+		CHIMP_SET_IMGUI_CONTEXT_IN_DOMAIN();
+		assert(ImGui::GetCurrentContext());
 		ImVec2 sceneViewSize = GetEngine().GetWindow().GetSize() * 0.5f;
 		ImGui::SetNextWindowPos(sceneViewSize, 0, { 0.5f,0.5f });
 		ImGui::Begin("Scene View", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);

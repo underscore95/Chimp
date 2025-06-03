@@ -2,6 +2,7 @@
 
 #include "api/utils/Maths.h"
 #include "Loggers.h"
+#include "api/graphics/camera/CameraMatrices.h"
 
 namespace Chimp {
 	struct alignas(16) PointLightMatrices {
@@ -92,17 +93,25 @@ namespace Chimp {
 		float Padding3;
 
 		Vector3f Attenuation;
-		float CutoffAngle; // Should be Cos(angle)
+		float DoNotUse_CutoffAngle = Cos(35.0f); // Should be Cos(angle), use the getters and setters below
 
 		float ShadowBias = 0.05f;
 		int SqrtNumShadowSamples = 3;
 		float Padding4;
-		float Padding5;
+		float DoNotUse_CutoffAngleDegrees = 35; // Use the getters and setters below
 
-		CameraMatrices CalculateMatrices(float cutoffAngleDegrees, float aspectRatio = 1, float zNear = 5.0f, float zFar = 50.0f, Vector3f up = { 0,1,0 }) const {
+		float* GetCutoffAngleDegreesPtr() { return &DoNotUse_CutoffAngleDegrees; }
+		float GetCutoffAngleDegrees() const { return DoNotUse_CutoffAngleDegrees; }
+
+		void SetCutoffAngleDegrees(float degrees) {
+			DoNotUse_CutoffAngleDegrees = degrees;
+			DoNotUse_CutoffAngle = Cos(degrees);
+		}
+
+		CameraMatrices CalculateMatrices(float aspectRatio = 1, float zNear = 5.0f, float zFar = 50.0f, Vector3f up = { 0,1,0 }) const {
 			CameraMatrices matrices;
-			assert(FloatEqual(Cos(cutoffAngleDegrees), CutoffAngle));
-			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(cutoffAngleDegrees * 2, aspectRatio, zNear, zFar));
+			
+			matrices.SetProjectionMatrix(CreatePerspectiveProjectionMatrix(DoNotUse_CutoffAngleDegrees * 2, aspectRatio, zNear, zFar));
 			assert(IsNormalised(Direction));
 
 			MakeUpVectorValid(&up, Direction);

@@ -3,6 +3,7 @@
 #include "stdafx.h"
 
 namespace Chimp {
+
 	class IWindow;
 	class ImGuiHandler {
 		friend class IWindow;
@@ -18,6 +19,7 @@ namespace Chimp {
 		void EndImGuiFrame();
 
 		ImGuiContext* GetImGuiContext();
+
 	private:
 		ImGuiContext* m_Context;
 	};

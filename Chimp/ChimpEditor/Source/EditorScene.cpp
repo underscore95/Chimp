@@ -32,6 +32,8 @@ namespace ChimpEditor {
 		m_camera.SetPosition(Chimp::Vector3f{ 10, 6, 10 });
 		m_camera.SetForwardVector(m_camera.GetPosition() * -1.0f); // Look at 0 0 0
 
+		GetLogger().Info("Below script warnings can be ignored vvv");
+
 		// Scene view
 		m_sceneView = m_ecs->CreateEntity();
 		m_ecs->GetScripts().AttachScript(m_sceneView, UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new SceneViewScript(m_engine, *m_ecs, *m_gameEcs)));
@@ -49,6 +51,8 @@ namespace ChimpEditor {
 		// Asset importer
 		m_ecs->GetScripts().AttachScript(m_ecs->CreateEntity(), UNIQUE_PTR_CAST_FROM_RAW_PTR(Chimp::IEntityScript, new AssetImporterScript(m_engine, *m_ecs, assetManager.Get())));
 
+		GetLogger().Info("Above script warnings can be ignored ^^^");
+
 		// Testing
 		m_gameEcs->GetScripts().DisableProcessing();
 		m_gameEcs->GetHierarchy().SetParent(m_gameEcs->CreateEntity(), m_gameEcs->CreateEntity());
@@ -56,16 +60,96 @@ namespace ChimpEditor {
 		m_gameEcs->SetComponent<EntityNameComponent>(testEnt, { "MyNamedEntity" });
 		m_gameEcs->SetComponent<Chimp::TransformComponent>(testEnt, {});
 		m_gameEcs->SetComponent<Chimp::MeshComponent>(testEnt, { { &m_engine.GetResourceManager().GetModels().Get(m_modelPath), m_modelPath } });
-		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f }); 
+		m_gameEcs->SetComponent<Chimp::HealthComponent>(testEnt, { 10.0f });
 		m_gameEcs->GetScripts().AttachScript(testEnt, "Test");
+
+		// Lighting entities
+		{
+			// Point Light Entity
+			auto pointLightEnt = m_gameEcs->CreateEntity();
+			m_gameEcs->SetComponent<EntityNameComponent>(pointLightEnt, { "PointLightEntity" });
+			m_gameEcs->SetComponent<Chimp::TransformComponent>(pointLightEnt, {
+				{0.0f, 0.0f, -2.5f},
+				{0, 0, 0},
+				{1, 1, 1}
+				});
+			m_gameEcs->SetComponent<Chimp::PointLight>(pointLightEnt, {
+				.Position = {0, 0, 0},
+				.Color = {1, 1, 1},
+				.Attenuation = {0.0f, 0.1f, 0.0f}
+				});
+			m_gameEcs->SetComponent<Chimp::AmbientLight>(pointLightEnt, {
+				.Color = {0.2f, 0.2f, 0.2f}
+				});
+
+			// Directional Light Entity
+			auto dirLightEnt = m_gameEcs->CreateEntity();
+			m_gameEcs->SetComponent<EntityNameComponent>(dirLightEnt, { "DirectionalLightEntity" });
+			m_gameEcs->SetComponent<Chimp::TransformComponent>(dirLightEnt, {
+				{0.0f, 0.0f, 0.0f},
+				{90, 0, 0},
+				{1, 1, 1}
+				});
+			m_gameEcs->SetComponent<Chimp::DirectionalLight>(dirLightEnt, {
+				.Direction = Chimp::Vector3f{0.0f, -1.0f, 0.0f},
+				.Color = Chimp::Vector3f{1.0f, 1.0f, 1.0f},
+				.ShadowBias = 0.05f,
+				.SqrtNumShadowSamples = 3
+				});
+
+			// Spotlight Entity
+			auto spotLightEnt = m_gameEcs->CreateEntity();
+			m_gameEcs->SetComponent<EntityNameComponent>(spotLightEnt, { "SpotlightEntity" });
+			m_gameEcs->SetComponent<Chimp::TransformComponent>(spotLightEnt, {
+				{0.0f, 5.0f, 0.0f},
+				{90, 0, 0},
+				{1, 1, 1}
+				});
+			m_gameEcs->SetComponent<Chimp::Spotlight>(spotLightEnt, {
+				.Direction = Chimp::Vector3f{0.0f, -1.0f, 0.0f},
+				.Position = Chimp::Vector3f{0.0f, 5.0f, 0.0f},
+				.Color = Chimp::Vector3f{1.0f, 1.0f, 1.0f},
+				.Attenuation = Chimp::Vector3f{0.0f, 0.1f, 0.0f},
+				.ShadowBias = 0.05f,
+				.SqrtNumShadowSamples = 3
+				});
+
+			// Ambient Light Entity
+			auto ambientLightEnt = m_gameEcs->CreateEntity();
+			m_gameEcs->SetComponent<EntityNameComponent>(ambientLightEnt, { "AmbientLightEntity" });
+			m_gameEcs->SetComponent<Chimp::AmbientLight>(ambientLightEnt, {
+				.Color = {0.2f, 0.2f, 0.2f}
+				});
+		}
 
 		m_ecs->GetSystems().OnInit();
 
 		// Test ecs serialisation
 		auto ecs = m_engine.CreateECS();
+		auto testEnt2 = ecs->CreateEntity();
 		ecs->CreateEntity();
 		ecs->RemoveEntity(ecs->CreateEntity());
 		ecs->GetScripts().AttachScript(ecs->CreateEntity(), "Test");
+		ecs->SetComponent<Chimp::PointLight>(testEnt2, {
+		.Position = {0, 0, 0},
+		.Color = {1, 1, 1},
+		.Attenuation = {0.0f, 0.1f, 0.0f}
+			});
+		ecs->SetComponent<Chimp::DirectionalLight>(testEnt2, Chimp::DirectionalLight{
+			.Direction = Chimp::Vector3f{0.0f, -1.0f, 0.0f},
+			.Color = Chimp::Vector3f{1.0f, 1.0f, 1.0f},
+			.ShadowBias = 0.05f,
+			.SqrtNumShadowSamples = 3
+			});
+		ecs->SetComponent<Chimp::Spotlight>(testEnt2, {
+			.Direction = Chimp::Vector3f{0.0f, -1.0f, 0.0f},
+			.Position = Chimp::Vector3f{0.0f, 5.0f, 0.0f},
+			.Color = Chimp::Vector3f{1.0f, 1.0f, 1.0f},
+			.Attenuation = Chimp::Vector3f{0.0f, 0.1f, 0.0f},
+			.DoNotUse_CutoffAngle = Chimp::Cos(30.0f),
+			.ShadowBias = 0.05f,
+			.SqrtNumShadowSamples = 3
+			});
 
 		auto json = ecs->Serialise();
 		GetLogger().Info("ecs1:");
@@ -86,10 +170,6 @@ namespace ChimpEditor {
 
 		auto& shader = m_engine.GetRenderingManager().GetChimpShaders().GetLitShader();
 		shader.SetCamera(m_camera);
-		shader.GetLighting().Ambient = { 1,1,1 };
-		shader.GetLighting().NumPointLights = 0;
-		shader.GetLighting().NumSpotlights = 0;
-		shader.GetLighting().NumDirectionLights = 0;
 	}
 
 	void EditorScene::OnDeactivate() {}
@@ -103,6 +183,8 @@ namespace ChimpEditor {
 
 	void EditorScene::OnRender() {
 		auto& rm = m_engine.GetRenderingManager();
+		auto& shader = m_engine.GetRenderingManager().GetChimpShaders().GetLitShader();
+		shader.SetLighting(m_gameEcs->GetLightManager().GenerateLighting());
 
 		m_ecs->GetSystems().OnRender();
 

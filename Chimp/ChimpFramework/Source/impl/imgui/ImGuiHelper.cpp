@@ -1,4 +1,4 @@
-#include "api/utils/ImGuiHelper.h"
+#include "api/imgui/ImGuiHelper.h"
 
 namespace Chimp {
 	void ImGuiHelper::CenteredTextHorizontally(const std::string& text) {

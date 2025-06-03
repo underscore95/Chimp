@@ -47,6 +47,10 @@ namespace Chimp {
 		}
 		const T& operator*() const { return *m_Value; }
 
+		const T& Get() const { assert(m_Value); return *m_Value; }
+		const T* GetNullablePtr() const { return m_Value; }
+		const T* GetNotNullPtr() const { return assert(m_Value); m_Value; }
+
 		bool HasValue() const { return m_Value != nullptr; }
 
 		operator bool() const { return HasValue(); }

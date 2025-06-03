@@ -18,6 +18,7 @@
 #include "api/ecs/scripting/IEntityScript.h"
 #include "api/ecs/components/ComponentRegistry.h"
 #include "api/ecs/components/MeshComponent.h"
+#include "api/graphics/shaders/shaders/lighting/LightComponents.h"
 
 // Misc
 #include "api/networking/PacketTypeRegistry.h"
@@ -41,3 +42,4 @@
 #include "api/utils/ByteVisualiser.h"
 #include "api/utils/FilePath.h"
 #include "api/utils/StringUtils.h"
+#include "api/imgui/ImGuiMacros.h"
