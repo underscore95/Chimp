@@ -1,8 +1,8 @@
 include(${CMAKE_SOURCE_DIR}/cmake/GameDataMacro.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LinkChimp.cmake)
 
 # ChimpGame
 include(ChimpGameSources.cmake)
-set_property(TARGET ChimpGame PROPERTY CXX_STANDARD 20)
 
 # Export all symbols
 if (MSVC)
@@ -11,22 +11,4 @@ if (MSVC)
 endif()
 
 # Link to chimp
-set_game_data_macro(ChimpGame)
-
-target_include_directories(ChimpGame PRIVATE "Source/")
-target_include_directories(ChimpGame PRIVATE "${CMAKE_SOURCE_DIR}/ChimpFramework/Source/")
-
-target_link_libraries(ChimpGame PRIVATE ChimpFramework)
-
-target_compile_definitions(ChimpGame PRIVATE
-        CHIMP_GLM=1
-        CHIMP_LIBSNDFILE=1
-        CHIMP_STB=1
-        CHIMP_FLECS=1
-        CHIMP_ENET=1
-        CHIMP_GLFW=1
-        CHIMP_OPENAL=1
-        CHIMP_OPENGL=1
-        CHIMP_ASSIMP=1
-        CHIMP_IMGUI=1
-)
+setup_chimp_target(ChimpGame)

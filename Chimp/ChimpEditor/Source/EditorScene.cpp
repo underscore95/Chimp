@@ -78,9 +78,6 @@ namespace ChimpEditor {
 				.Color = {1, 1, 1},
 				.Attenuation = {0.0f, 0.1f, 0.0f}
 				});
-			m_gameEcs->SetComponent<Chimp::AmbientLight>(pointLightEnt, {
-				.Color = {0.2f, 0.2f, 0.2f}
-				});
 
 			// Directional Light Entity
 			auto dirLightEnt = m_gameEcs->CreateEntity();
