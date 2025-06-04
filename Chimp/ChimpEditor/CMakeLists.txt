@@ -1,5 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/cmake/GameDataMacro.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/CopyChimpDlls.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/LinkChimp.cmake)
 
 # ChimpEditor
 include(ChimpEditorSources.cmake)

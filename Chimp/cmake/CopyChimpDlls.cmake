@@ -8,11 +8,11 @@ function(copy_chimp_dlls target)
         )
 
         # Copy some that are missed by above command
-        add_custom_command(TARGET ChimpEditor POST_BUILD
+        add_custom_command(TARGET ${target} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_BINARY_DIR}/ChimpFramework/pugixml.dll"
             "${CMAKE_BINARY_DIR}/ChimpFramework/libmp3lame.DLL"
-            $<TARGET_FILE_DIR:ChimpEditor>
+            $<TARGET_FILE_DIR:${target}>
         )
     endif()
 endfunction()
