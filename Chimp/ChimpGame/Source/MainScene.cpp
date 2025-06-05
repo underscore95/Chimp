@@ -2,9 +2,10 @@
 
 MainScene::MainScene(Chimp::Engine& engine) :
 	m_engine(engine),
-	m_ecs(engine.CreateECS()),
 	m_controller(m_camera, engine.GetWindow().GetInputManager())
 {
+	LoadEntities();
+
 	LoadResources();
 }
 
@@ -38,15 +39,21 @@ void MainScene::OnUpdate() {
 
 void MainScene::OnRender() {
 	auto& rm = m_engine.GetRenderingManager();
+
+	rm.GetRenderer().SetClearColor(0.3f, 0.3f, 0.6f);
+	rm.ClearColorBuffer();
+	rm.ClearDepthBuffer();
+
 	auto& shader = m_engine.GetRenderingManager().GetChimpShaders().GetLitShader();
 	shader.SetLighting(m_ecs->GetLightManager().GenerateLighting());
 
 	m_ecs->GetSystems().OnRender();
 
-	rm.SetViewport({ 0,0 }, m_engine.GetWindow().GetSize());
-	rm.SetFrameBuffer();
-	rm.GetRenderer().SetClearColor(0, 0, 0);
-	rm.ClearColorBuffer();
+	auto view = m_ecs->GetEntitiesWithComponents<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>();
+	shader.RenderWorld(view, *m_ecs);
+
+	rm.SetDefaultRenderTarget(std::weak_ptr<Chimp::IRenderTexture>());
+	rm.BindDefaultRenderTarget();
 }
 
 void MainScene::OnRenderUI() {
@@ -59,4 +66,26 @@ void MainScene::LoadResources() {
 
 void MainScene::UnloadResources() {
 
+}
+
+void MainScene::LoadEntities()
+{
+	do {
+		const std::string path = std::string(GAME_DATA_FOLDER) + "/ecs.json";
+
+		if (!std::filesystem::exists(path))
+			break;
+
+		std::ifstream file(path);
+		if (!file.is_open())
+			break;
+
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		std::string jsonContent = buffer.str();
+
+		m_ecs = Chimp::ECS::Deserialise(m_engine, jsonContent, true, true);
+	} while (false);
+
+	if (m_ecs == nullptr) m_ecs = m_engine.CreateECS();
 }

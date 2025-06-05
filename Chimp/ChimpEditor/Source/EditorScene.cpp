@@ -190,13 +190,6 @@ namespace ChimpEditor {
 
 		m_gameEcs = Chimp::ECS::Deserialise(m_engine, jsonContent, true, false);
 
-		// Use the euler angles we stored for rotation
-		auto view = m_gameEcs->GetEntitiesWithComponents<Chimp::TransformComponent, Chimp::EulerRotationComponent, Chimp::EntityIdComponent>();
-		for (auto& [transform, euler, id] : view) {
-			auto fromEuler = Chimp::ToQuatRotation(euler.Rotation);
-			m_gameEcs->GetTransformManager().SetLocalRotation(id.Id, fromEuler);
-		}
-
 		return m_gameEcs != nullptr;
 	}
 

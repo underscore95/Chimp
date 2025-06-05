@@ -68,7 +68,7 @@ namespace Chimp {
 
 			MeshComponent Deserialise(const Json& json) override {
 				std::string path = json["Path"];
-				return { {	Engine::GetEngine().GetResourceManager().GetModels().Get(path), path} };
+				return { {	Engine::GetEngine().GetResourceManager().GetModels().ImmediateDepend(path), path} };
 			}
 
 			void Serialise(Json& json, const MeshComponent& comp) override {
