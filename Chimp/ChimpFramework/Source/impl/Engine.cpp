@@ -52,6 +52,8 @@ namespace Chimp {
 
 	void Engine::Destroy()
 	{
+		m_SceneManager = nullptr;
+
 		// Can't destroy an OpenAL context in a thread destructor
 		m_AudioManager = nullptr;
 	}

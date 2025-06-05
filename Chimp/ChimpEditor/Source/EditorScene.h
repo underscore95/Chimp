@@ -18,6 +18,10 @@ namespace ChimpEditor {
 		void UnloadResources() override;
 
 	private:
+		bool LoadGameECS();
+		void SaveGameECS();
+
+	private:
 		Chimp::Engine& m_engine;
 		std::unique_ptr<Chimp::ECS> m_ecs;
 		std::unique_ptr<Chimp::ECS> m_gameEcs;

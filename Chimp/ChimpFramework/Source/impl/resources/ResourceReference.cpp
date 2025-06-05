@@ -7,6 +7,11 @@ namespace Chimp {
 		return instance;
 	}
 
+	ImportedAssetsList::~ImportedAssetsList()
+	{
+		
+	}
+
 	void ImportedAssetsList::NotifyAssetLoaded(const std::filesystem::path& path, AnyReference ref)
 	{
 #ifdef CHIMP_RESOURCE_SERIALISATION
@@ -52,6 +57,9 @@ namespace Chimp {
 
 	std::filesystem::path ImportedAssetsList::GetPath(int index)
 	{
+#ifndef CHIMP_RESOURCE_SERIALISATION
+		assert(false);
+#endif
 		for (auto& [path, assetIndex] : m_AssetIndices) {
 			if (index == assetIndex) return path;
 		}

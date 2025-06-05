@@ -28,8 +28,12 @@ namespace Chimp {
 		return json.dump();
 	}
 
-	std::unique_ptr<ECS> ECS::Deserialise(Engine& engine, std::string_view json, bool disableScriptProcessing)
+	std::unique_ptr<ECS> ECS::Deserialise(Engine& engine, std::string_view json, bool disableScriptProcessing, bool removeEditorComponents)
 	{
+		std::unordered_set<std::string> editorComponents = {
+			"Chimp::EulerRotationComponent"
+		};
+
 		std::unique_ptr<ECS> ecs = engine.CreateECS();
 		if (disableScriptProcessing) ecs->GetScripts().DisableProcessing();
 
@@ -60,7 +64,11 @@ namespace Chimp {
 		for (const auto& ent : entities) {
 			// Add all components
 			for (const auto& pair : ent.Json.items()) {
-				ComponentRegistry::Instance().Deserialise(*ecs, ent.Id, pair.key(), ent.Json);
+				std::string typeName = pair.key();
+				if (removeEditorComponents && editorComponents.contains(typeName)) {
+					continue;
+				}
+				ComponentRegistry::Instance().Deserialise(*ecs, ent.Id, typeName, ent.Json);
 			}
 		}
 

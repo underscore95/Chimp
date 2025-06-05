@@ -75,7 +75,7 @@ namespace Chimp {
 #ifdef CHIMP_RESOURCE_SERIALISATION
 				json["Path"] = comp.Mesh.GetPath();
 #else
-				Loggers::ECS().Warning("Cannot serialise MeshComponent unless CHIMP_rESOURCE_SERIALISATION is defined.");
+				Loggers::ECS().Warning("Cannot serialise MeshComponent unless CHIMP_RESOURCE_SERIALISATION is defined.");
 #endif
 			}
 		};

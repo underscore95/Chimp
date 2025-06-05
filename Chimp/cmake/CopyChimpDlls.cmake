@@ -14,5 +14,14 @@ function(copy_chimp_dlls target)
             "${CMAKE_BINARY_DIR}/ChimpFramework/libmp3lame.DLL"
             $<TARGET_FILE_DIR:${target}>
         )
+
+        # Copy pdb (debug symbols) for chimp
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_BINARY_DIR}/ChimpFramework/ChimpFramework.pdb"
+                $<TARGET_FILE_DIR:${target}>
+            )
+        endif()
     endif()
 endfunction()

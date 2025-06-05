@@ -1,6 +1,5 @@
 #include "InspectorScript.h"
 #include "scene_hierarchy\SceneHierarchyScript.h"
-#include "scene_hierarchy\EntityNameComponent.h"
 
 namespace ChimpEditor {
 	InspectorScript::InspectorScript(Chimp::Engine& engine,
@@ -38,7 +37,7 @@ namespace ChimpEditor {
 			// Entity name
 			auto ent = m_sceneHierarchy->GetSelectedEntity();
 			std::string str = std::to_string(ent);
-			auto nameComp = m_gameEcs.GetComponent<EntityNameComponent>(ent);
+			auto nameComp = m_gameEcs.GetComponent<Chimp::EntityNameComponent>(ent);
 			ImGui::Text(nameComp ? nameComp->Name.c_str() : str.c_str());
 
 			// Options

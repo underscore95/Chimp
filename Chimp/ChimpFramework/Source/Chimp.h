@@ -19,6 +19,7 @@
 #include "api/ecs/components/ComponentRegistry.h"
 #include "api/ecs/components/MeshComponent.h"
 #include "api/graphics/shaders/shaders/lighting/LightComponents.h"
+#include "api/ecs/components/EntityNameComponent.h"
 
 // Misc
 #include "api/networking/PacketTypeRegistry.h"

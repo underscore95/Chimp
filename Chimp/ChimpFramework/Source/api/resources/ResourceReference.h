@@ -14,6 +14,7 @@ namespace Chimp {
 	class ImportedAssetsList {
 	private:
 		ImportedAssetsList() = default;
+		~ImportedAssetsList();
 	public:
 		static ImportedAssetsList& Instance();
 

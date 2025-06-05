@@ -273,44 +273,19 @@ namespace Chimp {
 	// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 	Quaternion ToQuatRotation(Vector3f degrees)
 	{
-		float cr = Cos(degrees.x * 0.5);
-		float sr = Sin(degrees.x * 0.5);
-		float cp = Cos(degrees.y * 0.5);
-		float sp = Sin(degrees.y * 0.5);
-		float cy = Cos(degrees.z * 0.5);
-		float sy = Sin(degrees.z * 0.5);
-
-		Quaternion n = {
-			cr * cp * cy + sr * sp * sy,
-			sr * cp * cy - cr * sp * sy,
-			cr * sp * cy + sr * cp * sy,
-			cr * cp * sy - sr * sp * cy
-		};
-
-		return n;
+		degrees.x = ToRadians(degrees.x);
+		degrees.y = ToRadians(degrees.y);
+		degrees.z = ToRadians(degrees.z);
+		Quaternion q = glm::quat(degrees); 
+		return q;
 	}
 
 	// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Source_code_2
-	Vector3f ToEulerRotation(Quaternion rotation)
+	Vector3f ToEulerRotationDegrees(Quaternion q)
 	{
-		Vector3f angles;
+		Vector3f angles = glm::eulerAngles(q);
 
-		// roll (x-axis rotation)
-		float sinr_cosp = 2 * (rotation.w * rotation.x + rotation.y * rotation.z);
-		float cosr_cosp = 1 - 2 * (rotation.x * rotation.x + rotation.y * rotation.y);
-		angles.x = std::atan2(sinr_cosp, cosr_cosp);
-
-		// pitch (y-axis rotation)
-		float sinp = std::sqrt(1 + 2 * (rotation.w * rotation.y - rotation.x * rotation.z));
-		float cosp = std::sqrt(1 - 2 * (rotation.w * rotation.y - rotation.x * rotation.z));
-		angles.y = 2 * std::atan2(sinp, cosp) - HALF_PI;
-
-		// yaw (z-axis rotation)
-		float siny_cosp = 2 * (rotation.w * rotation.z + rotation.x * rotation.y);
-		float cosy_cosp = 1 - 2 * (rotation.y * rotation.y + rotation.z * rotation.z);
-		angles.z = std::atan2(siny_cosp, cosy_cosp);
-
-		// to degrees
+		// Convert to degrees
 		angles.x = ToDegrees(angles.x);
 		angles.y = ToDegrees(angles.y);
 		angles.z = ToDegrees(angles.z);
@@ -320,7 +295,9 @@ namespace Chimp {
 
 	Quaternion CreateIdentityQuaternion()
 	{
-		return glm::identity<glm::quat>();
+		Quaternion q = glm::identity<glm::quat>();
+		assert(q == ToQuatRotation({ 0, 0, 0 }));
+		return q;
 	}
 
 	std::string ToString(const Matrix& m)
@@ -349,7 +326,7 @@ namespace Chimp {
 		transformMatrix[0] *= scale.x;
 		transformMatrix[1] *= scale.y;
 		transformMatrix[2] *= scale.z;
-		transformMatrix[3] = glm::vec4(translation.x,translation.y,translation.z, 1.0f);
+		transformMatrix[3] = glm::vec4(translation.x, translation.y, translation.z, 1.0f);
 
 		return transformMatrix;
 	}

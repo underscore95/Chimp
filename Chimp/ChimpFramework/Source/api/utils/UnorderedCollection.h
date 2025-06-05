@@ -242,7 +242,7 @@ namespace Chimp {
 		j = Json::array();
 		for (const T& t : e) {
 			Json json;
-			to_json(json, e);
+			to_json(json, t);
 			j.push_back(json);
 		}
 	}

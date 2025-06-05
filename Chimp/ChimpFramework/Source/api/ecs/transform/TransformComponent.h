@@ -73,21 +73,32 @@ namespace Chimp {
 			}
 
 			TransformComponent Deserialise(const Json& json) override {
-				Quaternion rot;
-				json["Rotation"].get_to(rot);
+				const auto& rot = json["Rotation"];
 				return {
 					json["Translation"],
-					rot,
+					Quaternion(
+						rot["w"].get<float>(),
+						rot["x"].get<float>(),
+						rot["y"].get<float>(),
+						rot["z"].get<float>()
+					),
 					json["Scale"]
 				};
 			}
 
-
 			void Serialise(Json& json, const TransformComponent& comp) override {
 				json["Translation"] = comp.LocalTranslation;
-				json["Rotation"] = comp.LocalRotation;
+
+				json["Rotation"] = {
+					{ "w", comp.LocalRotation.w },
+					{ "x", comp.LocalRotation.x },
+					{ "y", comp.LocalRotation.y },
+					{ "z", comp.LocalRotation.z }
+				};
+
 				json["Scale"] = comp.LocalScale;
 			}
+
 		};
 		COMPONENT_REGISTER(TransformComponentRegister);
 	}

@@ -1,5 +1,4 @@
 #include "SceneHierarchyScript.h"
-#include "EntityNameComponent.h"
 #include "api/ecs/hierarchy/HierarchyComponent.h"
 
 namespace ChimpEditor {
@@ -57,7 +56,7 @@ namespace ChimpEditor {
 		ImGui::SetCursorPosX(cursorPosX);
 
 		// Get entity name
-		auto nameComp = m_gameECS.GetComponent<EntityNameComponent>(entity);
+		auto nameComp = m_gameECS.GetComponent<Chimp::EntityNameComponent>(entity);
 		std::string entityName = nameComp ? nameComp->Name : std::format("Entity {}", entity);
 
 		// Draw UI
@@ -99,7 +98,7 @@ namespace ChimpEditor {
 		m_selectedEntity = entity;
 		auto transformComp = m_gameECS.GetComponent<Chimp::TransformComponent>(m_selectedEntity);
 		if (transformComp && !m_gameECS.GetComponent<Chimp::EulerRotationComponent>(m_selectedEntity)) {
-			m_gameECS.SetComponent<Chimp::EulerRotationComponent>(m_selectedEntity, { Chimp::ToEulerRotation(transformComp->LocalRotation) });
+			m_gameECS.SetComponent<Chimp::EulerRotationComponent>(m_selectedEntity, { Chimp::ToEulerRotationDegrees(transformComp->LocalRotation) });
 		}
 	}
 }

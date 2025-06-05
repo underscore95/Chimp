@@ -47,7 +47,7 @@ namespace Chimp {
 		std::string Serialise();
 
 		// Deserialise from json
-		static std::unique_ptr<ECS> Deserialise(Engine& engine, std::string_view json, bool disableScriptProcessing);
+		static std::unique_ptr<ECS> Deserialise(Engine& engine, std::string_view json, bool disableScriptProcessing, bool removeEditorComponents);
 
 		// A view represents a set of entities each with the same common set of components
 		template <typename... Components>

@@ -24,7 +24,7 @@ namespace Chimp {
 	struct Vector3i;
 	struct Vector4i;
 
-	typedef glm::quat Quaternion;
+	using Quaternion = glm::quat;
 
 	// Compare two floats for equality, supports floating point error
 	[[nodiscard]] bool FloatEqual(float a, float b, float epsilon = 1e-6);
@@ -1004,7 +1004,7 @@ namespace Chimp {
 	[[nodiscard]] std::string ToString(const Quaternion& q);
 
 	[[nodiscard]] Quaternion ToQuatRotation(Vector3f degrees);
-	[[nodiscard]] Vector3f ToEulerRotation(Quaternion rotation);
+	[[nodiscard]] Vector3f ToEulerRotationDegrees(Quaternion rotation);
 
 	[[nodiscard]] Quaternion CreateIdentityQuaternion();
 
