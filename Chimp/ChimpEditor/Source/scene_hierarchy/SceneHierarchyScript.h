@@ -13,6 +13,7 @@ namespace ChimpEditor {
 		Chimp::EntityId GetSelectedEntity() const;
 		bool HasSelectedEntity() const;
 
+		void SelectEntity(Chimp::EntityId entity);
 	private:
 		void OnInit() override;
 		void OnUpdate() override;
@@ -21,7 +22,6 @@ namespace ChimpEditor {
 
 		void RenderUI(Chimp::EntityId entity, const Chimp::HierarchyComponent& hierarchyComp, float cursorPosX);
 
-		void SelectEntity(Chimp::EntityId entity);
 
 	private:
 		Chimp::ECS& m_gameECS;

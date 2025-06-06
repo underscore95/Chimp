@@ -21,9 +21,14 @@ namespace ChimpEditor {
 		void RenderByteVisualisationOption();
 		void RenderByteVisualisation(Chimp::AnyReference component);
 		std::string GetComponentTypeName(Chimp::AnyReference component);
+		void RenderAddRemoveComponentButtons();
+
+		void RenderComponentDropdown(const char* dropdownLabel, Chimp::InPlaceOptional<Chimp::TypeInfo>& storage, const std::function<bool(Chimp::TypeInfo)>& predicate);
 	private:
 		Chimp::ECS& m_gameEcs;
 		Chimp::Reference< SceneHierarchyScript> m_sceneHierarchy;
 		ByteVisualisationFormat m_byteVisualisationFormat = ByteVisualisationFormat::None;
+		Chimp::InPlaceOptional<Chimp::TypeInfo> m_selectedComponentAdd;
+		Chimp::InPlaceOptional<Chimp::TypeInfo> m_selectedComponentRemove;
 	};
 }

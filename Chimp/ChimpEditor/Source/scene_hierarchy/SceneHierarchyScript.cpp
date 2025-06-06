@@ -124,8 +124,12 @@ namespace ChimpEditor {
 		m_hasSelectedEntity = true;
 		m_selectedEntity = entity;
 		auto transformComp = m_gameECS.GetComponent<Chimp::TransformComponent>(m_selectedEntity);
-		if (transformComp && !m_gameECS.GetComponent<Chimp::EulerRotationComponent>(m_selectedEntity)) {
+		bool hasEulerComp = m_gameECS.GetComponent<Chimp::EulerRotationComponent>(m_selectedEntity);
+		if (transformComp && !hasEulerComp) {
 			m_gameECS.SetComponent<Chimp::EulerRotationComponent>(m_selectedEntity, { Chimp::ToEulerRotationDegrees(transformComp->LocalRotation) });
+		}
+		if (!transformComp && hasEulerComp) {
+			m_gameECS.RemoveComponent<Chimp::EulerRotationComponent>(m_selectedEntity);
 		}
 	}
 }

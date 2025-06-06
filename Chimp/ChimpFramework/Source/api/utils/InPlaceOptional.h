@@ -44,9 +44,14 @@ namespace Chimp {
 			return m_Value;
 		}
 
-		// Returns pointer to value, even if value is empty
+		// Returns ref to value, even if value is empty
 		[[nodiscard]] T& UnsafeGet() {
+			assert(m_HasValue);
 			return m_Value;
+		}
+
+		[[nodiscard]] bool operator==(const T& other) {
+			return HasValue() && m_Value == other;
 		}
 
 		void Reset() {

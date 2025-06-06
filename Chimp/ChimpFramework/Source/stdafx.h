@@ -35,6 +35,7 @@
 #include <fstream>
 #include <concepts>
 #include <filesystem>
+#include <typeindex>
 #include <functional>
 #include <typeinfo>
 #include <climits>

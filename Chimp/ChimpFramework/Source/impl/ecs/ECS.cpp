@@ -106,4 +106,12 @@ namespace Chimp {
 	{
 		m_World.make_alive(idToUse);
 	}
+
+	void ECS::RemoveComponent(EntityId entity, TypeInfo typeInfo)
+	{
+		assert(ComponentRegistry::Instance().IsAllowedToRemove(typeInfo));
+		auto it = m_TypeInfoToComponentId.find(typeInfo);
+		assert(it != m_TypeInfoToComponentId.end());
+		ecs_remove_id(m_World.c_ptr(), entity, it->second);
+	}
 }

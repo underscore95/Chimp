@@ -43,6 +43,9 @@ namespace ChimpEditor {
 			// Options
 			RenderByteVisualisationOption();
 
+			// Add / remove components
+			RenderAddRemoveComponentButtons();
+
 			// Components
 			m_gameEcs.GetComponentsOnEntity(ent, [this, ent](Chimp::AnyReference component) {
 				if (Chimp::ComponentRegistry::Instance().ShouldHideInInspectorUI(component.GetType())) return;
@@ -114,5 +117,54 @@ namespace ChimpEditor {
 			rawName.erase(0, 6);
 		}
 		return rawName;
+	}
+
+	void InspectorScript::RenderAddRemoveComponentButtons()
+	{
+		// Add component
+		if (m_selectedComponentAdd.Empty()) ImGui::BeginDisabled();
+		if (ImGui::Button("Add Component:")) {
+			m_gameEcs.AddDefaultComponent(m_sceneHierarchy->GetSelectedEntity(), m_selectedComponentAdd.UnsafeGet());
+			m_selectedComponentAdd.Reset();
+			// handle euler rotation component
+			m_sceneHierarchy->SelectEntity(m_sceneHierarchy->GetSelectedEntity());
+		}
+		else if (m_selectedComponentAdd.Empty()) ImGui::EndDisabled();
+		RenderComponentDropdown("##add-comp", m_selectedComponentAdd, [this](Chimp::TypeInfo typeInfo) {
+			return !m_gameEcs.HasComponent(m_sceneHierarchy->GetSelectedEntity(), typeInfo);
+			});
+
+		// Remove component
+		if (m_selectedComponentRemove.Empty()) ImGui::BeginDisabled();
+		if (ImGui::Button("Remove Component:")) {
+			m_gameEcs.RemoveComponent(m_sceneHierarchy->GetSelectedEntity(), m_selectedComponentRemove.UnsafeGet());
+			m_selectedComponentRemove.Reset();
+			// handle euler rotation component
+			m_sceneHierarchy->SelectEntity(m_sceneHierarchy->GetSelectedEntity());
+		}
+		else if (m_selectedComponentRemove.Empty()) ImGui::EndDisabled();
+		RenderComponentDropdown("##remove-comp", m_selectedComponentRemove, [this](Chimp::TypeInfo typeInfo) {
+			return m_gameEcs.HasComponent(m_sceneHierarchy->GetSelectedEntity(), typeInfo) && Chimp::ComponentRegistry::Instance().IsAllowedToRemove(typeInfo);
+			});
+
+	}
+	void InspectorScript::RenderComponentDropdown(const char* dropdownLabel, Chimp::InPlaceOptional<Chimp::TypeInfo>& storage, const std::function<bool(Chimp::TypeInfo)>& predicate)
+	{
+		if (ImGui::BeginCombo(dropdownLabel, storage.Empty() ? "None" : storage.UnsafeGet().Name())) {
+			for (Chimp::TypeInfo comp : Chimp::ComponentRegistry::Instance().GetRegisteredTypes()) {
+				if (
+					!predicate(comp) ||
+					Chimp::ComponentRegistry::Instance().ShouldHideInInspectorUI(comp)) {
+					if (storage == comp) storage.Reset();
+					continue;
+				}
+
+				if (ImGui::Selectable(comp.Name(), storage.HasValue() && storage == comp)) {
+					storage = comp;
+				}
+			}
+
+			ImGui::EndCombo();
+		}
 	}
 }

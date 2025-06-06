@@ -4,6 +4,9 @@
 #include "OptionalReference.h"
 
 namespace Chimp {
+
+	// Wraps std::type_info
+	// Can be constructed like this: Chimp::TypeInfo typeInfo = typeid(T);
 	class TypeInfo {
 	public:
 		template <typename T>
@@ -41,6 +44,10 @@ namespace Chimp {
 
 		bool operator==(const type_info& other) const {
 			return *this == &other;
+		}
+
+		inline std::type_index TypeIndex() const {
+			return { *m_TypeInfo };
 		}
 
 	private:

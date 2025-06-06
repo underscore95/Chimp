@@ -122,6 +122,14 @@ namespace Chimp {
 			return ToEntity(entity).is_alive();
 		}
 
+		// Has component
+		// typeInfo - type of component, must be a valid registered component
+		bool HasComponent(EntityId entity, Chimp::TypeInfo typeInfo) {
+			auto it = m_TypeInfoToComponentId.find(typeInfo);
+			assert(it != m_TypeInfoToComponentId.end());
+			return ToEntity(entity).has(it->second);
+		}
+
 		// Set a component on an entity, creating it if it doesn't exist
 		// Component - The component type to set
 		// entity - The entity to set the component on
@@ -138,6 +146,17 @@ namespace Chimp {
 			assert(IsEntityAlive(entity));
 #endif
 			ToEntity(entity).set(component);
+		}
+
+		// Add a component to the entity, default constructing it
+		// Entity must not already have the component (check using HasComponent)
+		// typeInfo - type of component, must be a valid registered component
+		void AddDefaultComponent(EntityId entity, Chimp::TypeInfo typeInfo) {
+			auto it = m_TypeInfoToComponentId.find(typeInfo);
+			assert(it != m_TypeInfoToComponentId.end());
+			assert(!HasComponent(entity, typeInfo));
+			ToEntity(entity).add(it->second);
+			assert(HasComponent(entity, typeInfo));
 		}
 
 		// Get a component from an entity
@@ -173,13 +192,21 @@ namespace Chimp {
 			return *m_TransformManager;
 		}
 
+		// Remove component from entity
+		// no side effects if entity doesn't have component
+		// component type must be valid though, meaning it must have been registered
+		template <typename T>
+		void RemoveComponent(EntityId entity) {
+			RemoveComponent(entity, typeid(T));
+		}
+
+		void RemoveComponent(EntityId entity, TypeInfo typeInfo);
 	private:
 
 		void DestroySingleEntity(EntityId entity) {
 			m_EntityCount--;
 			ToEntity(entity).destruct();
 		}
-
 
 		// Used for ECS deserialisation only
 		void CreateEntityWithoutComponents(EntityId idToUse);
@@ -188,6 +215,7 @@ namespace Chimp {
 		void RegisterComponent() {
 			m_World.component<T>();
 			m_ComponentIdToTypeInfo[m_World.id<T>()] = typeid(T);
+			m_TypeInfoToComponentId[typeid(T)] = m_World.id<T>();
 #ifndef NDEBUG
 			m_RegisteredComponents.insert(typeid(T));
 #endif
@@ -201,6 +229,7 @@ namespace Chimp {
 		Reference<EntityScriptingSystem> m_EntityScripting;
 		EntityHierarchy	m_EntityHierarchy;
 		std::unordered_map<flecs::id_t, TypeInfo> m_ComponentIdToTypeInfo;
+		std::unordered_map<TypeInfo, flecs::id_t> m_TypeInfoToComponentId;
 		LightManager m_LightManager;
 #ifndef NDEBUG
 		std::unordered_set<TypeInfo> m_RegisteredComponents;

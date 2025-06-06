@@ -41,15 +41,29 @@ namespace Chimp {
 			return it->second;
 		}
 
-	public:
+		void SetActiveECS(ECS& ecs) {
+			for (auto& [hashCode, function] : m_SetActiveECSFunctions) {
+				function(ecs);
+			}
+		}
 
+		bool IsAllowedToRemove(TypeInfo comp) {
+			return !m_ComponentsWhereRemovingDisallowed.contains(comp.TypeIndex());
+		}
+
+		const std::vector<TypeInfo>& GetRegisteredTypes() const {
+			return m_RegisteredTypeInfos;
+		}
+
+	private:
 		// Register a component, this can only be called from ComponentRegister which ensures it is impossible to register a component twice
 		template <typename T>
 		void RegisterComponent(bool shouldHideInInspectorUI,
 			const std::function<void(EntityId, T&)>& renderInspectorUi,
 			const std::function<void(ECS&)>& setActiveEcsFunction,
 			const std::function<void(Json&, const T&)>& serialiseFunction,
-			const std::function<T(const Json&)>& deserialiseFunction
+			const std::function<T(const Json&)>& deserialiseFunction,
+			bool isRemovingDisallowed
 		) {
 			TypeInfo typeId = typeid(T);
 			size_t hashCode = typeId.Hash();
@@ -65,15 +79,15 @@ namespace Chimp {
 			m_DeserialiseFunctions[typeId.Name()] = [deserialiseFunction](ECS& ecs, EntityId entity, const Json& json) {
 				ecs.SetComponent<T>(entity, deserialiseFunction(json));
 				};
+
+			if (isRemovingDisallowed) {
+				m_ComponentsWhereRemovingDisallowed.insert(typeId.TypeIndex());
+			}
+
+			m_RegisteredTypeInfos.push_back(typeId);
 		}
 
 		void RegisterComponentsInECS(ECS& ecs);
-
-		void SetActiveECS(ECS& ecs) {
-			for (auto& [hashCode, function] : m_SetActiveECSFunctions) {
-				function(ecs);
-			}
-		}
 
 	private:
 		std::unordered_map<size_t, std::function<void(EntityId, void*)>> m_RenderEditorUIFunctions; // type hash code -> function expecting T* which renders inspector ui
@@ -83,6 +97,8 @@ namespace Chimp {
 		std::unordered_map<size_t, std::function<void(Json&, const void*)>> m_SerialiseFunctions; // type hash code -> function
 		std::unordered_map<std::string, std::function<void(ECS&, EntityId, const Json&)>> m_DeserialiseFunctions; // type hash code -> function
 		std::vector<std::function<void(ECS&)>> m_ECSRegisterFunctions;
+		std::unordered_set<std::type_index> m_ComponentsWhereRemovingDisallowed;
+		std::vector<TypeInfo> m_RegisteredTypeInfos;
 
 		std::unordered_set<std::type_index> RegisteredComponents;
 	};
@@ -110,7 +126,8 @@ namespace Chimp {
 	public:
 		// Register a component
 		ComponentRegister(
-			bool shouldHideInInspectorUI = false
+			bool shouldHideInInspectorUI = false,
+			bool isRemovingDisallowed = false
 		) {
 			std::type_index typeIndex(typeid(T));
 			if (ComponentRegistry::Instance().RegisteredComponents.contains(typeIndex)) return;
@@ -126,7 +143,8 @@ namespace Chimp {
 				renderInspectorUiFunction,
 				setEcsFunction,
 				serialiseFunction,
-				deserialiseFunction
+				deserialiseFunction,
+				isRemovingDisallowed
 			);
 		}
 
