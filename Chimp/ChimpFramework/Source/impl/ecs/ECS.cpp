@@ -4,6 +4,8 @@
 #include "api/utils/StringUtils.h"
 #include "api/utils/preprocessor/Casting.h"
 #include "api/Engine.h"
+#include "api/ecs/components/EntityNameComponent.h"
+#include "api/utils/InPlaceOptional.h"
 
 namespace Chimp {
 
@@ -113,5 +115,14 @@ namespace Chimp {
 		auto it = m_TypeInfoToComponentId.find(typeInfo);
 		assert(it != m_TypeInfoToComponentId.end());
 		ecs_remove_id(m_World.c_ptr(), entity, it->second);
+	}
+
+	InPlaceOptional<EntityId> ECS::FindFirstEntityByName(const std::string& name)
+	{
+		auto view = GetEntitiesWithComponents<EntityNameComponent, EntityIdComponent>();
+		for (auto& [nameComp, id] : view) {
+			if (nameComp.Name == name) return { id.Id };
+		}
+		return {};
 	}
 }

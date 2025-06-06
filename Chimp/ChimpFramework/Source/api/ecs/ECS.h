@@ -22,6 +22,8 @@ namespace Chimp {
 	class Engine;
 	class ComponentRegistry;
 	struct EntityIdComponent;
+	template <typename T>
+	class InPlaceOptional;
 
 #ifdef CHIMP_FLECS
 	class ECS {
@@ -201,6 +203,10 @@ namespace Chimp {
 		}
 
 		void RemoveComponent(EntityId entity, TypeInfo typeInfo);
+
+		// Find entity by name
+		// name - case sensitive
+		InPlaceOptional<EntityId> FindFirstEntityByName(const std::string& name);
 	private:
 
 		void DestroySingleEntity(EntityId entity) {
