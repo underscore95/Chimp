@@ -11,7 +11,7 @@ namespace ChimpEditor {
 
 	public:
 		Chimp::EntityId GetSelectedEntity() const;
-		bool HasSelectedEntity();
+		bool HasSelectedEntity() const;
 
 	private:
 		void OnInit() override;

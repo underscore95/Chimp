@@ -8,14 +8,16 @@ namespace ChimpEditor {
 		IEntityScript(typeid(this).name(), engine, ecs),
 		m_gameECS(gameECS)
 	{
+
 	}
 
 	Chimp::EntityId SceneHierarchyScript::GetSelectedEntity() const
 	{
+		assert(HasSelectedEntity());
 		return m_selectedEntity;
 	}
 
-	bool SceneHierarchyScript::HasSelectedEntity()
+	bool SceneHierarchyScript::HasSelectedEntity() const
 	{
 		return m_hasSelectedEntity;
 	}
@@ -39,6 +41,20 @@ namespace ChimpEditor {
 			Chimp::ComponentMultiply(GetEngine().GetWindow().GetSize(), { 0.25f, 1.0f }) - Chimp::Vector2f{ 8,0 }
 		);
 		ImGui::Begin("Scene Hierarchy");
+
+		// New entity button
+		if (ImGui::Button("New Entity")) {
+			m_gameECS.CreateEntity();
+		}
+
+		// Remove entity
+		if (!HasSelectedEntity()) ImGui::BeginDisabled();
+		ImGui::SameLine();
+		if (ImGui::Button("Remove Entity")) {
+			m_gameECS.RemoveEntity(GetSelectedEntity());
+			m_hasSelectedEntity = false;
+		}
+		else if (!HasSelectedEntity()) ImGui::EndDisabled();
 
 		// Get all entities
 		std::vector<Chimp::EntityId> ents = m_gameECS.GetEntities([this](Chimp::EntityId id) {
