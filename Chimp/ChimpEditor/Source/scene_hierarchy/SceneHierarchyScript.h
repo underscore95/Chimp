@@ -19,7 +19,7 @@ namespace ChimpEditor {
 		void OnRender() override;
 		void OnRenderUI() override;
 
-		void RenderUI(Chimp::EntityId entity, Chimp::HierarchyComponent& hierarchyComp, float cursorPosX);
+		void RenderUI(Chimp::EntityId entity, const Chimp::HierarchyComponent& hierarchyComp, float cursorPosX);
 
 		void SelectEntity(Chimp::EntityId entity);
 

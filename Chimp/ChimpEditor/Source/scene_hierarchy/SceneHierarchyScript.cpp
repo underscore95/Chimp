@@ -40,17 +40,28 @@ namespace ChimpEditor {
 		);
 		ImGui::Begin("Scene Hierarchy");
 
-		auto view = m_gameECS.GetEntitiesWithComponents<Chimp::EntityIdComponent, Chimp::HierarchyComponent>();
+		// Get all entities
+		std::vector<Chimp::EntityId> ents = m_gameECS.GetEntities([this](Chimp::EntityId id) {
+			auto hierarchy = m_gameECS.GetComponent<Chimp::HierarchyComponent>(id);
+			assert(hierarchy);
+			return hierarchy->HierarchyLevel == 0;
+			});
 
-		for (auto& [entityId, hierarchy] : view) {
-			if (hierarchy.HierarchyLevel > 0) continue;
-			RenderUI(entityId.Id, hierarchy, ImGui::GetCursorPosX());
+		// Sort them by id to be consistent order
+		std::sort(ents.begin(), ents.end());
+
+		// Render ui
+		for (Chimp::EntityId id : ents) {
+			auto hierarchy = m_gameECS.GetComponent<Chimp::HierarchyComponent>(id);
+			assert(hierarchy);
+			if (hierarchy->HierarchyLevel > 0) continue; // Children get rendered recursively
+			RenderUI(id, *hierarchy, ImGui::GetCursorPosX());
 		}
 
 		ImGui::End();
 	}
 
-	void SceneHierarchyScript::RenderUI(Chimp::EntityId entity, Chimp::HierarchyComponent& hierarchyComp, float cursorPosX)
+	void SceneHierarchyScript::RenderUI(Chimp::EntityId entity, const Chimp::HierarchyComponent& hierarchyComp, float cursorPosX)
 	{
 		float oldCursorPosX = ImGui::GetCursorPosX();
 		ImGui::SetCursorPosX(cursorPosX);

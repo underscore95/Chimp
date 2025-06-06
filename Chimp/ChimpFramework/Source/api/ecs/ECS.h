@@ -11,6 +11,7 @@
 #include "api/utils/AnyReference.h"
 #include "api/graphics/shaders/shaders/lighting/LightManager.h"
 #include "hierarchy/EntityHierarchy.h"
+#include "api/utils/TupleUtils.h"
 
 namespace Chimp {
 	struct DeserialisedEntity {
@@ -84,7 +85,7 @@ namespace Chimp {
 			}
 
 		private:
-			std::vector<ComponentTuple> m_Components;
+			std::vector<ComponentTuple> m_Components; // Don't do stuff like sorting, removing from this list it doesn't work
 		};
 
 	public:
@@ -162,6 +163,8 @@ namespace Chimp {
 			// but it's only about 20-25% difference in release mode and imo the api is much nicer.
 			return View<Components...>(m_World);
 		}
+
+		std::vector<EntityId> GetEntities(const std::function<bool(EntityId)>& predicate);
 
 		// Get all components on an entity
 		void GetComponentsOnEntity(EntityId entity, const std::function<void(AnyReference)>& function);

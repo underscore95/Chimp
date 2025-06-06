@@ -78,6 +78,18 @@ namespace Chimp {
 		return std::move(ecs);
 	}
 
+	std::vector<EntityId> ECS::GetEntities(const std::function<bool(EntityId)>& predicate)
+	{
+		std::vector<EntityId> v;
+		auto view = GetEntitiesWithComponents<Chimp::EntityIdComponent>();
+		for (auto& [id] : view) {
+			if (predicate(id.Id)) {
+				v.push_back(id.Id);
+			}
+		}
+		return v;
+	}
+
 	void ECS::GetComponentsOnEntity(EntityId entity, const std::function<void(AnyReference)>& function)
 	{
 		ToEntity(entity).each([this, entity, &function](flecs::id id) {
