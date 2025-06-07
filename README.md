@@ -24,13 +24,23 @@ Blaboon is a Bloons TD Battles clone developed by me using Chimp v1: https://git
 ### Entities
 - Chimp provides an ECS which wraps FLECS
 - Entities can have parents and children, transforms respect this hierarchy
+- ECSs can be fully de/serialised to JSON
+- Custom reflection system to allow components to be serialised and integrated with editor
 
 ### Resource Management
 - Resources can be loaded and then will automatically be unloaded when nothing is referencing them
 - Won't reload shared resources when switching scenes
   
 ### Audio
-- Sound effect system (setup a list of sound files, pitch and volume range for extra variety)
+- Sound effect system (define a list of sound files, pitch and volume range for extra variety)
 - Positional audio
 - Music system supporting fading between tracks
 - OpenAL backend
+
+### Editor
+- Entirely optional, the game can be fully created in code without the editor
+- Scene view that updates in real time as entities are modified
+- Create and remove entities
+- Entity inspector allowing viewing, modifying, removing, and adding components
+- Asset manager to browse game data directory in-editor
+- Asset importer to control how assets are imported (WIP! settings are only used in editor and not at runtime)
