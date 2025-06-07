@@ -6,6 +6,7 @@
 #include "api/Engine.h"
 #include "api/ecs/components/EntityNameComponent.h"
 #include "api/utils/InPlaceOptional.h"
+#include "api/graphics/GameShader.h"
 
 namespace Chimp {
 
@@ -78,6 +79,13 @@ namespace Chimp {
 		ecs->GetScripts().OnDeserialise();
 
 		return std::move(ecs);
+	}
+
+	void ECS::Render(Chimp::GameShader& shader)
+	{
+		GetSystems().OnRender();
+
+		shader.RenderWorld(*this);
 	}
 
 	std::vector<EntityId> ECS::GetEntities(const std::function<bool(EntityId)>& predicate)

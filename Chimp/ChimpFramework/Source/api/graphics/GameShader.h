@@ -19,6 +19,10 @@ namespace Chimp {
 	class Engine;
 	class ICamera;
 	class Mesh;
+	struct TransformComponent;
+	struct MeshComponent;
+	struct EntityIdComponent;
+	class ECS;
 
 	// Simple abstraction around Chimp's renderer which is specific to the shader (so it sends correct textures, uniforms, etc)
 	class GameShader {
@@ -41,6 +45,9 @@ namespace Chimp {
 
 		// Render a mesh
 		virtual void Render(const Mesh& mesh, const TransformMatrices& transform);
+
+		// Render every entity in the world
+		virtual void RenderWorld(ECS& ecs) { assert(false && "Unsupported operation on this shader."); }
 
 		IShader& GetRawShader();
 

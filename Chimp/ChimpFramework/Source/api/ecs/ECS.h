@@ -22,6 +22,7 @@ namespace Chimp {
 	class Engine;
 	class ComponentRegistry;
 	struct EntityIdComponent;
+	class GameShader;
 	template <typename T>
 	class InPlaceOptional;
 
@@ -95,6 +96,18 @@ namespace Chimp {
 		EntityScriptingSystem& GetScripts() { return m_EntityScripting.Get(); }
 		EntityHierarchy& GetHierarchy() { return m_EntityHierarchy; }
 		LightManager& GetLightManager() { return m_LightManager; }
+
+		// Update the ecs, call once per frame
+		void Update() {
+			GetSystems().OnUpdate();
+			GetTransformManager().UpdateAllMatrices();
+		}
+
+		void Render(Chimp::GameShader& shader);
+
+		void RenderUI() {
+			GetSystems().OnRenderUI();
+		}
 
 		// Get number of alive entities
 		[[nodiscard]] size_t GetEntityCount() const {

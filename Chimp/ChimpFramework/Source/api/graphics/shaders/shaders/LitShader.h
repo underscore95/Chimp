@@ -27,9 +27,8 @@ namespace Chimp {
 		/// <summary>
 		/// Render the world with shadows
 		/// </summary>
-		/// <param name="view>View which contains every entity that should be rendered</param>
 		/// <param name="ecs>The ECS</param>
-		void RenderWorld(Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view, const ECS& ecs);
+		void RenderWorld(ECS& ecs) override;
 
 		static inline int VertexSize() {
 			return 3 * sizeof(float) // position

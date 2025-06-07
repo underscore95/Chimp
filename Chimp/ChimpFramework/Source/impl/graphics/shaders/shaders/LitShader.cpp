@@ -51,8 +51,9 @@ namespace Chimp {
 		GameShader::Render(mesh, transform);
 	}
 
-	void LitShader::RenderWorld(Chimp::ECS::View<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>& view, const ECS& ecs)
+	void LitShader::RenderWorld(ECS& ecs)
 	{
+		auto view = ecs.GetEntitiesWithComponents<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>();
 		ShadowPass(view, ecs);
 
 		BeginFrame();

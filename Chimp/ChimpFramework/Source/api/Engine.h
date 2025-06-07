@@ -64,6 +64,9 @@ namespace Chimp {
 		// Create an ECS world
 		[[nodiscard]] std::unique_ptr<ECS> CreateECS();
 
+		// Load ECS from file
+		[[nodiscard]] std::unique_ptr<ECS> LoadECS(const std::string& filePath);
+
 		// Create an event handler that can be used to send and receive events
 		// EventType - enum representing event type
 		// Event - struct representing event data, inheritance is supported

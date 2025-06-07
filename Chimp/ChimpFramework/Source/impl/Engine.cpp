@@ -186,6 +186,26 @@ namespace Chimp {
 		return std::move(ecs);
 	}
 
+	std::unique_ptr<ECS> Engine::LoadECS(const std::string& filePath)
+	{
+		do {
+			if (!std::filesystem::exists(filePath))
+				break;
+
+			std::ifstream file(filePath);
+			if (!file.is_open())
+				break;
+
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			std::string jsonContent = buffer.str();
+
+			return Chimp::ECS::Deserialise(*this, jsonContent, true, true);
+		} while (false);
+
+		return CreateECS();
+	}
+
 	std::unique_ptr<IWindow> Engine::CreateWindow() const
 	{
 		std::unique_ptr<IWindow> window = nullptr;

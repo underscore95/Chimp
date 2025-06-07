@@ -29,8 +29,7 @@ namespace ChimpEditor {
 		// TODO: clear stencil buffer
 
 		auto& shader = GetEngine().GetRenderingManager().GetChimpShaders().GetLitShader();
-		auto view = m_gameEcs.GetEntitiesWithComponents<Chimp::TransformComponent, Chimp::EntityIdComponent, Chimp::MeshComponent>();
-		shader.RenderWorld(view, m_gameEcs);
+		shader.RenderWorld(m_gameEcs);
 
 		rm.SetDefaultRenderTarget(std::weak_ptr<Chimp::IRenderTexture>());
 		rm.BindDefaultRenderTarget();

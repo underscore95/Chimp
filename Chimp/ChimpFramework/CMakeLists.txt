@@ -10,7 +10,7 @@ if(WIN32)
 endif()
 
 # Version
-set(CHIMP_VERSION "2.3.0")
+set(CHIMP_VERSION "2.3.1")
 
 # Chimp
 include(ChimpFrameworkSources.cmake)

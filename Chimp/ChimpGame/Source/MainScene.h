@@ -17,9 +17,6 @@ public:
 	void UnloadResources() override;
 
 private:
-	void LoadEntities();
-
-private:
 	Chimp::Engine& m_engine;
 	std::unique_ptr<Chimp::ECS> m_ecs;
 	Chimp::FreeCameraController m_controller;
