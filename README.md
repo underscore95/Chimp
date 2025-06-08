@@ -44,3 +44,6 @@ Blaboon is a Bloons TD Battles clone developed by me using Chimp v1: https://git
 - Entity inspector allowing viewing, modifying, removing, and adding components
 - Asset manager to browse game data directory in-editor
 - Asset importer to control how assets are imported (WIP! settings are only used in editor and not at runtime)
+
+## Documentation
+There is documentation on main aspects of the engine in the `docs` folder, this was written by me but ChatGPT was used for formatting and rewording the information.
